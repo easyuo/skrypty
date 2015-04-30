@@ -3,6 +3,7 @@ IgnoreItem Reset
 set %TnijCiala 1
 set %AutoGrabCiala 0
 set %UzywajAnatomii 0
+set %Lecz 1
 
 chooseskill medi
 if #skill >= 800
@@ -36,8 +37,7 @@ if findkind <> -1
 {
  set %sztyletID #FINDID
 }
-; set %SztyletID MIAXXSD ; 1st
-;set %SztyletID PVUHXDE ; 2nd
+
 set %czas_anatomia 10
 set %czas_bandarz 10
 set %hpdiff 10 ; Roznica w HP od ktorej zaczyna leczyc
@@ -116,9 +116,12 @@ if #enemyid <> N/A
 
  }
 
-if %leczBandazami = 1
+if %Lecz = 1
+{
+
+ if %leczBandazami = 1
   {
-  if %timer_bandarz < #SCNT
+   if %timer_bandarz < #SCNT
       {
        if #HITS <= #MAXHITS - %hpdiff
         {
@@ -138,16 +141,17 @@ if %leczBandazami = 1
       }
   }
 
-  if %leczMagia = 1
+ if %leczMagia = 1
+ {
+  
+  while #HITS <= #MAXHITS - %hpdiff
   {
-  
-   while #HITS <= #MAXHITS - %hpdiff
-   {
-      gosub LeczenieIVM
-      wait 10
-   }
-  
+   gosub LeczenieIVM
+   wait 10
   }
+ }
+
+}
 
 goto petla
 
