@@ -141,6 +141,9 @@ return
 sub Dispatch
 
 menu set status Idle
+
+gosub Leczenie
+
 gosub ScriptIdletime
 gosub TamingCheckSkill
 set %finditems N/A
@@ -209,9 +212,9 @@ if %finddist = N/A
 			
 			finditem #CHARID
       set %mojaReputacja #FINDREP
-      event exmsg #CHARID 3 30 Reputacja #FINDREP
+      event exmsg #CHARID 3 30 R: #FINDREP
 			
-			finditem * G_6
+			finditem * G_7
 			for %a 1 #findcnt
 			{
 				set #findindex %a
@@ -223,7 +226,7 @@ if %finddist = N/A
 				}
 			}
 
-			if %zwierzeta > 0
+			if %zwierzeta > 2
 			{
 				gosub OdstawDoStajni
 			}
@@ -427,7 +430,7 @@ finditem %tameid G_16
 if #findkind = -1
 return
 
-if #findrep = 1
+if #findrep = 1 || #findrep = 2
 {
 	event exmsg %tameid 3 30 Nie oswajam! Jest oswojony.
 	gosub TamingIgnore perm %tameid
@@ -1002,10 +1005,7 @@ if #FINDREP = 4 || #FINDREP = 6 ; 4 - szary / 6 - red
 	EVENT macro 6 ; Toggle War Mode
 	wait 1s
 }
-else
-{
-	event exmsg %tameid 3 30 TEGO NIE ZAATAKUJE! NIE MOGE! Reputacja #FINDREP
-}
+
 }
 }
 return #true
@@ -1371,16 +1371,32 @@ sub Leczenie
  return
 
 sub LeczenieOdtruj
-	event macro 15 24
+
+  if #mana < 11
+     event macro 1 0 .wypij duza mana
+
+  if #mana >= 11
+  {
+    event macro 15 24
     target 3s
     event macro 23 0
- return
-	
+  }
+
+return
+
 sub LeczenieIVM
-	event macro 15 28
-    target 3s
-    event macro 23 0
- return
+
+  if #mana < 11
+     event macro 1 0 .wypij duza mana
+     
+  if #mana >= 11
+  {
+	 event macro 15 28
+   target 3s
+   event macro 23 0
+  }
+
+return
 
 sub Lustro
 	event macro 15 35

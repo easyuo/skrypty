@@ -1,0 +1,247 @@
+InitEvents
+IgnoreItem Reset
+set %TnijCiala 1
+set %AutoGrabCiala 0
+set %UzywajAnatomii 0
+
+chooseskill medi
+if #skill >= 800
+{
+ set %leczBandazami 0
+ set %leczMagia 1
+}
+else
+{
+ set %leczBandazami 1
+ set %leczMagia 0
+}
+
+set #ltargetid RRMMVTD
+set #lobjectid RRMMVTD
+
+SET %zloto POF_
+SET %kamienie 	HVF_UVF_FVF_EVF_OVF_VUF_GVF_RVF_BVF_VVF_NVF_ZVF_EVF_HVF_BVF_RVF_ZVF_GVF_NVF_UVF_FXS_GXS_ZWS_AXS_TWS_WWS_VWS_UWS_VVF_CWL_LWL_UJG_IJG
+SET %ziola KUF_JUF_KZF_JZF_MZF_WZF_RZF_SZF_DUF_TZF_UZF_YZF_IUF_
+SET %scrolls AUL_BUL_cul_dul_EUL_FUL_GUL_hul_iul_JUL_KUL_LUL_MUL_nul_oul_PUL_QUL_RUL_SUL_tul_UUL_vul_wul_XUL_YUL_zul_avl_gvl_fvl_ivl_hvl_cvl_NTL_otl_ptl_qtl_rtl_stl_ttl_utl_VTL_wtl_XTL_YTL_ZTL_qxl_pxl_zxl_nxl_wxl_vxl_yxl_xxl_zfj_byl_cyl_dyl_eyl_fyl_gyl_hyl_iyl_jyl_kyl_kym_pym_sym_tym_wym_uym_
+SET %arrowsbolts RWF_LNK_FKF_
+SET %solenloot GMF_OKF_TTO_IJG_
+SET %jukaloot JSL_USL_WOH_YWL_
+SET %paragonloot IIF_IKF_BUD_HIF_
+;Resource loot lists
+SET %feather VLK
+
+;----------TU ZMIENIAJ-------------------
+finditem TSF C_ , #BACKPACKID
+if findkind <> -1
+{
+ set %sztyletID #FINDID
+}
+; set %SztyletID MIAXXSD ; 1st
+;set %SztyletID PVUHXDE ; 2nd
+set %czas_anatomia 10
+set %czas_bandarz 10
+set %hpdiff 10 ; Roznica w HP od ktorej zaczyna leczyc
+;----------------------------------------
+
+set %min_hp #MAXHITS - %hpdiff
+set %timer_bandarz #SCNT
+set %timer_anatomia #SCNT
+
+Event SysMessage [AA] Auto Anatomia + autobandaz.....ver 1.0.5 (modyfikacje: Krowa)
+petla:
+ if yes in #charghost
+    {
+       Event SysMessage U... padlem a niech to szlag!
+       wait 5s
+    }
+ if H in #charstatus
+    goto petla
+
+FINDITEM YFM G_2
+IF #FINDCNT > 0
+ {
+
+  if %AutoGrabCiala = 1
+   {
+     event macro 1 0 .grab zloto   ; POF
+     event macro 1 0 .grab ziola  ; POF
+     event macro 1 0 .grab kamienie
+     event macro 1 0 .grab ustawione
+     wait 1s
+   }
+
+  if #enemyID = N/A
+  {
+   if %TnijCiala = 1
+   {
+    set #lobjectid %SztyletID ; sztylet w plecaku
+    Event SysMessage Tne ciala
+    event Macro 17 ; Last Object
+    target
+    set #ltargetid #findID
+    set #LTargetKind 1
+    event Macro 22  ; Last Target
+   }
+   
+   gosub ZbierzRzeczy
+   
+  }
+ }
+}
+
+if #enemyid <> N/A
+ {
+;      event exmsg #enemyID 3 30 Atack
+      if %UzywajAnatomii = 1
+       {
+       if %timer_anatomia <= #SCNT
+           {
+              set %timer_anatomia #SCNT + %czas_anatomia
+              Event Macro 13 1 ; Anatomia 13 1 / Eval 13 16
+              target
+              set #ltargetid #enemyid
+              event Macro 22
+          }
+       }
+
+ }
+ else
+ {
+
+  while C in #CHARSTATUS && #HITS >= #MAXHITS - %hpdiff
+   {
+    gosub LeczenieOdtruj
+    wait 10
+   }
+
+ }
+
+if %leczBandazami = 1
+  {
+  if %timer_bandarz < #SCNT
+      {
+       if #HITS <= #MAXHITS - %hpdiff
+        {
+            FindItem ZLF C
+            if #findkind = -1
+            {
+               Event SysMessage Skaczyly sie bandaze!
+               wait 1s
+            }
+
+            if #findkind <> -1
+            {
+               event macro 1 0 .lecz
+               wait 2s
+            }
+        }
+      }
+  }
+
+  if %leczMagia = 1
+  {
+  
+   while #HITS <= #MAXHITS - %hpdiff
+   {
+      gosub LeczenieIVM
+      wait 10
+   }
+  
+  }
+
+goto petla
+
+sub LeczenieOdtruj
+
+  if #mana < 11
+     event macro 1 0 .wypij duza mana
+
+    event macro 15 24
+    target 3s
+    event macro 23 0
+
+return
+
+sub LeczenieIVM
+
+  if #mana < 11
+     event macro 1 0 .wypij duza mana
+     
+	event macro 15 28
+    target 3s
+    event macro 23 0
+
+return
+
+
+sub ZbierzRzeczy
+
+set %widzeZiola 1
+set %widzeKamienie 1
+set %widzeZloto 1
+set %widzeUstawione 1
+
+while %widzeZiola = 1 || %widzeKamienie = 1 || %widzeZloto = 1 || %widzeUstawione = 1
+{
+
+; Zloto
+FINDITEM POF_RZF_XUF G_3
+IF #FINDCNT > 0
+{
+event macro 1 0 .grab zloto   ; POF
+wait 1s
+}
+else
+	set %widzeZloto 0
+
+; Kamienie
+FINDITEM %kamienie G_3
+IF #FINDCNT > 0
+{
+event macro 1 0 .grab kamienie
+wait 1s
+}
+else
+	set %widzeKamienie 0
+
+; Ziola
+FINDITEM %ziola G_3
+IF #FINDCNT > 0
+{
+event macro 1 0 .grab ziola   ; RZF
+wait 1s
+}
+else
+	set %widzeZiola 0
+
+; Ustawione
+; EEG - futra
+; YLI - smocze udka
+; GPF - mana
+FINDITEM VLK_VRD_PUD_EEG_YLI_GPF G_3
+IF #FINDCNT > 0
+{
+event macro 1 0 .grab ustawione
+wait 1s
+}
+else
+	set %widzeUstawione 0
+}
+
+return
+
+sub Bless
+
+return
+
+
+sub Lustro
+
+  if #mana < 15
+     event macro 1 0 .wypij duza mana
+
+	event macro 15 35
+	wait 3s
+	event macro 23 0
+	
+ return
