@@ -206,11 +206,16 @@ if %finddist = N/A
 		{
 			ignoreitem reset
 			set %zwierzeta 0
+			
+			finditem #CHARID
+      set %mojaReputacja #FINDREP
+      event exmsg #CHARID 3 30 Reputacja #FINDREP
+			
 			finditem * G_6
 			for %a 1 #findcnt
 			{
 				set #findindex %a
-				if #findrep = 1 && #findid <> #charid
+				if #findrep = %mojaReputacja && #findid <> #charid
 				{
 					set %zwierzeta %zwierzeta + 1
 					event exmsg #findid 3 30 %zwierzeta
@@ -381,7 +386,7 @@ if %tameskill >= 796 && %tameskill < 820
 
 set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 if %tameskill >= 820
-set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_
+set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
 gosub TamingIgnore gain
 return
 
