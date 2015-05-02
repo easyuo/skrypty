@@ -4,6 +4,10 @@ set %TnijCiala 1
 set %AutoGrabCiala 0
 set %UzywajAnatomii 0
 set %Lecz 1
+set %PijZolte 1
+
+set %PijZoltePonizej 50
+set %hpdiff 20 ; Roznica w HP od ktorej zaczyna leczyc
 
 chooseskill medi
 if #skill >= 800
@@ -40,10 +44,9 @@ if findkind <> -1
 
 set %czas_anatomia 10
 set %czas_bandarz 10
-set %hpdiff 10 ; Roznica w HP od ktorej zaczyna leczyc
+
 ;----------------------------------------
 
-set %min_hp #MAXHITS - %hpdiff
 set %timer_bandarz #SCNT
 set %timer_anatomia #SCNT
 
@@ -83,8 +86,11 @@ IF #FINDCNT > 0
     event Macro 22  ; Last Target
    }
    
-   gosub ZbierzRzeczy
-   
+   if %AutoGrabCiala = 1
+   {
+    gosub ZbierzRzeczy
+   }
+
   }
  }
 }
@@ -118,6 +124,12 @@ if #enemyid <> N/A
 
 if %Lecz = 1
 {
+
+ if %PijZolte = 1
+ {
+  if #hits < %PijZoltePonizej
+    event macro 1 0 .wypij duza leczenia
+ }
 
  if %leczBandazami = 1
   {
@@ -177,7 +189,6 @@ sub LeczenieIVM
 
 return
 
-
 sub ZbierzRzeczy
 
 set %widzeZiola 1
@@ -222,7 +233,7 @@ else
 ; EEG - futra
 ; YLI - smocze udka
 ; GPF - mana
-FINDITEM VLK_VRD_PUD_EEG_YLI_GPF G_3
+FINDITEM VLK_VRD_PUD_YLI_GPF G_3
 IF #FINDCNT > 0
 {
 event macro 1 0 .grab ustawione

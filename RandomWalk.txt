@@ -1,0 +1,128 @@
+;==================================
+; Script Name: Random, one tile-walker
+; Author: Aahz
+; Version: 1.0
+; Client Tested with: 4.0.2.a
+; EUO version tested with: 1.42.0081
+; Shard OSI / FS: OSI
+; Revision Date:
+; Public Release: May 20, 2004
+; Purpose: Walks one random tile every time the RandoMmove sub is called,
+;			Can also track tiles that it has moved to, and avoid them, as well
+;			as track which tiles block movement, to avoid trying to move to
+;			them again.
+;==================================
+;			Instructions:
+;
+;			If you want it not to backtrack, to keep a record of what tiles it has gone to
+;			and to avoid going back to them, set %backtrack to #false.
+;			If this feature is on, and there are no tiles left to move to, the list of tiles will
+;			be reset.
+;
+;			If you want it to keep a record of those tiles that block movement, and to not
+;			try them the next time it tries to move, set %ignoreblocked to #true
+;			Similarly, if there are no tiles left to move to, the list will be reset.
+;
+;			<Note>  The move command will not work if there is anything typed in the
+;					   in-game chat bar (or whatever it's called). This includes spaces!
+;					   If the script does not seem to be working, hit backspace until
+;					   your chat bar is clear.
+;
+;==================================
+set %backtrack #false
+set %ignoreblocked #true
+;==================================
+if ! %backtrack
+	set %currentposvar _ , #charposx , #charposy , _
+set %ignoreposvar
+
+
+loop:
+gosub randommove
+goto loop
+
+
+
+;==================================
+;Sub RandomMove
+;==================================
+sub randommove
+resetmoveloop:
+gosub setmovevar
+if ! %backtrack
+	{
+	if %movingposvar in %currentposvar
+		{
+		set %tilecounter %tilecounter + 1
+		if %tilecounter > 15
+			set %currentposvar
+		goto resetmoveloop
+		}
+	}
+if %ignoreblocked
+	{
+	if %movingposvar in %ignoreposvar
+		{
+		set %tilecounter2 %tilecounter2 + 1
+		if %tilecounter2 > 15
+			set %ignoreposvar
+		goto resetmoveloop
+		}
+	set %13x #charposx
+	set %13y #charposy
+	}
+move %mx %my 0 1s
+if %ignoreblocked
+	{
+	if #charposx = %13x && #charposy = %13y
+		{
+		set %ignoreposvar %ignoreposvar , %movingposvar , _
+		goto resetmoveloop
+		}
+	set %tilecounter2
+	}
+if ! %backtrack
+	{
+	set %tilecounter
+	set %currentposvar %currentposvar , #charposx , #charposy , _
+	}
+return
+
+
+sub setmovevar
+setmovevarloop:
+
+set %10 #random - 1
+set %10 %10 / 333
+if %10 = 0
+	set %mx #charposx + 1
+if %10 = 1
+	set %mx #charposx - 1
+if %10 = 2
+	{
+	set %11 #true
+	set %mx #charposx
+	}
+
+set %10 #random - 1
+set %10 %10 / 333
+if %10 = 0
+	set %my #charposy + 1
+if %10 = 1
+	set %my #charposy - 1
+if %10 = 2
+	{
+	set %12 #true
+	set %my #charposy
+	}
+
+if %11 && %12
+	{
+	set %11 #false
+	set %12 #false
+	goto setmovevarloop
+	}
+set %movingposvar %mx , %my
+return
+
+
