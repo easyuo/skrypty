@@ -1,8 +1,18 @@
+;=========================================
+; Script Name: Automatyczne wyladowanie stuffu
+; Author: Krowa
+; Version: 1.0
+; Client Tested with: 4.0.9b
+; EUO version tested with: 1.5.1.285
+; Shard OSI / FS: OSI Tested Only
+; Revision Date: 5/13/2015
+; Public Release: 5/13/2015
+
 set %skrzynia_id DBZMZDE
 set %sprzedawca_id EKMJLD
 
 ; VLK - piora
-set %przedmioty_do_skrzyni VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_
+set %przedmioty_do_skrzyni VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
 
 ; POF - zloto
 set %przedmioty_do_sprzedawcy POF_
@@ -14,6 +24,10 @@ repeat
   onhotkey %hotkey
     gosub organizer
   sleep 1
+  
+  gosub organizer
+  sleep 1
+  
 until #false
 
 sub organizer
@@ -26,12 +40,12 @@ sub organizer
  if #FINDCNT > 0
  {
    gosub przeniesPrzedmioty %przedmioty_do_skrzyni #BACKPACKID %skrzynia_id
-   wait 2s
+   wait 5s
  }
 
 return
 
-; przeniesPrzedmioty %przedmioty %z_pojemnika %do_pojemnika
+; przeniesPrzedmioty %przedmioty %pojemnikZrodlowy %pojemnikDocelowy
 sub przeniesPrzedmioty
 
   set %przedmioty %1
@@ -42,21 +56,16 @@ sub przeniesPrzedmioty
 
   if #FINDCNT > 0
   {
-    event exmsg %3 3 30 Przenosze
+    event exmsg %pojemnikDocelowy 3 30 Przenosze
     
     for #findindex 1 #findcnt
     {
-     event exmsg #CHARID 3 30 Findindex: #FINDINDEX z #FINDCNT
-     event exmsg #CHARID 3 30 przeniesPrzedmiot #findid %3 #findstack
      gosub przeniesPrzedmiot #findid %pojemnikDocelowy #findstack
     }
 
-    event SysMessage Done!
+    event SysMessage Koniec!
   }
-  else
-  {
-;    event SysMessage Nic nie przenioslem
-  }
+
 return
 
 sub przeniesPrzedmiot
