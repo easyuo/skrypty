@@ -5,9 +5,9 @@ set %AutoGrabCiala 0
 set %UzywajAnatomii 0
 set %Lecz 1
 set %PijZolte 1
-
 set %PijZoltePonizej 50
-set %hpdiff 20 ; Roznica w HP od ktorej zaczyna leczyc
+
+set %hpdiff 10 ; Roznica w HP od ktorej zaczyna leczyc
 
 chooseskill medi
 if #skill >= 800
@@ -78,7 +78,6 @@ IF #FINDCNT > 0
    if %TnijCiala = 1
    {
     set #lobjectid %SztyletID ; sztylet w plecaku
-    Event SysMessage Tne ciala
     event Macro 17 ; Last Object
     target
     set #ltargetid #findID
