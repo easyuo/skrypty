@@ -12,7 +12,7 @@ set %skrzynia_id DBZMZDE
 set %sprzedawca_id EKMJLD
 
 ; VLK - piora
-set %przedmioty_do_skrzyni VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
+set %przedmioty_do_skrzyni UWS_QOF_UTO_VLF_XUF_VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
 
 ; POF - zloto
 set %przedmioty_do_sprzedawcy POF_
@@ -38,11 +38,12 @@ sub organizer
 
  finditem %skrzynia_id G_1
  if #FINDCNT > 0
- {
+  {
    gosub przeniesPrzedmioty %przedmioty_do_skrzyni #BACKPACKID %skrzynia_id
-   wait 5s
- }
+   wait 10s
+  }
 
+ 
 return
 
 ; przeniesPrzedmioty %przedmioty %pojemnikZrodlowy %pojemnikDocelowy

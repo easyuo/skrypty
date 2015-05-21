@@ -1,0 +1,72 @@
+  ; BlaZin' Doorman
+; by BlaZe Buddle of Excelsior's ?ud ?rothers
+; v1.5 Completed 1/8/11
+;;;;; ;;;;; ;;;;; ;;;;; ;;;;;
+set %delay 15 ;-The pause between each opening attempt, 20 = 1 second
+              ; default is 15 (.75s), increase this if its a laggy day
+set %range 2  ;-The distance from a door to attempt opening
+              ; default (and max) is 2
+;;;;; ;;;;; ;;;;; ;;;;; ;;;;;
+set %doors UBD_SBD_GCD_ECD_MBD_WBD_YBD_KBD_EDD_YCD_CDD_SCD_WCD_QCD_KCD_UCD_KIB_IIB_YHB_WHB_AIB_CIB_OHB_
++QHB_IFB_GFB_WEB_UEB_OEB_MEB_AFB_YEB_RUN_FUN_CEB_AEB_OIB_MIB_QIB_SIB_EIB_GIB_SEB_QEB_GEB_EEB_IEB_KEB_
++WDB_YDB_TFD_VFD_XFD_RFD_GFD_IFD_UED_WED_BOC_NNC_PNC_ZNC_JNC_LNC_XMC_ZMC_BRC_DRC_PQC_RQC_BQC_ZPC_NQC_
++LQC_FBD_HBD_BBD_DBD_QFD_OFD_CFD_EFD_XQC_ZQC_LMC_NMC_FNC_HNC_RNC_TNC_JOC_HOC_XNC_VNC_VQC_TQC_JQC_HQC_
++VPC_XPC_JPC_LPC_RPC_TPC_DQC_FQC_LAM_BAM_NAM_ZZL_HAM_JAM_TAM_VAM_ZOC_XOC_PJC_NJC_RJC_TJC_FJC_HJC_UXS_
++SXS_DDR_WXS_NTU_FOU_JOU_DOU_LTU_PTU_JTU_BUU_LUU_ZTU_FUU_DUU_XTU_RTU_TTU_VTU_MBR_WBR_PCR_OXS_VCR_QXS_
++RCR_MXS_BDR_KXS_YXS_XCR_AHB_IHB_TMC_VMC_HMC_JMC_RMC_PMC_PAQ_RAQ_DBQ_BBQ_CXS_MBS_EXS_VAQ_TAQ_JAQ_HAQ_
++ZAQ_XAQ_LBQ_JBQ_GBS_GHB_LOP_BNC_DNC_FPC_TOC_DPC_BPC_NPC_PPC_KHB_JCB_SUX_DUX_GWX_FFD_AKG_OXD_RXD_
+
+; MHB - jaszczury wydmowe / opancerzne smomki
+
+set #scnt 0
+;;;;; ;;;;; ;;;;; ;;;;; ;;;;;
+loop:
+gosub XYcheck
+  if #scnt >= 3
+    {
+    ignoreitem reset
+    set #scnt 0
+    }
+  finditem %doors G_ , %range
+  if #findkind = -1
+    goto loop
+  if #findZ > ( #charPosZ + 7 ) || #findZ < ( #charPosZ - 7 ) || #findID in %doors || #findID = OVNPKMD
+    {
+    ignoreitem #findid
+    goto loop
+    }
+  set #lobjectid #findid
+  event macro 17
+  wait %delay
+goto loop
+;;;;; ;;;;; ;;;;; ;;;;; ;;;;;
+sub XYcheck
+  if #charPosX >= 2368 && #charPosX <= 2374 && #charPosY >= 819 && #charPosY <= 825
+    {
+    if #cursKind = 0
+      event macro 1 0 Remember
+    if #cursKind = 1
+      event macro 1 0 Forget
+    wait 3s
+    }
+  if #charPosX >= 680 && #charPosX <= 712 && #charPosY >= 2230 && #charPosY <= 2245 && #cursKind <= 1
+    {
+    event macro 1 0 Cross
+    wait 3s
+    }
+  if #charPosX >= 4542 && #charPosX <= 4548 && #charPosY >= 848 && #charPosY <= 855 && #cursKind <= 1
+    {
+    event macro 1 0 Recdu
+    wait 3s
+    }
+  if #charPosX >= 5732 && #charPosX <= 5738 && #charPosY >= 3192 && #charPosY <= 3200 && #cursKind <= 1
+    {
+    event macro 1 0 Recsu
+    wait 3s
+    }
+  if #charPosX >= 103 && #charPosX <= 108 && #charPosY >= 1628 && #charPosY <= 1630 && #cursKind = 3
+    {
+    event macro 1 0 Odkleni Vrata
+    wait 3s
+    }
+return

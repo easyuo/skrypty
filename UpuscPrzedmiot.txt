@@ -1,0 +1,31 @@
+set %upuscID 0
+set %coUpuszczac DWJ_ENK_NPF_TVH_PMH
+ignoreItem reset *
+
+loop:
+
+FindItem %coUpuszczac C_ , #BackPackID
+ if #FindKind <> -1
+ {
+  set %upuscID #FindID
+  gosub upusc
+ }
+
+goto loop
+
+sub upusc
+ event macro 1 0 .upusc
+ target
+ set #LTargetID %upuscID
+ set #LTargetKind 1
+ event macro 22 0
+return
+
+; NPF - kilof
+; ENK - sztabki
+; DWJ - ruda
+; RVH - mapy
+
+; 1lvl    995   mapa wygladajaca na niedawno naszkicowana
+; 2lvl    444   pozolka mapa
+

@@ -1,11 +1,11 @@
 InitEvents
 IgnoreItem Reset
-set %TnijCiala 1
+set %TnijCiala 0
 set %AutoGrabCiala 0
 set %UzywajAnatomii 0
 set %Lecz 1
 set %PijZolte 1
-set %PijZoltePonizej 50
+set %PijZoltePonizej 60
 
 set %hpdiff 10 ; Roznica w HP od ktorej zaczyna leczyc
 

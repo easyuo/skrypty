@@ -1,0 +1,6 @@
+if #CONTSIZEX = 330 && #CONTSIZEY = 300
+{
+ msg 1
+ click 170 260
+ wait 1s
+}
