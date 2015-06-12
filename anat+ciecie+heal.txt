@@ -7,7 +7,7 @@ set %Lecz 1
 set %PijZolte 1
 set %PijZoltePonizej 60
 
-set %hpdiff 10 ; Roznica w HP od ktorej zaczyna leczyc
+set %hpdiff 1 ; Roznica w HP od ktorej zaczyna leczyc
 
 chooseskill medi
 if #skill >= 800

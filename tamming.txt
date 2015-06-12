@@ -1395,7 +1395,7 @@ sub LeczenieIVM
    target 3s
    event macro 23 0
   }
-
+                                            `
 return
 
 sub Lustro

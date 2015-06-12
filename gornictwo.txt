@@ -1,0 +1,522 @@
+; mining beta ;>
+
+; kilof = NPF
+; ruda = DWJ
+; wlocznia = LTF
+; mapa = RVH
+; czerwone butle - ZUF
+
+set %HID #SCNT
+set %plyta HSH_MSH
+
+; POZYCJE DO KOPANIA W MINOC - START przy zjezdzie winy !
+
+set %X1 2587
+set %Y1 458
+set %Z1 5
+
+
+; KONIEC POZYCJI !!!
+
+gosub GetBackpackID
+set %kop 0
+set %starttime #SCNT
+set %lasttime %starttime
+set %timeout 10
+set %gleba 0 ; Wyrzucac rude na glebe? 1 = tak inna wartosc = nie
+set %przetapiaj 0 ; Przetapia, jezeli stoisz przy piecu
+
+set %teleportuj 0
+set %zbierajRude 1
+
+set %PozycjaPostaci 1 ; Do Recalla
+ignoreitem #charid 2 ; Do evala, ignorowanie Samego Siebie do EVAL INT
+
+; Wyrzucanie niepotrzebnych map
+set %mapy 1
+set %mapaID RVH
+set %mapaKoloryDoUpuszczenia 995_444 ; Kolory map do upuszczenia
+
+loop:
+OnHotKey F11
+   gosub fight
+FindItem %plyta C_ , #CharID
+if #FindKind <> -1
+  {
+  exevent drag #FindID
+  exevent dropc %BackPackID
+  goto loop
+  }
+
+if #TargCurs = 1
+   key ESC
+if #SCNT > %lasttime + 200
+   {
+   set %lasttime #SCNT
+   set %time #SCNT - %starttime
+   set %time %time / 60
+   event ExMsg #CharID 0 0 Kopiesz juz %time minut! :(
+   }
+if #EnemyID <> N/A
+   {
+   FindItem %plyta C_ , %BackPackID
+   repeat
+         {
+         exevent drag #FindID
+         exevent droppd
+         wait 10
+         FindItem %plyta C_ , %BackPackID
+         }
+   until #FindKind = -1
+   FindItem LTF_AUH_SMH C_ , %BackPackID
+   if #FindKind = -1
+      {
+      msg Myslisz kreaturo ze sobie z toba straze nie poradza??!!!! STRAZE !$
+      wait 2s
+      goto loop
+      }
+   set %bron #FindID
+   exevent drag %kilof
+   exevent dropc %BackPackID
+   while #LLifetedKind = 1
+         {
+         }
+   wait 15
+   set %kilof N/A
+   exevent drag %bron
+   exevent droppd
+   while #LLifetedKind = 1
+         {
+         }
+   wait 15
+   while #EnemyID <> N/A
+         {
+         wait 5
+         }
+   exevent drag %bron
+   exevent dropc %BackPackID
+   goto loop
+   }
+FindItem NPF C_ , #CharID
+if #FindKind = -1
+   gosub znajdzkilof
+else
+   set %kilof #FindID
+if %plecak = N/A
+   gosub znajdzplecak
+set #LObjectID %kilof
+set %_JIndex #JIndex
+event macro 17 0
+target 5s
+if %kop = 0
+{
+   set #ltargetx #charposx
+   set #ltargety #charposy
+}
+if %kop = 1
+{
+   set #ltargetx #charposx
+   set #ltargety #charposy + 1
+}
+if %kop = 2
+{
+   set #ltargetx #charposx - 1
+   set #ltargety #charposy
+}
+if %kop = 3
+{
+   set #ltargetx #charposx
+   set #ltargety #charposy - 1
+}
+if %kop = 4
+{
+   set #ltargetx #charposx + 1
+   set #ltargety #charposy
+}
+if %kop = 5
+{
+   set #ltargetx #charposx + 1
+   set #ltargety #charposy + 1
+}
+if %kop = 6
+{
+   set #ltargetx #charposx
+   set #ltargety #charposy + 2
+}
+if %kop = 7
+{
+   set #ltargetx #charposx - 1
+   set #ltargety #charposy + 1
+}
+if %kop = 8
+{
+   set #ltargetx #charposx - 2
+   set #ltargety #charposy
+}
+if %kop = 9
+{
+   set #ltargetx #charposx - 1
+   set #ltargety #charposy - 1
+}
+if %kop = 10
+{
+   set #ltargetx #charposx
+   set #ltargety #charposy - 2
+}
+if %kop = 11
+{
+   set #ltargetx #charposx + 1
+   set #ltargety #charposy - 1
+}
+if %kop = 12
+{
+   set #ltargetx #charposx + 2
+   set #ltargety #charposy
+}
+if %kop = 13
+{
+   set #ltargetx #charposx + 2
+   set #ltargety #charposy + 1
+}
+if %kop = 14
+{
+   set #ltargetx #charposx + 2
+   set #ltargety #charposy + 2
+}
+if %kop = 15
+{
+   set #ltargetx #charposx + 1
+   set #ltargety #charposy + 2
+}
+if %kop = 16
+{
+   set #ltargetx #charposx - 1
+   set #ltargety #charposy + 2
+}
+if %kop = 17
+{
+   set #ltargetx #charposx - 2
+   set #ltargety #charposy + 2
+}
+if %kop = 18
+{
+   set #ltargetx #charposx - 2
+   set #ltargety #charposy + 1
+}
+if %kop = 19
+{
+   set #ltargetx #charposx - 2
+   set #ltargety #charposy - 1
+}
+if %kop = 20
+{
+   set #ltargetx #charposx - 2
+   set #ltargety #charposy - 2
+}
+if %kop = 21
+{
+   set #ltargetx #charposx - 1
+   set #ltargety #charposy - 2
+}
+if %kop = 22
+{
+   set #ltargetx #charposx + 1
+   set #ltargety #charposy - 2
+}
+if %kop = 23
+{
+   set #ltargetx #charposx + 2
+   set #ltargety #charposy - 2
+}
+if %kop = 24
+{
+   set #ltargetx #charposx + 2
+   set #ltargety #charposy - 1
+}
+set #LTargetKind 2
+event macro 22 0
+
+; ===== Zbieranie rudy z ziemii ========
+if %zbierajRude = 1
+{
+      FindItem DWJ G_2
+       for #FindIndex 1 #FindCNT
+           {
+           exevent drag #FindID #FindStack
+           exevent dropc %plecak
+           }
+}
+; ===== Zbieranie rudy z ziemii ========
+; EVALLLL
+
+            FindItem IS_HS G_8
+            if #findkind = -1 2
+            {
+              ignoreitem reset 1
+            }
+            else
+            {
+            set #ltargetid #findid
+            set #ltargetkind 1
+            ignoreitem #findid 1
+            event macro 13 1 ; 13 16 - EVAL || 13 1 - ANATOMIA
+            target 10
+            event macro 22 0
+
+            }
+; EVALLLL
+;                                 2             3        4                            5                 6               7         8                 9       10
+gosub ScanJournal %_JIndex Nie_udalo_ci_sie Wykopales Nie_ma_tu_wiecej_rudy. Wybrane_miejsce_jest doing_something Nie_mozesz Musisz_uzyc_lopaty already
+if #Result = 2
+   wait 5
+   event sysmessage Resoult: #Result : %_JIndex : Weight: #weight
+if #Result = 3
+   {
+   event sysmessage Resoult: #Result : %_JIndex : Weight: #weight
+
+; Mapy
+
+   if %mapy = 1 ; Wyrzucanie niepotrzebnych map na glebe
+         {
+           FindItem %mapaID C_ , #BackPackID
+           for #FindIndex 1 #FindCNT
+           {
+            if #FindCol in %mapaKoloryDoUpuszczenia
+            {
+             event sysmessage Upuszczam niepotrzebna mape.
+             set %upuscID #FindID
+             gosub upusc
+            }
+           }
+         }
+
+; Ruda
+      FindItem DWJ C_ , %BackPackID
+      if #FindKind <> -1
+      {
+         if %gleba = 1   ; Wyrzucanie rudy na glebe
+         {
+          set %upuscID #FindID
+          gosub upusc
+         }
+
+         if %przetapiaj = 1
+         {
+            set #lObjectID #FindID
+            event Macro 17
+         }
+
+         if %plecak <> %BackPackID
+         {
+         FindItem DWJ C_ , %BackPackID
+          for #FindIndex 1 #FindCNT
+           {
+           exevent drag #FindID #FindStack
+           exevent dropc %plecak
+           }
+         }
+      }
+   }
+if #Result = 4
+   gosub ZmienMiejsceKopania
+if #Result = 5
+   wait 1
+if #Result = 6
+   wait 1
+if #Result = 7
+   gosub ZmienMiejsceKopania
+if #Result = 8
+   gosub ZmienMiejsceKopania
+if #Result = 9
+   wait 3
+if #Result = TIMEOUT
+   goto loop
+goto loop
+
+; ================================ SUBs ========================
+sub fight
+if #FindKind <> -1
+   {
+   exevent drag %plecak
+   exevent dropg #CharPosX #CharPosY #CharPosZ
+   FindItem %plyta C_ , %BackPackID
+   repeat
+         {
+         exevent drag #FindID
+         exevent droppd
+         wait 10
+         FindItem %plyta C_ , %BackPackID
+         }
+   until #FindKind = -1
+   FindItem LTF_AUH_SMH C_ , %BackPackID
+   set %bron #FindID
+   exevent drag %kilof
+   exevent dropc %BackPackID
+   set %kilof N/A
+   exevent drag %bron
+   exevent droppd
+   pause
+   exevent drag %bron
+   exevent dropc %BackPackID
+   goto loop
+   }
+return
+
+sub znajdzkilof
+FindItem NPF C
+if #FindKind = -1
+   {
+   display ok Nie masz kilofow.
+   halt
+   }
+set %kilof #FindID
+exevent drag %kilof
+exevent droppd
+wait 2s
+return
+
+
+sub znajdzplecak
+FindItem ZJF C_ , %BackPackID
+if #FindKind = -1
+   {
+   set %plecak %BackPackID ; Jezeli nie znalazl plecaka w BackPacku ustawia BackPack jako plecak (czyli ruda laduje w glownym)
+   event sysmessage Nie znalazlem plecaka. Ruda laduje w glownym.
+   return
+   }
+set %plecak #FindID
+event sysmessage Plecak w ktorym bedzie ruda: %plecak
+return
+
+; Szukanie plecaka
+sub GetBackPackID
+FindItem ZJF C_ , #CharID
+if #FindKind = -1
+   {
+   display OK Nie mozna znalesc plecaka. Prawdopodobnie nie masz widocznego Paperdolla. Otworz paperdoll i wlacz skrypt ponownie.
+   halt
+   }
+else
+   {
+   event sysmessage Twoj plecak: #FindID
+   set %BackpackID #FindID
+   return
+   }
+return
+
+sub upusc
+ event macro 1 0 .upusc
+ target
+ set #LTargetID %upuscID
+ set #LTargetKind 1 ; http://wiki.easyuo.com/index.php?title=LTargetKind
+ event macro 22 0 ;LastTarget
+return
+
+sub ScanJournal
+set %__JIndex %1
+set %_timeout #SCNT
+ScanLoop:
+set %x %timeout + %_timeout
+if #SCNT > %_timeout + %timeout
+   return TIMEOUT
+if #JIndex > %__JIndex
+   {
+   set %__JIndex %__JIndex + 1
+   ScanJournal %__JIndex
+   for %i 2 %0
+       {
+       if % . %i in #journal
+          return %i
+       }
+   }
+goto ScanLoop
+return
+
+
+; --------------------------------------------------------------------------
+sub TeleportPostaci
+if %PozycjaPostaci = 1
+{
+ set #ltargetx %X1
+ set #ltargety %Y1
+ set #ltargetz %Z1
+}
+
+if %PozycjaPostaci = 2
+{
+ set #ltargetx %X2
+ set #ltargety %Y2
+ set #ltargetz %Z2
+}
+
+if %PozycjaPostaci = 3
+{
+ set #ltargetx %X3
+ set #ltargety %Y3
+ set #ltargetz %Z3
+}
+
+if %PozycjaPostaci = 4
+{
+ set #ltargetx %X4
+ set #ltargety %Y4
+ set #ltargetz %Z4
+}
+
+if %PozycjaPostaci = 5
+{
+ set #ltargetx %X5
+ set #ltargety %Y5
+ set #ltargetz %Z5
+}
+
+if %PozycjaPostaci = 6
+{
+ set #ltargetx %X6
+ set #ltargety %Y6
+ set #ltargetz %Z6
+}
+
+if %PozycjaPostaci = 7
+{
+ set #ltargetx %X7
+ set #ltargety %Y7
+ set #ltargetz %Z7
+}
+
+;event sysmessage Zmieniam lokalizacje postaci (Teleport)
+event sysmessage Przenosze do # %PozycjaPostaci : X: #ltargetx Y: #ltargety Z: #ltargetz
+;   while #LTargetX = #CharPosX && #LTargetY = #CharPosY
+ ;        {
+         gosub LTargetRecall
+         wait 5
+;         }
+ set %PozycjaPostaci %PozycjaPostaci + 1
+ if %PozycjaPostaci = 8
+ {
+  set %PozycjaPostaci 1
+ }
+return
+
+sub ZmienMiejsceKopania
+    if %kop = 24
+     {
+      msg Myjcie sie dziewczyny, nie znacie dnia ani godziny! $
+      gosub TeleportPostaci
+      set %kop 0
+     }
+    else
+     {
+      set %kop %kop + 1
+      event sysmessage Miejsce kopania: %kop
+     }
+return
+
+sub LTargetRecall
+ event macro 15     21  ; Teleport
+ target
+ set #LTargetKind 3
+ event macro 22
+return
+
+

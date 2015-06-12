@@ -1,0 +1,478 @@
+;-----------------------
+;Auto Majster by Krowa |
+
+initevents
+;/------ZMIENNE-------/
+set %JEDZ 1
+set %PRZENOS 0
+set %PRZETAPIAJ 0
+set %coUpuszczac CNF_IEG_XCG_XRD_RQF_WSF_KAG_ENK
+;/--------------------/
+set %zarcie HND_END_QQD_QUD_YRD
+set %zrobione 0
+set %zmienione 0
+set %przetopione 0
+set %licznik 0
+set %czas 0
+
+set %narzedzia_majstra GTL
+set %pojemnik_z_narzedziami VAZIVCE
+set %pojemnik_ze_sztabami LLHKNCE
+
+start:
+if %PRZENOS = 1
+   gosub WskazPojemnik
+
+poczatek:
+if %PRZENOS = 1
+   gosub PoliczItemy
+
+ignoreitem reset 1
+
+chooseskill Blac
+if ( %PRZETAPIAJ = 1 && #skill >= 700 )
+    gosub ZnajdzSzczypce
+else
+{
+    if ( %PRZETAPIAJ = 1 )
+     {
+      set %PRZETAPIAJ 0
+      event sysmessage Przetapiac mozna od 70. Przetapianie wylaczone ...
+     }
+}
+if %JEDZ = 1
+   gosub SprawdzGlod
+
+FindItem %narzedzia_majstra C_ , #BackpackID
+event sysmessage Szukam narzedzi
+
+if #FindKind = -1
+{
+   event sysmessage Nie znalazlem narzedzi w plecaku. Szukam w pojemniku z narzedziami.
+   gosub ZnajdzNarzedzia
+   gosub UzyjNarzedzi
+}
+else
+{
+   event sysmessage Znalazlem narzedzia w plecaku.
+   set %mlotek #FindID
+   gosub UzyjNarzedzi
+}
+
+gosub ZnajdzMaterial
+gosub KliknijWMaterial
+
+if %przetopione <> 1
+ ;  gosub ZmienOpcje
+
+if %PRZENOS = 1
+   gosub IgnorujPrzedmioty
+   
+; Wybranie co mam robic. W pêtli bedzie kliknie na zrobienie ostatniego przedmiotu
+gosub WybierzCoRobic
+
+loop:
+ ; Skanowanie Journala
+ ; Jezeli narzedzie jest cale robimy jeszcze raz
+ ; Jezeli narzedzie sie popsulo - wybieramy na nowo
+ 
+ if 1 = 0
+ {
+ gosub ScanJournal %_JIndex Wykonales Nie_udalo Twoje_narzedzie
+ if #Result = 3
+ 
+   set %przetopione 0
+   goto poczatek
+
+ }
+ else
+ {
+   continue
+ }
+ 
+ FindItem %narzedzia_majstra C_ , #BackpackID
+ if #FindKind = -1
+ {
+   event sysmessage Zniknely narzedzia. Zaczynam od poczatku.
+   goto poczatek
+ }
+ else
+ {
+;   event sysmessage Narzedzia sa. Robie ostatnie.
+ }
+ }
+ 
+ repeat
+ {
+  set %zrobione 0
+  gosub RobOstatnie
+
+FindItem %coUpuszczac C_ , #BackPackID
+ if #FindKind <> -1
+  gosub upusc #FindID
+
+goto loop
+
+ }
+ until %zrobione = 1
+ 
+
+; Wyciachanie
+ if 1 = 0
+ {
+ if ( %PRZENOS = 1 && %PRZETAPIAJ = 1 && %licznik = 149 )
+ {
+  set %licznik 0
+  gosub PoliczItemy
+  if ( %licznik = 149 )
+    {
+      wait 10
+      click 40 500 dmc
+      wait 10
+      gosub Przetop
+      set %czas 2 * %licznik + 3
+      wait %czas , s
+      set %przetopione 1
+      set %licznik 0
+      goto poczatek
+    }
+    else
+    {
+      continue
+    }
+
+ if ( %PRZENOS = 1 && %PRZETAPIAJ = 0 && %licznik = 149 )
+ {
+  set %licznik 0
+  gosub PoliczItemy
+  if ( %licznik = 149 )
+    {
+      wait 10
+      click 40 500 dmc
+      wait 10
+      set %licznik 0
+      set %przetopione 1
+      event sysmessage Pelen pojemnik. Wskaz nowy.
+      goto start
+    }
+    else
+    {
+      set %licznik 0
+      continue
+    }
+}
+
+ wait 1
+ if %PRZENOS = 1
+   {
+      FindItem * C_ , #BackpackID
+      if #FindKind <> -1
+         {
+          exevent drag #FindID
+          exevent dropc %KOSZ
+          set %licznik %licznik + 1
+         }
+   }
+; Koniec wyciachania
+ }
+
+goto loop
+
+sub OtworzPojemnik
+  event sysmessage Otwieram pojemnik %1
+  set #lobjectid %1
+  event macro 17 0
+  wait 1s
+return
+
+sub ZnajdzNarzedzia
+ event sysmessage Szukam narzedzi
+ gosub OtworzPojemnik %pojemnik_z_narzedziami
+ FindItem %narzedzia_majstra C_ , %pojemnik_z_narzedziami
+ if #FindKind = -1
+   {
+   display Nie moge znalesc narzedzi do majsterkowania
+   halt
+   }
+
+ set %mlotek #FindID
+
+ exevent drag %mlotek
+ exevent dropc #backpackid
+
+ event sysmessage Znalazlem mlotek: %mlotek
+return
+
+sub UzyjNarzedzi
+ set #LObjectID %mlotek
+ wait 10
+ event macro 17 0
+return
+
+sub ZnajdzMaterial
+ event sysmessage Szukam materialu
+ gosub OtworzPojemnik %pojemnik_ze_sztabami
+ FindItem ENK C_ , %pojemnik_ze_sztabami
+ if #FindKind = -1
+   {
+    display Nie ma sztab.
+    halt
+   }
+ set %sztaby #FindID
+ wait 10
+return
+
+sub KliknijWMaterial
+ set #LTargetID %sztaby
+ wait 10
+ event macro 22 0
+return
+
+sub ZmienOpcje
+ set %zmienione 0
+ repeat
+ if #ContSizeX = 510 && #ContSizeY = 520
+   {
+    wait 10
+    click 635 90 dmc
+    wait 10
+    set %zmienione 1
+    }
+ until %zmienione = 1
+return
+
+sub upusc
+ event macro 1 0 .upusc
+ target
+ set #LTargetID %1
+ set #LTargetKind 1
+ event macro 22 0
+return
+
+sub RobOstatnie
+ chooseskill Tink
+ if #skill > 999
+ {
+   event sysmessage Masz 100% skilla
+   halt
+ }
+   
+      
+ if ( #ContSizeX = 510 && #ContSizeY = 520 )
+ {
+  ; Rob Ostatnie
+  click 140 500 dmc
+  wait 6s
+  set %zrobione 1
+ }
+ else
+ {
+  FindItem %narzedzia_majstra C_ , #BackpackID
+  if #FindKind = -1
+  {
+   event sysmessage Zniknely narzedzia. Zaczynam od poczatku.
+   goto poczatek
+  }
+ }
+
+return
+
+sub WybierzCoRobic
+ event sysmessage Wybieram przedmiot pierwszy raz
+ repeat
+ {
+  if ( #ContSizeX = 510 && #ContSizeY = 520 )
+  {
+   chooseskill Tink
+   if #skill <= 330
+     {
+       display Naucz sie od NPC do tych 33.
+       halt
+     }
+   if #skill > 330
+     {
+     ; Narzedzia -> Mozdzierz
+        set %x1 40
+        set %y1 125
+        set %x2 210
+        set %y2 420
+     }
+   if #skill > 500
+     {
+     ; Narzedzia -> Mozdzierz
+        set %x1 40
+        set %y1 125
+        set %x2 210
+        set %y2 420
+     }
+   if #skill > 620
+     {
+     ; Narzedzia -> Mozdzierz
+        set %x1 40
+        set %y1 125
+        set %x2 210
+        set %y2 420
+     }
+   if #skill > 630
+     {
+     ; Narzedzia -> Mozdzierz
+        set %x1 40
+        set %y1 125
+        set %x2 210
+        set %y2 420
+     }
+   if #skill > 710
+     {
+     ; Czesci -> Sekstans
+        set %x1 40
+        set %y1 150
+        set %x2 210
+        set %y2 200
+     }
+   if #skill > 780
+     {
+     ; Rozne -> Wytrychy
+        set %x1 40
+        set %y1 300
+        set %x2 210
+        set %y2 370
+     }
+   if #skill > 849
+     {
+     ; Czesci -> Kranik
+        set %x1 40
+        set %y1 150
+        set %x2 210
+        set %y2 250
+     }
+   if #skill > 949
+     {
+      ; Rozne -> wywazony noz
+        set %x1 40
+        set %y1 305
+        
+        set %x2 210
+        set %y2 300
+     }
+
+   event sysmessage Klikam
+   click %x1 %y1 dmc
+   wait 1
+   click %x2 %y2 dmc
+   wait 1s
+   if %x3 <> N/A
+    click %x3 %y3 dmc
+   set %zrobione 1
+  }
+ }
+ until %zrobione = 1
+ 
+return
+
+sub ScanJournal
+set %__JIndex %1
+set %_timeout #SCNT
+ScanLoop:
+if #JIndex > %__JIndex
+   {
+   set %__JIndex %__JIndex + 1
+   ScanJournal %__JIndex
+   for %__i 2 %0
+       {
+       if % . %__i in #journal
+          return %__i
+       }
+   }
+goto ScanLoop
+return
+
+sub SprawdzGlod
+glodloop:
+repeat
+      event macro 8 7
+      wait 5
+until #ContID = #BackpackID
+wait 30
+set %_JIndex #JIndex
+event macro 1 0 .glod
+gosub ScanJournal %_JIndex Twoja_postac_jest_tak_najedzona Twoja_postac_jest_najedzona_do_syta_i_nic_wiecej Twoja_postac_jest_najedzona_do_syta Twoja_postac_jest_najedzona Twoja_postac_nie_jest_glodna Twoja_postac_czuje_oznaki_glodu Twoja_postac_jest_nieco_glodna Twoja_postac_jest_glodna Twoja_postac_jest_bardzo_glodna Twoja_postac_przymiera_glodem Twoja_postac_jest_bliska_smierci_glodowej
+if #Result <= 5
+   return
+if #Result > 5
+   {
+   FindItem %zarcie C
+   if #FindKind = -1
+      {
+      event sysmessage Nie znalazlem jedzenia
+      return
+      }
+   set #LObjectID #FindID
+   event macro 17 0
+   }
+goto glodloop
+return
+
+sub WskazPojemnik
+   event sysmessage Wskaz pojemnik albo kosz.
+   set #TargCurs 1
+   repeat
+   until #TargCurs = 0
+   set %KOSZ #LTargetID
+   event sysmessage Wskazano.
+return
+
+sub IgnorujPrzedmioty
+   repeat
+   FindItem * C_ , #BackpackID
+   if #FindKind <> -1
+        {
+          IgnoreItem #FindID 1
+        }
+   until #FindKind = -1
+return
+
+sub ZnajdzSzczypce
+FindItem TBG C_ , #BackpackID
+if #FindKind = -1
+   {
+   display Szczypce brak :<.
+   halt
+   }
+set %szczypce #FindID
+event sysmessage Znaleziono szczypce.
+return
+
+sub Przetop
+set #lObjectID %szczypce
+wait 10
+event macro 17 0
+
+set #LTargetID %KOSZ
+wait 10
+event macro 22 0
+return
+
+sub PoliczItemy
+set #LObjectID %KOSZ
+wait 5
+event macro 17 0
+wait 5
+
+liczloop:
+FindItem * C_ , %KOSZ
+if #FINDID <> x
+   {
+     set %licznik %licznik + 1
+     ignoreitem #FINDID 2
+     goto liczloop
+   }
+
+ignoreItem reset 2
+
+event sysmessage W pojemniku jest %licznik przedmiotow.
+
+repeat
+event macro 8 7
+wait 5
+until #ContID = #BackpackID
+return
