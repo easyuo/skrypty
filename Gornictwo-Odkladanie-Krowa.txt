@@ -1,13 +1,19 @@
 set %sklad XBZMZDE
+set %kilofy XBZMZDE
+
 set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
 set %piece_do_przetapiania JBG
 
-set %kilofy XBZMZDE
+; Zmienne dla ArmsLore
+set %armslore_badaj HSH_LSH_MSH_YSF_CIK_
+set %ostatnieUzycieAL 0
 
 set %czas 0
 set %wagajes 300
 set %timeout 20
 set #sysmsgcol 154
+
+set %ileBandazy 30
 
 chooseskill medi
 if #skill >= 800
@@ -37,24 +43,12 @@ start:
 
 menu get tryb_select
 set *gornictwo_tryb #menures
-menu get przetapianie_check
-set *gornictwo_przetapianie #menures
+menu get armslore_check
+set *trenujArmsLore #menures
 menu get odkladanie_check
 set *gornictwo_odkladanie #menures
 
-if *gornictwo_przetapianie = #true
-{
- finditem %piece_do_przetapiania G_2
 
- if #findid = x || #finddist > 2
- {
-  event sysmessage Musisz miec brazier w zasiegu przy starcie skryptu!
-  goto pokaz_menu
- }
-
- set %brazier #findid
-
-}
 
 if *gornictwo_odkladanie = #true
 {
@@ -82,6 +76,11 @@ loop:
 
 if #targcurs = 1
  key esc
+ 
+if *trenujArmsLore = #true
+{
+ gosub ArmsLore
+}
 
 if *gornictwo_tryb = 1
 {
@@ -408,7 +407,7 @@ sub odkladanie
   event sysmessage Uzupelnianie stuffu (bandaze, ziola)
   ; Bandaze
  finditem ZLF C_ , #BACKPACKID
- if #findstack < 10
+ if #findstack < %ileBandazy
   {
    set #lobjectid %pojemnik
    set #ltargetkind 1
@@ -567,15 +566,15 @@ sub r_menu
  menu text narzedzie_txt 5 102 Miejsca - ziemia
  menu font style
  menu text narzedzie_txt 20 25 Tryb pracy:
- menu text przetapianie_txt 27 60 Przetapianie:
+ menu text przetapianie_txt 27 60 ArmsLore:
 
- if *gornictwo_przetapianie = n/a
-  set *gornictwo_przetapianie #false
+ if *trenujArmsLore = n/a
+  set *trenujArmsLore #false
 
  if *gornictwo_odkladanie = n/a
   set *gornictwo_odkladanie #false
 
- menu check przetapianie_check 95 59 18 20 *gornictwo_przetapianie
+ menu check armslore_check 95 59 18 20 *trenujArmsLore
  menu text odkladanie_txt 130 60 Odkladanie:
  menu check odkladanie_check 210 59 18 20 *gornictwo_odkladanie
  menu text ilosc_miejsc_txt 15 125 Ilosc zapisanych miejsc:
@@ -628,5 +627,36 @@ sub ScanJournal
   }
  goto ScanLoop
 
+return
+
+sub ArmsLore
+ FindItem %armslore_badaj C_ , #BackPackID
+ if #FindKind <> -1
+ {
+  set %ALtimeDiff #TIME - %ostatnieUzycieAL
+  if %ALtimeDiff > 10
+  {
+   event sysmessage AL time diff: %ALtimeDiff
+   event macro 13 4
+   set %lastTarget #FindID
+   event sysmessage LT: %lastTarget
+   target 3s
+   set #LTargetID %lastTarget
+   set #LTargetKind 1
+   event macro 22 0
+   ignoreitem %lastTarget
+   set %ostatnieUzycieAL #TIME
+  }
+  else
+  {
+   event sysmessage AL Time diff: %ALtimeDiff
+  }
+ }
+if #FindKind = -1
+ {
+  event sysmessage Reset ignorowanych przedmiotow dla ArmsLore
+  ignoreItem reset
+ }
+}
 return
 

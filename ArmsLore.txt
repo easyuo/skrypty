@@ -1,0 +1,60 @@
+;Autor: [nGz]
+;Tak samo jak skrypt armslore.txt tylko jeszcze sprawdza glod i je owoce(jesli je masz)
+initevents
+ignoreItem reset
+set %jesc 0
+set %debug 0
+set %armslore_badaj IMH_WLH_APH_ZOH_DPH_HSH_YPO_BNF_CPH_INF_FSF_OSF_ASF_HNF_FMH_CNF_LSF_NSF_ISF_SMH_RMH_CSF_ZRF_MPH_LPH_MSF_BSF_KPO_GUO_KTF_JTF_BPH_EPH_ZSF_ATF_JPH_SOH_POH_NMH_OMH_LPO_ZTO_XTH_YTH_HSF_KSF_NPO_XPO_FUO_JPO_QPF_NPF_KPH_FYG_RHM_SFR_SRH_AQF_PPF_TSF_WSF_BUO_VPO_WPO_WRH_VRH_XRH_YRH_LTF_MTF_OPO_RRH_CUO_OLH_JOH_URH_EMH_WTH_DMH_QMH_CFF_BFF_PMH_GMH_ZPF_CQF_FFF_RPF_TRH_YSF_XSF_FBG_VTH_AUH_ZTH_UOH_VOH_AUO_MPO_BUH_CUH_DMH_GFF_QOH_HFF_TLH_GBG_WOH_TOH_QPO_SPO_WOH_TOH_JSF_USF_LMH_MMH_QPO_SPO_PPO_RPO_JSF_USF_LMH_MMH_PPO_RPO_JSF_KTO_LSH_MSH_YSF_CIK_ISH_NSH_OMH_VRH_KFR_JFR_ZRF_GUO_
+
+set %ostatnie_uzycie 0
+set %pojemnik_z_jedzeniem #BackpackID
+
+set %zarcie HND_
+
+start:
+ if %jesc = 1
+  gosub Jedzenie
+ gosub ArmsLore
+goto start
+
+sub ArmsLore
+ chooseskill Arms
+ FindItem %armslore_badaj C_ , #BackPackID
+ if #FindKind <> -1
+   gosub ArmsLoreZbadaj #FindID
+ else
+ {
+  FindItem %armslore_badaj G_2
+  if #FindKind <> -1
+     gosub ArmsLoreZbadaj #FindID
+  else
+  {
+   event sysmessage Reset ignorowanych przedmiotow dla ArmsLore
+   ignoreItem reset
+  }
+return
+
+sub ArmsLoreZbadaj
+  set %TimeDiff #TIME - %ostatnie_uzycie
+   event macro 13 4
+   set %lastTarget %1
+   event sysmessage TD: %TimeDiff Zostalo: #FindCNT Skill: #skill
+   target 3s
+   set #LTargetID %lastTarget
+   set #LTargetKind 1
+   event macro 22 0
+   ignoreitem %lastTarget
+   set %ostatnie_uzycie #TIME
+  wait 10s
+return
+
+sub Jedzenie
+   FindItem %zarcie C_ , %pojemnik_z_jedzeniem
+   if #FindKind = -1
+      {
+      event sysmessage Nie znalazlem jedzenia
+      return
+      }
+   set #LObjectID #FindID
+   event macro 17 0
+return

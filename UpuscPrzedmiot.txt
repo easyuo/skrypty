@@ -1,5 +1,5 @@
 set %upuscID 0
-set %coUpuszczac KAG_KMH_KPH_WLH_
+set %coUpuszczac NPF_ENK_WLH_KMH
 ignoreItem reset *
 
 loop:

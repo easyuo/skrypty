@@ -1,5 +1,5 @@
-;-----------------------
-;Auto Kowal by Krowa   |
+                     ;-----------------------
+;Auto Majster by Krowa |
 
 initevents
 ;/------ZMIENNE-------/
@@ -15,9 +15,9 @@ set %przetopione 0
 set %licznik 0
 set %czas 0
 
-set %narzedzia_majstra TLH
-set %pojemnik_z_narzedziami RFTVQDE
-set %pojemnik_ze_sztabami UGZMZDE
+set %narzedzia_alchemika GTL
+set %pojemnik_z_narzedziami VAZIVCE
+set %pojemnik_ze_sztabami LLHKNCE
 
 start:
 if %PRZENOS = 1
@@ -43,7 +43,7 @@ else
 if %JEDZ = 1
    gosub SprawdzGlod
 
-FindItem %narzedzia_majstra C_ , #BackpackID
+FindItem %narzedzia_alchemika C_ , #BackpackID
 event sysmessage Szukam narzedzi
 
 if #FindKind = -1
@@ -67,7 +67,7 @@ if %przetopione <> 1
 
 if %PRZENOS = 1
    gosub IgnorujPrzedmioty
-   
+
 ; Wybranie co mam robic. W pêtli bedzie kliknie na zrobienie ostatniego przedmiotu
 gosub WybierzCoRobic
 
@@ -75,12 +75,12 @@ loop:
  ; Skanowanie Journala
  ; Jezeli narzedzie jest cale robimy jeszcze raz
  ; Jezeli narzedzie sie popsulo - wybieramy na nowo
- 
+
  if 1 = 0
  {
  gosub ScanJournal %_JIndex Wykonales Nie_udalo Twoje_narzedzie
  if #Result = 3
- 
+
    set %przetopione 0
    goto poczatek
 
@@ -89,8 +89,8 @@ loop:
  {
    continue
  }
- 
- FindItem %narzedzia_majstra C_ , #BackpackID
+
+ FindItem %narzedzia_alchemika C_ , #BackpackID
  if #FindKind = -1
  {
    event sysmessage Zniknely narzedzia. Zaczynam od poczatku.
@@ -101,7 +101,7 @@ loop:
 ;   event sysmessage Narzedzia sa. Robie ostatnie.
  }
  }
- 
+
  repeat
  {
   set %zrobione 0
@@ -115,7 +115,7 @@ goto loop
 
  }
  until %zrobione = 1
- 
+
 
 ; Wyciachanie
  if 1 = 0
@@ -188,18 +188,19 @@ return
 sub ZnajdzNarzedzia
  event sysmessage Szukam narzedzi
  gosub OtworzPojemnik %pojemnik_z_narzedziami
- FindItem %narzedzia_majstra C_ , %pojemnik_z_narzedziami
+ FindItem %narzedzia_alchemika C_ , %pojemnik_z_narzedziami
  if #FindKind = -1
    {
-   display Nie moge znalesc mlotka
+   display Nie moge znalesc narzedzi do majsterkowania
    halt
    }
 
  set %mlotek #FindID
+
  exevent drag %mlotek
- exevent droppd
+ exevent dropc #backpackid
+
  event sysmessage Znalazlem mlotek: %mlotek
- 
 return
 
 sub UzyjNarzedzi
@@ -255,8 +256,8 @@ sub RobOstatnie
    event sysmessage Masz 100% skilla
    halt
  }
-   
-      
+
+
  if ( #ContSizeX = 510 && #ContSizeY = 520 )
  {
   ; Rob Ostatnie
@@ -266,7 +267,7 @@ sub RobOstatnie
  }
  else
  {
-  FindItem %narzedzia_majstra C_ , #BackpackID
+  FindItem %narzedzia_alchemika C_ , #BackpackID
   if #FindKind = -1
   {
    event sysmessage Zniknely narzedzia. Zaczynam od poczatku.
@@ -349,7 +350,7 @@ sub WybierzCoRobic
       ; Rozne -> wywazony noz
         set %x1 40
         set %y1 305
-        
+
         set %x2 210
         set %y2 300
      }
@@ -365,7 +366,7 @@ sub WybierzCoRobic
   }
  }
  until %zrobione = 1
- 
+
 return
 
 sub ScanJournal

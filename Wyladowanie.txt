@@ -9,11 +9,14 @@
 ; Public Release: 5/13/2015
 
 set %skrzynia_id DBZMZDE
+set %skrzynia_dest_id DXYMZDE
 ; set %skrzynia_id LLHKNCE  ; Destard Dom
 set %sprzedawca_id EKMJLD
 
 ; VLK - piora
-set %przedmioty_do_skrzyni NPF_TMK_OUF_ZLF_AMF_UWS_QOF_UTO_VLF_XUF_VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
+set %przedmioty_do_skrzyni PUD_NPF_TMK_OUF_ZLF_AMF_UWS_QOF_UTO_VLF_XUF_VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
+set %przedmioty_do_skrzyni_dest PUD_NPF_TMK_OUF_AMF_UWS_QOF_UTO_VLF_XUF_VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
+
 
 ; POF - zloto
 set %przedmioty_do_sprzedawcy POF_
@@ -41,6 +44,14 @@ sub organizer
  if #FINDCNT > 0
   {
    gosub przeniesPrzedmioty %przedmioty_do_skrzyni #BACKPACKID %skrzynia_id
+   wait 10s
+  }
+  
+ finditem %skrzynia_dest_id G_1
+ if #FINDCNT > 0
+  {
+   gosub przeniesPrzedmioty %przedmioty_do_skrzyni_dest #BACKPACKID %skrzynia_dest_id
+   gosub przeniesPrzedmioty %przedmioty_do_sprzedawcy #BACKPACKID %skrzynia_dest_id
    wait 10s
   }
 

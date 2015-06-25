@@ -1,0 +1,1770 @@
+;==================================
+; Script Name: xParr's Smart Looter
+; Author: xParr
+; Version: 1.60
+; Client Tested with: 6.0.11.0 Patch 87
+; EUO version tested with: V1.5 [Build 144]
+; Shard: FS
+; Public Release: 11/29/08
+; Revision Date: 12/12/08
+; Global Variables Used: *xparr_gold *xparr_items
+; Purpose: Fastest looting of Corpses/Chests/Ground to Packy/Bag or even a chest on the ground. Cuts corpse/hides,
+; sheers sheep, Loot speed will fluctuate till it finds the best speed for your server! And much much more!!
+;==================================
+gosub main_menu
+gosub main_variables
+gosub eventproperty
+gosub os_ver
+gosub load_settings #false
+gosub load_string #false
+gosub tf_check
+gosub combine_itemgroups
+gosub set_bag #true lootbag_ID lootbag_loc
+gosub action_window ...Looting started.
+;-------------------------------------;
+;------------- Mainloop --------------;
+;-------------------------------------;
+mainloop:
+wait %waitFast
+gosub error_check #false
+gosub mainmenu_buttons
+gosub action_window scanning...
+if %TF_1
+  gosub loot_from #true %corpse  ;-------loot corpse
+if %TF_3
+  gosub loot_from #true %container ;-------loot chest
+if %TF_2
+  gosub loot_from #false * G_ 2 ;-------loot ground
+finditem %sheep G_2
+if %TF_7 && #FINDKIND <> -1 ;-------sheer sheep
+{
+  gosub openit %_bladeID #FINDID 1
+  gosub event_property #FINDID $ #false
+  gosub action_window Sheering sheep: #RESULT
+}
+if %TF_15 && ( packy in %lootbag_loc || packy in %regbag_loc ) ;-------call packy
+  gosub call_packy
+goto mainloop
+;-------------------------------------;
+;  %1 - true=container - false=ground
+;  %2 - search for * or container/corpse
+;-------------------------------------;
+sub loot_from
+nameSpace Push
+nameSpace Local loot_from
+set !1 %1
+set !2 %2
+set !3 %3
+finditem !2 G_2
+if #FINDID in %ignore_ID || #FINDID = %lootbag_ID || #FINDID = %regbag_ID || #FINDID = #CHARID
+  goto _return
+if #FINDKIND <> -1
+{
+  set !cont_ID #FINDID
+  set !cont_Type #FINDTYPE
+  set !cont_Stack #FINDSTACK
+  set !cont_Kind #FINDKIND
+  if !1
+    gosub open_gump !cont_ID #false #false
+  gosub error_check #false
+  set %journal #RESULT
+  if !1 && %TF_19 ;-------Ignore PC corps
+  {
+    if %event_property
+    {
+      event property !cont_ID
+      if Corpse$ notin #PROPERTY
+      {
+        gosub action_window Ignored Player Corpse!
+        goto _ignore
+      }
+    }
+    if criminal in %journal ;-------Ignore PC
+    {
+      gosub action_window Would be a Crime!
+      goto _ignore
+    }
+  }
+  if lootrights in %journal
+  {
+    gosub event_property !cont_ID $ #false
+    gosub action_window Ignored: #RESULT
+    goto _ignore
+  }
+  if !1 && %TF_5 && !cont_Type in %corpse ;-------cut corpse
+  {
+    gosub openit %_bladeID !cont_ID 1
+    gosub event_property !cont_ID $ #false
+    gosub action_window Cutting: #RESULT
+    wait %waitFast
+  }
+  if %TF_6 ;-------cut hides
+    gosub cut_hides !cont_ID
+  set !cnt 1
+  set !loot %loot_list
+  while %itemgroup_ . !cnt <> N/A
+  {
+    if %TF_12 && %TF_list . !cnt ;-------priority looting
+      set !loot %itemgroup_ . !cnt
+    if !1 && ( %TF_4 || %TF_18 ) ;-------loot all corpse/chest
+      set !loot *
+    if ! !1 && %TF_14 ;-------loot all ground
+      set !loot *
+    _loot:
+    if !1
+      finditem !loot C_ , !cont_ID
+    else
+      finditem !loot G_2
+    set !loot_ID #FINDID
+    set !loot_Type #FINDTYPE
+    set !loot_Stack #FINDSTACK
+    set !loot_Kind #FINDKIND
+    set !loot_Cnt #FINDCNT
+    if ! !1 && ( !loot_Stack = 0 || !loot_ID in %ignore_ID || !loot_Type in %corps || !loot_Type in %container || !loot_Type in %ignore_Type )
+      goto _return
+    gosub event_property !loot_ID $ #false
+    set !result #RESULT
+    if ! !1
+    {
+      finditem * G_2
+      if #FINDKIND = -1 || #FINDSTACK = 0 || #FINDID in %ignore_ID
+        break
+      finditem %container G_2
+      if #FINDKIND = 1
+        goto _return
+      finditem %corpse G_2
+      if #FINDKIND = 1
+        goto _return
+    }
+    if ! !1 && !loot_Type in %corps
+      break
+    if !loot_Kind <> -1
+    {
+      if %last_looted = !loot_ID && !loot_ID <> X
+      {
+        set %last_lootedcnt %last_lootedcnt + 1
+        if %last_lootedcnt = 2
+        {
+          display ok Error: bag may be full, unable to pickup item !loot_ID $
+          +Script halting!
+          halt
+        }
+      }
+      if %TF_15
+      {
+        if Packy in %lootbag_loc || Packy in %regbag_loc ;-------call packy
+          gosub call_packy
+      }
+      gosub error_check #true
+      if %TF_22 && !loot_Type in %reagents && %regbag_ID <> N/A ;-------reagent bag
+        gosub drag_drop dropc !loot_ID !loot_Stack %regbag_ID
+      else
+        gosub drag_drop dropc !loot_ID !loot_Stack %lootbag_ID
+      if ignore in #RESULT
+        goto _ignoreitem
+      if distance in #RESULT
+        goto _ignoreitem
+      gosub action_window Looting: !result
+      gosub counting_items !loot_Type !loot_Stack
+      finditem !loot_ID G_2
+      if #FINDID = !loot_ID
+      {
+        gosub action_window ...Looting Error, bag may be full!
+        gosub pause_script
+      }
+      set %last_looted !loot_ID
+      _ignoreitem:
+      ignoreitem !loot_ID 2
+      if ! %TF_12 ;-------priority check
+        goto _loot
+    }
+    if ! %TF_12 && !loot_Kind = -1 ;-------priority check
+      break
+    if !loot_Cnt =< 1
+      set !cnt !cnt + 1
+  }
+  finditem !cont_ID
+  if #FINDDIST > 2
+  {
+    gosub event_property !cont_ID $ #false
+    gosub action_window Out of Range: #RESULT
+    goto _dontignore
+  }
+  gosub action_window Done...
+  _ignore:
+  if !cont_Type in %corpse
+  {
+    if %TF_8 && ;-------hide corps
+      hideitem !cont_ID
+    if %TF_9 && ! %TF_8 ;-------close gump
+      gosub closegump !cont_ID
+  }
+  if !cont_Type in %container
+  {
+    if %TF_17 &&  ;-------hide chest
+      hideitem !cont_ID
+    if %TF_9 && ! %TF_17 ;-------close gump
+      gosub closegump !cont_ID
+  }
+  ignoreitem !cont_ID 1
+  _dontignore:
+}
+_return:
+nameSpace Clear
+nameSpace Pop
+return
+;-------------------------------------;
+;  main menu buttons
+;-------------------------------------;
+sub mainmenu_buttons
+if #MENUBUTTON = btn_loottarget
+{
+  set #TARGCURS 1
+  while #TARGCURS = 1
+    wait %waitFast
+  ignoreitem #LTARGETID 1
+  gosub loot_from #true #LTARGETID
+  set #MENUBUTTON N/A
+}
+if #MENUBUTTON = btn_pause
+  gosub pause_script
+if #MENUBUTTON = btn_options
+{
+  gosub options
+  gosub action_window ...Looting started.
+}
+if #MENUBUTTON = btn_reset
+{
+  gosub action_window ...Reseting ignore list.
+  set %ignore_ID
+  set %ignore_Type
+  ignoreitem reset
+	set #MENUBUTTON N/A
+}
+if #MENUBUTTON = CLOSED
+  halt
+return
+;-------------------------------------;
+;  Find OS version
+;-------------------------------------;
+sub os_ver
+  str Left #OSVER 1
+  if #STRRES = 1
+  {
+    set %cmd command.com
+    set %buffer_length 500
+    gosub action_window ...OS detected: Win 95/98
+  }
+  if #STRRES = 2
+  {
+    set %cmd cmd.exe
+    set %buffer_length 2000
+    gosub action_window ...OS detected: Win 2000/XP
+  }
+return
+;-------------------------------------;
+;  close gump
+;-------------------------------------;
+sub closegump
+  if %1 = #CONTID
+  {
+    str Pos #CONTSIZE _
+    set %cnt #STRRES - 1
+    str Left #CONTSIZE %cnt
+    set %x #CONTPOSX + ( #STRRES / 2 )
+    str Right #CONTSIZE %cnt
+    set %y #CONTPOSY + ( #STRRES / 2 )
+    click %x %y r
+  }
+return
+;-------------------------------------;
+;  cut hides
+;-------------------------------------;
+sub cut_hides
+  finditem %hides C_ , %1
+  if #FINDKIND <> -1
+  {
+    gosub openit %_scissorID #FINDID 1
+    gosub event_property #FINDID $ #false
+    gosub action_window Cutting hides: #RESULT
+    wait %waitFast
+  }
+return
+;-------------------------------------;
+;  check if event property works
+;-------------------------------------;
+sub eventproperty
+  event Property #BACKPACKID
+  if Backpack notin #PROPERTY
+  {
+    set %event_property #false
+    gosub action_window ...Properties disabled
+  }
+  else
+  {
+    set %event_property #true
+    gosub action_window ...Properties enabled
+  }
+return
+;<@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@>
+;<---------------------------------------------------------->
+; @Par's smart moving sub
+; @checks for errors and will slow looting over time
+; %1 = dropg | dropc
+; %2 = object id
+; %3 = [amount]
+; %4 = {x}   | [dest container id]
+; %5 = {y}   | {x}
+; %6 = {z}   | {y}
+; @example
+; @ gosub moveitem dropg POF * #CHARPOSX #CHARPOSY #CHARPOSZ
+; @ gosub moveitem dropc POF 1 #BACKPACKID 10 10
+;<---------------------------------------------------------->
+sub drag_drop
+  nameSpace Push
+  nameSpace Local drag_drop
+  set !_jindex #JINDEX
+  set %return
+  _retrydragdrop:
+  exevent drag %2 %3
+  if %0 = 6
+    exevent %1 %4 %5 %6
+  else
+    exevent %1 %4
+  sleep %wait_drag
+  while #JINDEX > !_jindex
+  {
+    set !_jindex !_jindex + 1
+    scanjournal !_jindex
+    if %You_can_not_pick in #journal
+      set %return ignore
+    if %You_must_wait in #journal || %You_are_already in #journal
+    {
+      set %wait_drag %wait_drag + %wait_dragincrement
+      goto _retrydragdrop
+    }
+    if %That_is_too in #journal || %That_is_out in #journal
+      set %return distance
+  }
+  nameSpace Clear
+  nameSpace Pop
+return %return
+;-------------------------------------;
+;  call packy
+;-------------------------------------;
+sub call_packy
+  nameSpace Push
+  nameSpace Local call_packy
+  set !t #TIME
+  set !scnt #SCNT2
+  repeat
+  {
+    finditem %lootbag_ID G
+    if #FINDKIND = -1 || #FINDDIST > 15 || !error_cnt > 3
+    {
+      gosub action_window ...Packy Inaccessible!!!
+      gosub pause_script
+      set !error_cnt
+    }
+    if #SCNT2 > !scnt
+    {
+
+      if !x <> #FINDX || !y <> #FINDY
+        set !t #TIME + 1
+      if !x = #FINDX && !y = #FINDY && #TIME > !t && #FINDDIST > 2
+      {
+        event macro 1 0 %lootbag_name come
+        set !error_cnt !error_cnt + 1
+        set !t #TIME + 2
+      }
+      set !x #FINDX
+      set !y #FINDY
+      set !scnt #SCNT2 + 5
+    }
+  }
+  until #FINDDIST =< 2
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  Load Button
+;-------------------------------------;
+sub load_settings
+  nameSpace Push
+  nameSpace Local load_settings
+  set %Type_list
+  set !1 %1
+  call smartlooter.cfg
+  gosub action_window ...Loading smartlooter.cfg
+  if %Type_list1 = N/A
+  {
+    if !1
+      goto loadend
+    gosub action_window ...No save found!
+    gosub default_variables
+    set !set_defualts #true
+  }
+  else
+  {
+    if ! !1 && %chraname <> #CHARNAME
+    {
+      gosub action_window ...New Char: lootbag reset!
+      gosub set_bag #false lootbag_ID lootbag_loc
+      set %regbag_ID N/A
+      set %regbag_loc N/A
+    }
+    for !i 1 %lcnt
+      set %Type_list %Type_list , %Type_list . !i
+    gosub loadstr %Type_list itemgroup_ +
+    gosub loadstr %TF_list TF_list +
+    gosub loadstr %TF_options TF_ +
+    gosub event_property %lootbag_ID $ #false
+    if %event_property && %lootbag_ID <> #RESULT
+      set %lootbag_name #RESULT
+    else
+      set %lootbag_name All
+    gosub action_window ...Completed loading.
+    !set_defualts #false
+  }
+  set !i 1
+  while %itemgroup_ . !i <> N/A
+  {
+    set %itemgroup_cnt !i
+    if !set_defualts
+      set %TF_list . !i #true
+    set !i !i + 1
+  }
+  loadend:
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+; Sub to parse the saved settings
+;  %1 -
+;  %2 -
+;  %3 -
+;-------------------------------------;
+sub loadstr
+  set #lpc %lpcFast
+  nameSpace Push
+  nameSpace Local loadstr
+  str Count %1 %3
+  if #STRRES = 0
+    goto loadstr_end
+  set !cnt #STRRES
+  for !i 1 !cnt
+  {
+    str Pos %1 %3
+    set !cnt #STRRES
+    str Left %1 !cnt
+    set !tmp #STRRES
+    str Del !tmp !cnt 1
+    set % , %2 , !i #STRRES
+    str Del %1 1 !cnt
+    set %1 #STRRES
+  }
+  set %1 %i
+  loadstr_end:
+  nameSpace Clear
+  nameSpace Pop
+  set #lpc %lpcSlow
+return %1
+;-------------------------------------;
+;  event property check
+;  %1 - string to search
+;  %2 - search for string
+;  %3 - true=remove space / false
+;-------------------------------------;
+sub event_property
+  set #lpc %lpcFast
+  nameSpace Push
+  nameSpace Local event_property
+  set %return %1
+  if %event_property
+  {
+    event Property %1
+    if %0 = 1
+    {
+      set %return #PROPERTY
+      goto propend
+    }
+    set !prop #PROPERTY
+    str Len !prop
+    if #STRRES < 2
+      goto propend
+    str Pos !prop %2
+    set !cnt #STRRES - 1
+    str Left !prop !cnt
+    set %return #STRRES
+    if ! %3
+      goto propend
+    str Count %return #spc
+    set !_cnt #STRRES
+    for !i 1 !_cnt
+    {
+      str Pos %return #spc
+      set !cnt #STRRES
+      str Del %return !cnt 1
+      set %return #STRRES
+    }
+  }
+  propend:
+  nameSpace Clear
+  nameSpace Pop
+  set #lpc %lpcSlow
+return %return
+;-------------------------------------;
+;  check true/false
+;-------------------------------------;
+sub tf_check
+  nameSpace Push
+  nameSpace Local tf_check
+  if %TF_5 ;-------cut corpse check
+  {
+    gosub SearchForItem %blade C_ #BACKPACKID 5
+    if #RESULT
+      set %_bladeID #FINDID
+    else
+      set %TF_5 #false
+  }
+  if %TF_6 ;-------cut hides check
+  {
+    gosub SearchForItem %scissors C_ #BACKPACKID 6
+    if #RESULT
+      set %_scissorID #FINDID
+    else
+      set %TF_6 #false
+  }
+  if #EUOVER <> 1_50_00
+  {
+    display okcancel Warning! must be running EUO v1.50 or higher
+    if #DISPRES = cancel
+      halt
+  }
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  groups all item types together
+;-------------------------------------;
+sub combine_itemgroups
+  nameSpace Push
+  nameSpace Local combine_itemgroups
+  set %all_loot
+  for !i 1 %itemgroup_cnt
+  {
+    set !tmp %itemgroup_ . !i
+    str Pos !tmp _
+    set !cnt_t #STRRES
+    str Len !tmp
+    set !cnt_l #STRRES
+    set !cnt_r !cnt_l - !cnt_t
+    str Right !tmp !cnt_r
+    set %all_loot %all_loot , #STRRES
+    if MageRegs in %itemgroup_ . !i || NecroRegs in %itemgroup_ . !i
+      set %reagents %reagents , %itemgroup_ . !i
+  }
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  search for item
+; %1 = {{id} | {type} | *}
+;      @also parses out the name of the viriable
+;      @example %name result = name
+; %2 = [[G_] | [C_]]
+; %3 = [{dist} | {container id}]
+;-------------------------------------;
+sub SearchForItem
+  nameSpace Push
+  nameSpace Local SearchForItem
+  set !_1 %1
+  set !_2 %2
+  set !_3 %3
+  set !return #false
+  if !_1 = *
+  {
+    finditem !_1 !_2 , !_3
+    goto searchforitem_end
+  }
+  gosub open_gump #BACKPACKID #true #true
+  if ! #RESULT
+  {
+    set !return #false
+    goto searchforitem_end
+  }
+  str Pos !_1 _
+  set !cnt #STRRES - 1
+  str Left !_1 !cnt
+  set !string #STRRES
+  gosub action_window ...Initiating search for !string
+  if ! %TF_20
+    goto SearchForItem_manualy
+  finditem !_1 !_2 , !_3
+  if #FINDKIND = -1
+  {
+    finditem !_1 !_2 , #CHARID
+    if #FINDKIND <> -1
+    {
+      set !return #true
+      goto searchforitem_end
+    }
+    gosub action_window ...Did not find !string
+    display yesno Did not find !string $
+    +Target now?
+    SearchForItem_manualy:
+    if ! %TF_20 && blade in !string
+      display yesno Target a Knife now for cutting Corpses.
+    if ! %TF_20 && scissors in !string
+      display yesno Target Scissors now for cutting Hides.
+    if #DISPRES = yes
+    {
+      set #TARGCURS 1
+      while #TARGCURS = 1
+        wait %waitFast
+      finditem #LTARGETID
+      if #FINDKIND <> -1
+      {
+        if #FINDTYPE notin % . !string
+          set % . !string % . !string , #FINDTYPE , _
+        set !return #true
+        goto searchforitem_end
+      }
+    }
+    if #DISPRES = no
+    {
+      set !return #false
+      goto searchforitem_end
+    }
+  }
+  if #FINDTYPE in !_1 || #FINDID in !_1 && #FINDKIND <> -1
+    set !return #true
+  searchforitem_end:
+  set %return !return
+  nameSpace Clear
+  nameSpace Pop
+return %return
+;-------------------------------------;
+;  setup lootbag
+;  %1 = true/false
+;  %2 = bag_ID
+;  %3 = bag_loc
+;-------------------------------------;
+sub set_bag
+  nameSpace Push
+  nameSpace Local set_bag
+  set !2 %2
+  set !3 %3
+  if %1 && % . !2 <> N/A
+    goto setbag_end
+  gosub open_gump #BACKPACKID #true #false
+  gosub action_window ...Initiating !2 setup
+  display okcancel Please select !2
+  if #DISPRES = cancel
+  {
+    if % . !2 = N/A
+      display ok No !2 selected!$
+    goto setbag_end
+  }
+  setbagloop:
+  set #TARGCURS 1
+  while #TARGCURS = 1
+    wait %waitFast
+  repeat
+  {
+    finditem #LTARGETID
+    if #FINDKIND <> -1
+      break
+    if #FINDKIND = -1 && !cnt <> 1
+    {
+      ignoreitem #LTARGETID
+      set !cnt 1
+      continue
+    }
+    gosub action_window ...Cannot find target.
+    display yesno Error: Cannot find target.$
+    +Try again?
+    if #DISPRES = yes
+      goto setbagloop
+    display Script halted!
+    halt
+  }
+  until #true
+  finditem #LTARGETID
+  gosub event_property #LTARGETID $ #true
+  set !n #RESULT
+  if #FINDID = #CHARID
+    set % . !3 Character
+  if #FINDID = #BACKPACKID
+    set % . !3 Backpack
+  if #FINDBAGID = #BACKPACKID
+    set % . !3 Subbag
+  if #FINDSTACK = 0 && #FINDBAGID = X && #FINDID <> #CHARID
+    set % . !3 Packy
+  if #FINDSTACK > 0 && #FINDBAGID = X
+    set % . !3 Ground
+  if %lootbag_loc = N/A
+    set % . !3 Unknown
+  gosub action_window ... , !2 type: %lootbag_loc
+  display yesno You have selected$
+  +Location: %lootbag_loc $
+  +Name/ID: !n $
+  +$
+  +note: If target is packy or chest must be within 2 tiles during looting.$
+  +if selected target is of an unknown type it may still work.$
+  +$
+  +Is this target ID: #FINDID correct?
+  if ! %event_property || !n = #FINDID
+    set %lootbag_name All
+  else
+    set %lootbag_name !n
+  if #DISPRES = yes
+  {
+    set % . !2 #LTARGETID
+    ;set % . !2 % . !2 , #CHARNAME , _
+    if % . !2 notin %ignore_ID
+      set %ignore_ID %ignore_ID , % . !2 , _
+    goto setbag_end
+  }
+  if #DISPRES = no
+    goto setbagloop
+  setbag_end:
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  Script Error Check
+;  %1 - true/false
+;-------------------------------------;
+sub error_check
+  nameSpace Push
+  nameSpace Local error_check
+  set #LPC %lpcFast
+  set %pause #false
+  set %journal
+  finditem %lootbag_ID
+  if %lootbag_ID <> #FINDID && %lootbag_loc <> packy
+  {
+    gosub open_gump #BACKPACKID #true #true
+    if %1
+    {
+      gosub action_window ...Can't find lootbag!
+      display yesnocancel Can't find lootbag, select a new one?
+      if #DISPRES = yes
+        gosub set_bag #false lootbag_ID lootbag_loc
+      if #DISPRES = no
+        wait 1s
+      if #DISPRES = cancel
+      {
+        gosub action_window ...Script halted
+        halt
+      }
+    }
+  }
+  if #TIME > %reset_time
+  {
+    gosub action_window ...Auto reset ignore list.
+    ignoreitem reset
+    set %ignore_ID
+    set %reset_time #TIME + %reset_cnt
+  }
+  if #CHARNAME = N/A  ;-------open charactor status bar
+  {
+    gosub action_window ...Opening status bar.
+    event macro 8 2
+    wait %waitSlow
+  }
+  onHotKey %hotkey1 %hotkey2
+    gosub pause_script
+  while %TF_16 && #WEIGHT > %max_weight && packy notin %lootbag_loc  ;-------stop before full
+  {
+    gosub action_window ...Paused: weight ( #WEIGHT / #MAXWEIGHT )
+    if #DISPRES <> Ok
+      display ok "Paused" Weight #WEIGHT of #MAXWEIGHT
+    gosub mainmenu_buttons
+    while #LLIFTEDKIND = 1
+      gosub auto_learn
+  }
+  while %TF_10 && H in #CHARSTATUS  ;-------stop looting on hide
+  {
+    gosub action_window ...Paused: hiding.
+    gosub mainmenu_buttons
+  }
+  while %TF_11 && G in #CHARSTATUS  ;-------stop looting in warmode
+  {
+    gosub action_window ...Paused: warmode.
+    gosub mainmenu_buttons
+  }
+  while #CHARGHOST = yes  ;-------stop when dead
+  {
+    gosub action_window ...Paused: got yourself perished #CHARNAME , !
+    gosub mainmenu_buttons
+  }
+  while #CLILOGGED <> 1 && #CLITOP < 1 ;-------stop when logged out
+  {
+    gosub action_window ...Paused: logged out!
+    gosub mainmenu_buttons
+    wait %waitSlow
+  }
+  while #LLIFTEDKIND = 1
+    gosub auto_learn
+  while #JINDEX > %_jindex
+  {
+    set %_jindex %_jindex + 1
+    scanjournal %_jindex
+    if %will_be_a_criminal in #JOURNAL
+      set %journal %journal , criminal , _
+    if %may_not_loot in #JOURNAL || %You_did_not_earn in #JOURNAL || %did_not_slay_this in #JOURNAL
+      set %journal %journal , lootrights , _
+    if %That_is_too in #JOURNAL || %That_is_out in #JOURNAL || %You_must_wait in #JOURNAL || %You_can_not_pick in #JOURNAL || %You_are_already in #JOURNAL || %I_cant_reach_that in #JOURNAL
+      set %journal %journal , cantmove , _
+    if %is_attacking_you in #JOURNAL
+      set %journal %journal , underattack , _
+    if %You_are_now_under in #JOURNAL
+      set %journal %journal , underguard , _
+    if %You_have_left_the in #JOURNAL
+      set %journal %journal , unguarded , _
+    if %It_appears_to_be_locked in #JOURNAL
+      set %journal %journal , chestlocked , _
+    if %You_dont_see_how in #JOURNAL
+      set %journal %journal , cantunlock , _
+    if %world_is_saving in #JOURNAL
+      set %journal %journal , worldsaving , _
+    if %world_save_complete in #JOURNAL
+      set %journal %journal , savecomplete , _
+    if %renamed_to in #JOURNAL && %lootbag_name in #JOURNAL
+    {
+      if packy in %regbag_loc
+        set !_loc %regbag_ID
+      if packy in %lootbag_loc
+        set !_loc %lootbag_ID
+      gosub event_property !_loc $ #true
+      if %event_property
+        set %lootbag_name #RESULT
+      else
+        set %lootbag_name All
+    }
+    if %that_container_cannot in #JOURNAL
+    {
+      gosub action_window ...Lootbag may be full: %lootbag_ID
+      gosub pause_script
+    }
+    if %That_is_not_your_container in #JOURNAL
+    {
+      gosub action_window ...Container error
+      display yesno You can't store things here: %lootbag_name $
+      +Select a new lootbag.
+      if #DISPRES = yes
+        gosub set_bag #false lootbag_ID lootbag_loc
+      if #DISPRES = no
+      {
+        gosub action_window ...Script halted
+        halt
+      }
+    }
+  }
+  str Len %journal
+  if #STRRES < 1
+    set %journal N/A
+  set #LPC %lpcSlow
+  nameSpace Clear
+  nameSpace Pop
+return %journal
+;-------------------------------------;
+;   learn what you pickup
+;-------------------------------------;
+sub auto_learn
+  nameSpace Push
+  nameSpace Local auto_learn
+  gosub event_property #LLIFTEDID $ #false
+  gosub action_window Busy with: #RESULT
+  if #LLIFTEDID notin %ignore_ID
+    set %ignore_ID %ignore_ID , #LLIFTEDID , _
+  if %TF_13 ;-------learn mode
+  {
+    if #LLIFTEDTYPE notin %all_loot
+    {
+      for !i 1 %itemgroup_cnt
+      {
+        if AutoLearn in %itemgroup_ . !i
+        {
+          if #LLIFTEDTYPE notin %itemgroup_ . !i
+            set %itemgroup_ . !i %itemgroup_ . !i , #LLIFTEDTYPE , _
+          goto learn
+        }
+      }
+      gosub action_window Creating AutoLearn entry.
+      set %itemgroup_cnt %itemgroup_cnt + 1
+      set %itemgroup_ . !i AutoLearn , _ , #LLIFTEDTYPE , _
+      set %TF_list . !i #true
+      learn:
+      set %learn_Type %learn_Type , #LLIFTEDTYPE , _
+      gosub action_window Adding item type #LLIFTEDTYPE
+      gosub combine_itemgroups
+    }
+  }
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  open backpack
+;  %1 - container id
+;  %2 - true = backpack / false = other
+;  %3 - true = { if searching for blade/scissors }
+;-------------------------------------;
+sub open_gump
+  nameSpace Push
+  nameSpace Local open_gump
+  nextCPos %contpos_x %contpos_y
+  set !time #TIME + 5
+  set !return #true
+  set !_1 %1
+  set !_2 %2
+  set !_3 %3
+  finditem !_1
+  if #FINDSTACK = 0 && #FINDDIST =< 2
+  {
+    gosub openit !_1
+    goto open_gump_end
+  }
+  while #CONTID <> !_1
+  {
+    if !time < #TIME || #FINDDIST > 2
+    {
+      gosub action_window ...Unable to open backpack.
+      if !_3
+        display ok Error: Backpack must be accessable to search for blade/scissors.$
+      set !return #false
+      goto open_gump_end
+    }
+    if !time > #TIME
+    {
+      gosub event_property !_1 $ #false
+      if locked in #RESULT
+      {
+        gosub action_window ...Can't open: #RESULT
+        set !return #false
+        goto open_gump_end
+      }
+      gosub action_window Opening #RESULT
+    }
+    if !_2
+      event macro 8 7
+    else
+      gosub openit !_1
+    wait %waitSlow
+  }
+  open_gump_end:
+  set %return !return
+  nameSpace Clear
+  nameSpace Pop
+return %return
+;-------------------------------------;
+;  interact with object
+;  %1 = #LOBJECTID
+;  %2 = #LTARGETID
+;  %3 = #LTARGETKIND
+;-------------------------------------;
+sub openit
+  nameSpace Push
+  nameSpace Local openit
+  if %0 = 1
+    set %2 N/A
+  set #LOBJECTID %1
+  event macro 17 0
+  wait %waitFast
+  set #LTARGETID %2
+  set #LTARGETKIND %3
+  target %waitSlow
+  event macro 22 0
+  wait %waitFast
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  manualy pause script
+;-------------------------------------;
+sub pause_script
+  nameSpace Push
+  nameSpace Local pause_script
+  set #MENUBUTTON N/A
+  wait %waitSlow
+  set !scnt2 #SCNT2
+  set !tmp ActiveBorder
+  while #MENUBUTTON <> btn_pause
+  {
+    gosub action_window ...Paused
+    if #SCNT2 > !scnt2
+    {
+      menu delete btn_pause
+      menu Font BGColor !tmp
+      menu Button btn_pause 80 132 69 17 Pause
+      set !scnt2 #SCNT2 + 2
+      if !tmp = red
+	      set !tmp ActiveBorder
+      else
+	      set !tmp red
+    }
+    onHotKey %hotkey1 %hotkey2
+      break
+    if #MENUBUTTON = btn_options
+    {
+      gosub options
+      break
+    }
+    wait %waitFast
+  }
+  gosub action_window ...Looting started
+  menu Font BGColor ActiveBorder
+  menu Button btn_pause 80 132 69 17 Pause
+  set #MENUBUTTON N/A
+  wait %waitFast
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  main menu: window actions list
+;  %1 -
+;-------------------------------------;
+sub action_window
+  nameSpace Push
+  nameSpace Local action_window
+  if %1 = N/A
+    goto actiondone
+  set !new
+  for !i 1 %0
+    set !new !new , % . !i , #spc
+  if !new = %last_act
+    goto actiondone
+  menu List Add list_actions !new
+  set %list_count %list_count + 1
+  menu List Select list_actions %list_count
+  set %last_act !new
+  actiondone:
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  track gold and loot
+;-------------------------------------;
+sub counting_items
+  menu Font BGColor GrayText
+  if %1 in %gold
+  {
+    set *xparr_gold *xparr_gold + %2
+    menu delete label_2
+    menu Text label_2 34 160 *xparr_gold
+  }
+  set *xparr_items *xparr_items + 1
+  menu delete label_4
+  menu Text label_4 162 160 *xparr_items
+return
+;-------------------------------------;
+;  main menu
+;-------------------------------------;
+sub main_menu
+  menu Clear
+	menu Window Title Smart Looter: #CHARNAME
+	menu Window Color 3DDkShadow
+	menu Window Size 229 182
+	menu Font Transparent #true
+	menu Font Align Right
+	menu Shape shape_1 4 4 221 149 3 7 1 Black 7 BtnShadow
+	menu Shape shape_2 4 156 221 21 3 7 1 Black 7 BtnShadow
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Style
+	menu Font Color WindowText
+	menu Font Transparent #false
+	menu Font Align Left
+	menu Font BGColor GrayText
+  menu Text text_gold 8 160 Gold:
+	menu Text EUOLabel1 108 160 Item Count:
+	menu Text label_2 34 160 *xparr_gold
+	menu Text label_4 162 160 *xparr_items
+	menu Font BGColor $00B3A28C
+	menu List Create list_actions 8 8 213 102
+	menu Font BGColor BtnFace
+	menu Button btn_reset 8 132 69 17 Reset
+	menu Button btn_pause 80 132 69 17 Pause
+	menu Button btn_options 152 132 69 17 Options
+  menu Button btn_loottarget 8 112 213 17 Loot Target
+	menu Show
+return
+;-------------------------------------;
+;  options menu
+;-------------------------------------;
+sub options_menu
+  menu Clear
+	menu Window Title v1.60 Options Menu: Looting "Paused"
+	menu Window Color 3DDkShadow
+	menu Window Size 529 264
+	menu Font Transparent #true
+	menu Font Align Right
+	menu Shape shape_6 4 4 209 193 3 7 1 Black 7 BtnShadow
+	menu Shape shape_4 316 4 209 221 3 7 1 Black 7 BtnShadow
+	menu Shape shape_edit1 4 228 521 31 3 7 1 Black 7 BtnShadow
+	menu Shape shape_2 216 56 97 169 3 7 1 Black 7 BtnShadow
+	menu Shape shape_7 320 8 97 109 3 7 1 Black 7 ScrollBar
+	menu Shape shape_9 320 120 97 57 3 7 1 Black 7 ScrollBar
+	menu Shape shape_10 320 180 97 41 3 7 1 Black 7 ScrollBar
+	menu Shape shape_11 420 8 101 213 3 7 1 Black 7 ScrollBar
+	menu Shape shape_1 4 200 209 25 3 7 1 Black 7 BtnShadow
+	menu Shape shape_3 216 4 97 49 3 7 1 Black 7 BtnShadow
+	menu Shape shape_lootbag 220 105 89 17 3 7 1 Black 7 BtnShadow
+	menu Shape shape_regbag 220 143 89 17 3 7 1 Black 7 BtnShadow
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Style
+	menu Font Color WindowText
+	menu Font BGColor $00B3A28C
+  menu List Create list_1 8 25 201 149
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Style
+	menu Font Color WindowText
+	menu Font BGColor ActiveBorder
+  menu Button btn_enable 9 8 63 17 Enable
+	menu Button btn_disable 75 8 63 17 Disable
+  menu Button btn_savereturn 220 204 89 17 Save / Return
+	menu Button btn_loadlast 220 184 89 17 Load / Last
+	menu Button btn_loaddefaults 220 164 89 17 Load / Defaults
+  menu Button btn_lootbag 220 88 89 17 Set Loot Bag
+  menu Button btn_regbag 220 126 89 17 Set Reg Bag
+	menu Button btn_up 8 176 99 17 Up
+	menu Button btn_down 110 176 99 17 Down
+	menu Button btn_create 8 204 65 17 Create New
+	menu Button btn_delete 76 204 65 17 Delete Last
+	menu Button btn_addtarget 144 204 65 17 Add Target
+	menu Font Align Left
+	menu Font BGColor BtnShadow
+  menu Text text_lootbag 224 108 %lootbag_ID
+	menu Text text_regbag 224 146 %regbag_ID
+	menu Check check_all 140 8 33 17 #false All
+	menu Font BGColor Window
+  menu Combo Create combo_weight 440 160 73
+	menu Edit edit_1 8 232 513 N/A
+	menu Edit edit_pause 219 26 29 F1
+	menu Combo Create combo_pause 247 26 62
+	menu Combo Add combo_pause alt
+	menu Combo Add combo_pause ctrl
+	menu Combo Add combo_pause shift
+	menu Combo Add combo_pause N/A
+	menu Show
+return
+;-------------------------------------;
+;  option menu: check box's
+;-------------------------------------;
+sub check_menu
+  menu Font BGColor Menu
+  for %i 1 %options_cnt
+    menu delete check_ , %i
+  menu Check check_1 324 16 85 13 %TF_1 Loot Corpse
+	menu Check check_4 336 32 69 13 %TF_4 Loot All
+	menu Check check_19 324 48 77 13 %TF_19 Ignore PC
+	menu Check check_8 324 64 81 13 %TF_8 Hide Corpse
+	menu Check check_5 324 80 77 13 %TF_5 Cut Corpse
+	menu Check check_6 324 96 81 13 %TF_6 Cut Hides
+	menu Check check_3 324 124 81 17 %TF_3 Loot Chest
+	menu Check check_18 336 140 69 17 %TF_18 Loot All
+	menu Check check_17 324 160 77 13 %TF_17 Hide Chest
+	menu Check check_2 324 184 81 17 %TF_2 Loot Ground
+	menu Check check_14 336 200 69 17 %TF_14 Loot All
+	menu Check check_9 424 16 89 13 %TF_9 Close Gump
+	menu Check check_22 424 32 89 13 %TF_22 Reagent Bag
+	menu Check check_12 424 48 93 13 %TF_12 Priority Looting
+	menu Check check_15 424 64 89 13 %TF_15 Call Packy
+	menu Check check_7 424 80 89 13 %TF_7 Sheer Sheep
+	menu Check check_10 424 96 93 13 %TF_10 Stop on Hiding
+	menu Check check_11 424 112 93 13 %TF_11 Stop on War
+	menu Check check_13 424 128 85 13 %TF_13 Auto Learn
+	menu Check check_16 424 144 93 13 %TF_16 Weight Check
+	menu Check check_20 424 184 93 29 %TF_20 Auto Detect: Knife/Scissors
+  menu Font BGColor BtnShadow
+  menu Check check_21 220 8 73 17 %TF_21 Pause Key
+return
+;-------------------------------------;
+;  options menu
+;-------------------------------------;
+sub options
+  nameSpace Push
+  nameSpace Local options
+  gosub options_menu
+  gosub check_menu
+  menu get list_1
+  menu Font BGColor Window
+  menu delete edit_1
+  for !i 1 #MAXWEIGHT
+    menu Combo Add combo_weight !i
+  if %max_weight > #MAXWEIGHT
+    set %max_weight #MAXWEIGHT
+  menu Combo Select combo_weight %max_weight
+  menu Combo Select combo_pause 1
+  gosub load_string #true
+  menu List Select list_1 #RESULT
+  menu Edit edit_1 8 232 513 %itemgroup_ . #MENURES
+  while #MENUBUTTON <> btn_savereturn
+  {
+    menu get list_1
+    if #MENURES <> %last
+      gosub get_edit #true
+    if #MENUBUTTON = btn_delete ;-------delete
+    {
+      if AutoLearn in %itemgroup_ . %itemgroup_cnt ;--------forget learned
+        set %learn_Type
+      set %itemgroup_ . %itemgroup_cnt N/A
+      set %TF_list . %itemgroup_cnt #false
+      set %itemgroup_cnt %itemgroup_cnt - 1
+      if %itemgroup_cnt = 0
+      {
+        set %itemgroup_cnt 1
+        set %itemgroup_ . %itemgroup_cnt rename_
+        set %TF_list . %itemgroup_cnt #true
+      }
+      menu get list_1
+      if #MENURES >= %itemgroup_cnt
+      {
+        gosub load_string #true
+        set %last %itemgroup_cnt
+        menu List Select list_1 %last
+        gosub get_edit #false
+        goto btn_delete_end
+      }
+      gosub load_string #true
+      menu List Select list_1 %last
+      btn_delete_end:
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_create ;-------create new
+    {
+      gosub get_edit #false
+      set %itemgroup_cnt %itemgroup_cnt + 1
+      set %itemgroup_ . %itemgroup_cnt rename_
+      set %TF_list . %itemgroup_cnt #true
+      set %last %itemgroup_cnt
+      gosub load_string #true
+      menu List Select list_1 %last
+      gosub get_edit #false
+      goto btn_delete_end
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_addtarget ;-------add target
+    {
+      set #TARGCURS 1
+      while #TARGCURS = 1
+        wait %waitFast
+      finditem #LTARGETID
+      for !i 1 %itemgroup_cnt
+      {
+          if #FINDTYPE in %itemgroup_ . !i
+          {
+            display Found #FINDTYPE under %itemgroup_ . !i
+            goto foundtarget
+          }
+      }
+      set %itemgroup_ . %last %itemgroup_ . %last , #FINDTYPE , _
+      foundtarget:
+      gosub get_edit #false
+      set #MENUBUTTON N/A
+    }
+    if %TF_13 && #LLIFTEDKIND = 1 && #LLIFTEDTYPE notin %learn_Type && #LLIFTEDTYPE notin %all_loot
+    {
+      gosub auto_learn
+      gosub get_edit #false
+      gosub load_string #true
+      menu List Select list_1 %last
+    }
+    menu get check_21 ;-------select all enable/disable
+    if #MENURES
+    {
+      menu get edit_pause
+      set %hotKey1 #MENURES
+      menu get combo_pause
+      set %hotKey2 %combo_pause . #MENURES
+    }
+    else
+    {
+      set %hotKey1
+      set %hotKey2
+    }
+    if #MENUBUTTON = btn_enable
+      gosub EnDis_list #true
+    if #MENUBUTTON = btn_disable
+      gosub EnDis_list #false
+    if #MENUBUTTON = btn_loadlast
+    {
+      set !cnt %itemgroup_cnt
+      for !i 1 %itemgroup_cnt
+        set %itemgroup_ . !i N/A
+      gosub load_settings #true
+      set %last %itemgroup_cnt
+      gosub load_string #true
+      menu List Select list_1 %last
+      gosub get_edit #false
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_loaddefaults
+    {
+      for !i 1 %itemgroup_cnt
+        set %itemgroup_ . !i N/A
+      gosub default_variables
+      set !i 1
+      while %itemgroup_ . !i <> N/A
+      {
+        set %itemgroup_cnt !i
+        set %TF_list . !i #true
+        set !i !i + 1
+      }
+      set %last %itemgroup_cnt
+      gosub load_string #true
+      menu List Select list_1 %last
+      gosub get_edit #false
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_up
+    {
+      gosub get_edit #true
+      menu get list_1
+      gosub up_down #MENURES -
+      gosub load_string #true
+      menu List Select list_1 %last
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_down
+    {
+      gosub get_edit #true
+      menu get list_1
+      gosub up_down #MENURES +
+      gosub load_string #true
+      menu List Select list_1 %last
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_lootbag
+    {
+      gosub set_bag #false lootbag_ID lootbag_loc
+      menu delete text_lootbag
+      menu Text text_lootbag 224 104 %lootbag_ID
+      set #MENUBUTTON N/A
+    }
+    if #MENUBUTTON = btn_regbag
+    {
+      gosub set_bag #false regbag_ID regbag_loc
+      if %regbag_loc <> N/A && %TF_22 <> #true
+      {
+        menu delete check_22
+        menu Font BGColor Menu
+        menu Check check_22 424 32 89 13 #true Reagent Bag
+        menu delete text_regbag
+	      menu Text text_regbag 224 144 %regbag_ID
+      }
+      set #MENUBUTTON N/A
+    }
+    for !i 1 %options_cnt
+    {
+      menu get check_ , !i
+      set %TF_ , !i #MENURES
+    }
+    if %TF_16
+    {
+      menu get combo_weight
+      set %max_weight #MENURES
+    }
+    if %TF_4 && ! %TF_1 ;-------all corpse
+    {
+      menu delete check_1
+      menu Font BGColor Menu
+      menu Check check_1 324 16 85 13 #true Loot Corpse
+    }
+	  if %TF_14 && ! %TF_2 ;-------all ground
+	  {
+      menu delete check_2
+      menu Font BGColor Menu
+      menu Check check_2 324 184 81 17 #true Loot Ground
+    }
+    if %TF_18 && ! %TF_3 ;-------all chest
+	  {
+      menu delete check_3
+      menu Font BGColor Menu
+      menu Check check_3 324 124 81 17 #true Loot Chest
+    }
+    if #MENUBUTTON = CLOSED
+      halt
+  }
+  menu get edit_1
+  set %itemgroup_ . %last #MENURES
+  gosub combine_itemgroups
+  gosub save_settings
+  set %list_count
+  gosub main_menu
+  gosub tf_check
+  set #MENUBUTTON N/A
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  %1 -
+;-------------------------------------;
+sub get_edit
+  if ! %1
+    goto get_edit_skip
+  menu get edit_1
+  set %itemgroup_ . %last #MENURES
+  menu get list_1
+  set %new #MENURES
+  if #MENURES < 1
+    menu List Select list_1 1
+  get_edit_skip:
+  menu delete edit_1
+  menu Font BGColor Window
+  menu Edit edit_1 8 232 513 %itemgroup_ . %new
+  set %last %new
+return
+;-------------------------------------;
+;  moves loot list selection up or down
+;  %1 -
+;  %2 - { + | - }
+;-------------------------------------;
+sub up_down
+  nameSpace Push
+  nameSpace Local up_down
+  set !tmp_a %itemgroup_ . %1
+  set !tmp_b %TF_list . %1
+  set !cnt %1 %2 1
+  if %itemgroup_ . !cnt = N/A
+    goto updown_end
+  set %itemgroup_ . %1 %itemgroup_ . !cnt
+  set %TF_list . %1 %TF_list . !cnt
+  set %itemgroup_ . !cnt !tmp_a
+  set %TF_list . !cnt !tmp_b
+  set %last !cnt
+  updown_end:
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+; options menu: Sub to update loot list
+; %1 -
+;-------------------------------------;
+sub load_string
+  nameSpace Push
+  nameSpace Local load_string
+  set #lpc %lpcFast
+  set %loot_list
+  if ! %1
+    goto skipload_string
+  menu Delete list_1
+  menu Font Style
+  menu Font BGColor $00B3A28C
+  menu List Create list_1 8 25 201 149
+  menu List Select list_1 1
+  menu Font Size 12
+  menu Font BGColor ActiveBorder
+  menu Edit load_msg 58 88 97 Loading...
+  menu Font Size 8
+  skipload_string:
+  for !i 1 %itemgroup_cnt
+  {
+    str Pos %itemgroup_ . !i _
+    set %cnt #STRRES
+    str Left %itemgroup_ . !i %cnt
+    if %TF_list . !i
+    {
+      set %list . !i Enabled , #spc , - , #spc , #STRRES
+      set %TF_list . !i #true
+    }
+    if ! %TF_list . !i
+    {
+      set %list . !i - , #spc , #STRRES
+      set %TF_list . !i #false
+      goto listadd
+    }
+    str Len %itemgroup_ . !i
+    set !tmp #STRRES - %cnt
+    str Right %itemgroup_ . !i !tmp
+    set %loot_list %loot_list , #STRRES
+    listadd:
+    menu List Add list_1 !i , #spc , %list . !i
+  }
+  set %result !i - 1
+  menu Delete load_msg
+  set #lpc %lpcSlow
+  nameSpace Clear
+  nameSpace Pop
+return %result
+;-------------------------------------;
+;  Save Button
+;-------------------------------------;
+sub save_settings
+  nameSpace Push
+  nameSpace Local save_settings
+  menu Window Title Options Menu: Saving...
+  menu get list_1
+  for !i 1 %lcnt
+    set %Type_list . !i
+  set %lcnt 1
+  set %TF_list
+  set %TF_options
+  for !i 1 %itemgroup_cnt
+  {
+    savesettings:
+    if %Type_list . %lcnt = N/A
+      set %Type_list . %lcnt
+    if %itemgroup_ . !i = N/A
+      break
+    set %Type_list . %lcnt %Type_list . %lcnt , %itemgroup_ . !i , +
+    str Len %Type_list . %lcnt
+    if #STRRES > %buffer_length
+    {
+      set %Type_list . %lcnt %last
+      set %lcnt %lcnt + 1
+      goto savesettings
+    }
+    set %TF_list %TF_list , %TF_list . !i , +
+    set %last %Type_list . %lcnt
+  }
+  for !i 1 %options_cnt
+    set %TF_options %TF_options , %TF_ . !i , +
+  execute %cmd /c erase smartlooter.cfg
+  for !i 1 %lcnt
+    execute %cmd /c echo set % , Type_list , !i %Type_list . !i >> smartlooter.cfg
+  execute %cmd /c echo set % , TF_list %TF_list >> smartlooter.cfg &&
+  + echo set % , TF_options %TF_options >> smartlooter.cfg &&
+  + echo set % , wait_drag %wait_drag >> smartlooter.cfg &&
+  + echo set % , chraname #CHARNAME >> smartlooter.cfg &&
+  + echo set % , max_weight %max_weight >> smartlooter.cfg &&
+  + echo set % , lootbag_loc %lootbag_loc >> smartlooter.cfg &&
+  + echo set % , lootbag_ID %lootbag_ID >> smartlooter.cfg &&
+  + echo set % , regbag_loc %regbag_loc >> smartlooter.cfg &&
+  + echo set % , regbag_ID %regbag_ID >> smartlooter.cfg &&
+  + echo set % , hotkey1 %hotkey1 >> smartlooter.cfg &&
+  + echo set % , hotkey2 %hotkey2 >> smartlooter.cfg &&
+  + echo set % , lcnt %lcnt >> smartlooter.cfg &&
+  + echo exit >> smartlooter.cfg
+  set #MENUBUTTON N/A
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+; enable / disable loot list selection
+; %1 -
+;-------------------------------------;
+sub EnDis_list
+  nameSpace Push
+  nameSpace Local EnDis_list
+  menu get check_all
+  if #MENURES
+  {
+    for !i 1 %itemgroup_cnt
+      set %TF_list . !i %1
+  }
+  menu get list_1
+  set %last #MENURES
+  if %TF_list . %last <> %1
+    set %TF_list . %last %1
+  gosub load_string #true
+  menu List Select list_1 %last
+  set #MENUBUTTON N/A
+  nameSpace Clear
+  nameSpace Pop
+return
+;-------------------------------------;
+;  setup main variables
+;-------------------------------------;
+sub main_variables
+  ;-----------------------------------;
+  set %That_is_too That_is_too_far_away
+  set %That_is_out That_is_out_of_sight
+  set %You_must_wait You_must_wait_to
+  set %You_can_not_pick You_can_not_pick_that_up
+  set %You_are_already You_are_already_holding
+  set %I_cant_reach_that I_can't_reach_that.
+  ;-----------------------------------;
+  set %You_are_now_under You_are_now_under
+  set %You_have_left_the You_have_left_the
+  set %is_attacking_you is_attacking_you
+  ;-----------------------------------;
+  set %may_not_loot may_not_loot
+  set %will_be_a_criminal a_criminal_act  ;Looting_this_corpse_will_be_a_criminal_act!
+  set %You_did_not_earn You_did_not_earn_the_right_to_loot
+  set %did_not_slay_this did_not_slay_this_creature
+  ;-----------------------------------;
+  set %It_appears_to_be_locked It_appears_to_be_locked.
+  set %The_lock_quickly_yields The_lock_quickly_yields
+  set %You_dont_see_how You_don't_see_how_that_lock_can_be_manipulated.
+  set %You_set_off_a_trap You_set_off_a_trap!
+  ;-----------------------------------;
+  set %world_is_saving world_is_saving
+  set %world_save_complete world_save_complete
+  ;-----------------------------------;
+  set %That_is_not_your_container That_is_not_your_container,_you_can't_store_things_here.
+  set %renamed_to renamed_to
+  set %that_container_cannot That_container_cannot_hold_more_weight
+  ;-----------------------------------;
+  set %lootbag_loc N/A
+  set %lootbag_ID N/A
+  set %hotkey1 N/A
+  set %hotkey2 N/A
+  set #MENUBUTTON N/A
+  ;-----------------------------------;
+  set %lpcFast 500
+  set %lpcSlow 50
+  set %waitFast 2
+  set %waitSlow 5
+  set %wait_drag 400 ;------dragdrop delay
+  set %wait_dragincrement 25
+  set %options_cnt 22
+  set %reset_cnt 1000
+  set %max_weight #MAXWEIGHT
+  set %contpos_x 50
+  set %contpos_y 50
+  ;-----------------------------------;
+  set %reset_time #TIME
+  set #lpc %lpcSlow
+  set %TF_list
+  set %learn_Type
+  set %ignore_ID
+  set %reagents
+  set %ignore_Type XII_YFM_
+  set %_jindex #JINDEX
+  set %combo_pause1 alt
+  set %combo_pause2 ctrl
+  set %combo_pause3 shift
+  set %combo_pause4
+  ;-----------------------------------;
+  ;--- set gold type
+  set %gold gold_POF_
+  ;--- set skining blade Type
+  set %blade blade_GMH_HNF_BNF_TRD_URD_CNF_TSF_WSF_NMH_
+  ;--- set scissor type for cuting hides
+  set %scissors scissors_JAG_
+  ;--- set hides to know what to cut
+  set %hides hides_EEG_DEG_GED_
+  ;--- set corpse type
+  set %corpse YFM_
+  ;--- set sheep type
+  set %sheep PF_
+  ;--- set containers to loot from, on the ground.
+  set %other_corpse WNF_LNF_KNF_YNF_MNF_PNF_JNF_
+  set %container EDE_EFP_IFP_GFP_PVD_NVD_KIF_TMF_VMF_HKF_IHP_CFP_KKF_ZTD_SHP_GHP_
+  +MHP_KHP_AHP_YGP_CUD_PWN_UXM_SPF_TXM_OKF_AUD_LKF_QWN_VWN_TWN_WWN_CTD_BKF_KUD_ZJF_
+  +HIF_JKF_BUD_JWN_CKF_UWN_JIF_DLN_ELN_HWN_DVD_BDE_GZD_VCE_BFP_UYD_JHP_DHP_LHP_HHP_
+  +VEP_FFP_FHP_XGP_BVD_ZGP_HFP_ , %other_corpse
+return
+;-------------------------------------;
+;  default variables
+;-------------------------------------;
+sub default_variables
+  ;-----------------------------------;
+  set %TF_1 #true  ;loot corpse
+  set %TF_2 #true  ;loot ground
+  set %TF_3 #true  ;loot chest
+  set %TF_4 #false  ;loot all Corpse
+  set %TF_5 #true  ;cut corpse - check for blade
+  set %TF_6 #true  ;cut hides - check for scissor
+  set %TF_7 #false  ;sheer sheep
+  set %TF_8 #false  ;hide corpse
+  set %TF_9 #true  ;close corpse
+  set %TF_10 #false  ;stop on hide
+  set %TF_11 #false  ;stop on war
+  set %TF_12 #false  ;priority looting
+  set %TF_13 #false  ;learn
+  set %TF_14 #false  ;Loot all Ground
+  set %TF_15 #false  ;Call Packy
+  set %TF_16 #false  ;Weight check
+  set %TF_17 #false  ;Hide Chest
+  set %TF_18 #false  ;Loot all chest
+  set %TF_19 #false  ;Ignore PC corpse
+  set %TF_20 #true  ;auto detect knife/scissors
+  set %TF_21 #false  ;pause check
+  set %TF_22 #false  ;reagent check
+  ;set %TF_23 #true  ;necro reagent check
+  ;-----------------------------------;
+  set %itemgroup_1 %gold
+  set %itemgroup_2 gems_ZVF_VVF_NVF_HVF_GVF_UVF_BVF_EVF_RVF_
+  set %itemgroup_3 jewels_UJG_IJG_LWL_MWL_BWL_CWL_ZVL_FJG_SJG_HJG_RJG_TJG_
+  set %itemgroup_4 ore_DWJ_
+  set %itemgroup_5 ingots_ENK_
+  set %itemgroup_6 granite_BVI_
+  set %itemgroup_7 scales_STO_
+  set %itemgroup_8 leather_JJG_
+  set %itemgroup_9 %hides
+  set %itemgroup_10 feathers_VLK_
+  set %itemgroup_11 boards_TLK_
+  set %itemgroup_12 logs_ZLK_
+  set %itemgroup_13 shafts_SLK_
+  set %itemgroup_14 BaleOfCotton_NFF_
+  set %itemgroup_15 Flaxbundle_QEK_
+  set %itemgroup_16 bones_GUF_
+  set %itemgroup_17 wool_OFF_
+  set %itemgroup_18 BoltOfCloth_ZZF_
+  set %itemgroup_19 CutCloth_CUI_
+  set %itemgroup_20 cloth_BUI_
+  set %itemgroup_21 bandage_ZLF_
+  set %itemgroup_22 fish_EQD_GQD_YDF_
+  set %itemgroup_23 net_UDF_
+  set %itemgroup_24 fishingpole_KDF_
+  set %itemgroup_25 sos_RVH_
+  set %itemgroup_26 msginbottle_HTD_
+  set %itemgroup_27 treasuremap_SVH_
+  set %itemgroup_28 skullofpower_PCK_
+  set %itemgroup_29 ChampionSkull_EWH_
+  set %itemgroup_30 Macefighting_GFF_QOH_ADP_QMH_ZPF_RPF_DDP_ZTH_TRH_AUO_BUH_YSF_VTH_UOH_
+  set %itemgroup_31 Fencing_PPF_RRH_MTF_XRH_CUO_OPO_BUO_HDP_FDP_LDP_ZCP_VRH_WSF_
+  set %itemgroup_32 Swordsmanship_QPF_FSF_CNF_HNF_GMH_KDP_GUO_YTH_ZTO_HSF_LPH_RMH_ZRF_NSF_
+  +BSF_LSF_JDP_YCP_EDP_BPH_SOH_JTF_NMH_JPH_NPO_ATF_FUO_
+  set %itemgroup_33 Archery_XCP_PPO_QPO_LMH_USF_WOH_
+  set %itemgroup_34 Shariken_GDP_
+  set %itemgroup_35 Fukiya_MDP_
+  set %itemgroup_36 Arrow_RWF_
+  set %itemgroup_37 Bolt_LNK_
+  set %itemgroup_38 FukiyaDart_SGP_
+  set %itemgroup_39 Sheilds_OIK_LIK_CLK_NIK_AIK_CIK_HLK_FIK_GIK_
+  set %itemgroup_40 Intstruments_PGP_OQF_LQF_PRF_MQF_NRF_QRF_
+  set %itemgroup_41 Wands_IFF_HFF_CFF_
+  set %itemgroup_42 LeatherArmor_NJL_VKH_JKH_KKH_QKH_PKH_
+  set %itemgroup_43 StuddedArmor_MLH_ALH_XKH_LLH_GLH_
+  set %itemgroup_44 RingmailArmor_IMH_BMH_WLH_YLH_
+  set %itemgroup_45 ChainmailArmor_DPH_ZOH_APH_
+  set %itemgroup_46 PlatemailArmor_OSH_LSH_NSH_ISH_HSH_MSH_
+  set %itemgroup_47 BoneArmor_ZPH_CQH_AQH_PPH_QPH_
+  set %itemgroup_48 DragonArmor_NKO_LKO_RKO_PKO_DLO_
+  set %itemgroup_49 FemaleLeatherArmor_YSK_QSK_ATK_OSK_
+  set %itemgroup_50 FemaleStuddedArmor_USK_SSK_
+  set %itemgroup_51 FemalePlateArmor_MSK_
+  set %itemgroup_52 SamuriLeatherArmor_GCP_UBP_OWO_IZO_SWO_GWO_
+  set %itemgroup_53 SamuriStuddedArmor_FCP_CAP_NWO_HZO_PCP_
+  set %itemgroup_54 SamuriPlatemailArmor_DCP_RBP_QWO_SBP_VBP_FWO_DWO_ZBP_ECP_WBP_LWO_PWO_
+  set %itemgroup_55 NinjaLeatherArmor_CCP_OCP_MCP_NCP_LCP_
+  set %itemgroup_56 MiscHelms_EWO_NWL_CSH_GSH_ESH_ASH_
+  set %itemgroup_57 Ribs_VRD_YRD_
+  set %itemgroup_58 FishSteak_IND_
+  set %itemgroup_59 hats_XVI_
+  set %itemgroup_60 Lockpick_IWH_
+  set %itemgroup_61 NecroScroll_CZM_RYM_SYM_PYM_QYM_VYM_WYM_TYM_UYM_JYM_KYM_HYM_IYM_NYM_OYM_LYM_MYM_
+  set %itemgroup_62 MageScroll_CVL_HVL_IVL_FVL_GVL_VUL_WUL_TUL_UUL_ZUL_AVL_XUL_YUL_NUL_OUL_
+  +LUL_MUL_RUL_SUL_PUL_QUL_FUL_GUL_DUL_EUL_JUL_KUL_HUL_IUL_XTL_YTL_VTL_WTL_BUL_CUL_ZTL_AUL_
+  +PTL_QTL_NTL_OTL_TTL_UTL_RTL_STL_FYL_GYL_DYL_EYL_JYL_KYL_HYL_IYL_XXL_YXL_VXL_WXL_BYL_CYL_
+  +ZXL_AYL_PXL_QXL_NXL_
+  set %itemgroup_63 SpellBooks_MPF_ZBN_XXM_YXM_
+  set %itemgroup_64 postions_XUF_ZUF_AVF_UUF_TUF_NUF_YUF_
+  set %itemgroup_65 NecroRegs_YZF_UZF_TZF_OZF_DUF_IUF_
+  set %itemgroup_66 MageRegs_SZF_RZF_WZF_MZF_JZF_KZF_JUF_KUF_
+  set %itemgroup_67 Vines_MVE_
+  set %itemgroup_68 ZoogiFungus_TTO_
+  set %itemgroup_69 Clothing_TQL_TVI_GCI_EDI_NVI_FWL_PVI_PAM_ZVI_DCI_VDI_
+  set %itemgroup_70 Hats_GZH_IWI_JWI_WVI_HWI_BWI_MJN_YVI_CZH_KWI_VVI_EWI_
+  set %itemgroup_71 BodyParts_QIL_SIL_MIL_RIL_FIL_PIL_
+  set %itemgroup_72 Seeds_PDF_
+  set %itemgroup_73 Dirt_NZF_
+  set %itemgroup_74 BolaBalls_FKF_
+  set %itemgroup_75 RawBird_PUD_
+  set %itemgroup_76 Mask_DZH_BZH_
+  set %itemgroup_77 PowerCrystal_YWL_
+  set %itemgroup_78 FireHorn_ZWF_
+  set %itemgroup_79 Tools_PBG_UFG_OGG_DND_IWH_QPF_CIG_FBG_TLH_TBG_CGG_TWF_
+  +ZHG_AGG_EGG_HAG_AIG_FSF_KTL_BIG_RQF_ , %scissors
+return
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; end ;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
