@@ -1,0 +1,119 @@
+                              ;==================================
+    ; Script Name: Froncy's Auto Attack
+    ; Author: Froncy
+    ; Version: 1.00
+    ; Client Tested with: 4.0.0q
+    ; EUO version tested with: 1.40 build 005B
+    ; Shard OSI / FS: FS
+    ; Revision Date: 8th of February 2004
+    ; Public Release: 8th of February 2004
+    ; Purpose: Scans all possible pgs and npcs, and attacks the most dangerous,
+    ; using a custom priority system and selecting the nearest one.
+    ; Instructions:
+    ; Hit F12 to attack the best enemy.
+    ; Hit F11 to toggle Berserk mode: if you haven't got an enemy, it attacks something.
+    ; Hit ESC to halt the script
+    ;==================================
+
+    ;=========SETUP========
+    initevents
+    set %maxtries 17
+    set %alwayson #false
+
+    ; Set to 0 the level of enemy types you DON'T want to attack
+    ; Set to a number greater than 0 the level of enemy types you DO want to attack
+    ; If the script has to choose between more enemies, it chooses between the ones with the greater level.
+
+      ;blue (innocent)
+    set %enemylevel1 0
+      ;green (friend)
+    set %enemylevel2 0
+      ;grey (grey - animal)
+    set %enemylevel3 1
+      ;grey (criminal)
+    set %enemylevel4 1
+      ;orange (enemy)
+    set %enemylevel5 1
+      ;red (murderer)
+    set %enemylevel6 1
+      ;yellow (invulnerable)
+    set %enemylevel7 0
+
+    ;=========MAIN LOOP========
+
+    mainloop:
+    onhotkey f12
+            gosub attackbest
+    onhotkey esc
+            halt
+    onhotkey f11
+            gosub togglealwayson
+    if %alwayson && #enemyid = N/A
+            gosub attackbest
+    goto mainloop:
+
+    ;=========SUBROUTINES========
+
+    sub attackbest
+    set %mindist 18
+    set %bestenemylevel 0
+    set %bestenemy N/A
+    set %tries 0
+    set %firsttarget N/A
+    loopattackbest:
+    event macro 26
+    set %tries %tries + 1
+    finditem #ltargetid g
+    if #findkind = -1
+    {
+            event sysmessage error
+            goto loopattackbest
+    }
+    if #findid = %firsttarget || %tries > %maxtries
+            goto endloopattackbest
+    if %firsttarget = N/A
+            set %firsttarget #ltargetid
+    if %enemylevel . #findrep > 0
+    {
+            if %bestenemy <> N/A
+            {
+                    if %enemylevel . #findrep >= %bestenemylevel && #finddist < %mindist
+                    {
+                            set %bestenemy #findid
+                            set %mindist #finddist
+                            set %bestenemylevel %enemylevel . #findrep
+                    }
+            }
+            if %bestenemy = N/A
+            {
+                    set %bestenemy #findid
+                    set %mindist #finddist
+                    set %bestenemylevel %enemylevel . #findrep
+            }
+    }
+    goto loopattackbest
+    endloopattackbest:
+    if %bestenemy = N/A
+    {
+            if ! %alwayson
+                    event sysmessage enemy not found
+    }
+    if %bestenemy <> N/A
+    {
+            set #ltargetid %bestenemy
+            event macro 27
+    }
+    deletevar %bestenemy
+    deletevar %bestenemylevel
+    deletevar %mindist
+    deletevar %tries
+    deletevar %firsttarget
+    return
+
+    sub togglealwayson
+    set %alwayson ! %alwayson
+    if %alwayson
+            event sysmessage Berserk mode ON
+    if ! %alwayson
+            event sysmessage Berserk mode OFF
+    return

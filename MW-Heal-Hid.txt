@@ -1,0 +1,296 @@
+;Autor: [nGz]
+;Wersja 1.6
+;Przyciskiem u gory wlacza sie i wylacza leczenie,
+;jak jest zielony to mozna zamknac menu i skrypt bedzie caly czas wlaczony,
+;jednak jak jest czezrwony i zamknie sie menu to skrypt sie wylacza.
+;Przycisk Lecz leczy zawsze, bez wzgledu na to czy ten u gory jest czerwony czy zielony.
+;Przycisk Myj B. myje bandaze, po nacisnieciu nalezy wskazac wode.
+;Nizej mozna ustawic pare rzeczy dotyczacych skryptu:
+;%Alarm_HP - defaultowo ustawione na 20, okresla od ilu hp ma wyskakiwac napis o jego stanie.
+;%Alarm_HP_dzwiek - sciezka do wava, ktory bedzie odgrywany wraz z napisem o stanie hp (w sciezce nie moze byc spacji).
+;%Alarm_band - defaultowo ustawione na 10, okresla od jakiej ilosci bandazy ma wyskakiwac napis o ich stanie.
+;%Wlacz_Menu - defaultowo ustawione na 1, jesli nie chcesz zadnego menu zmien na 0.
+;%Ukrywanie - defaultowo ustawione na 0, robi hida miedzy leczeniami, aby wlaczyc ustaw na 1.
+
+;====================
+set %Alarm_HP 20
+set %Alarm_HP_dzwiek E:\Mp3\kryt2.wav
+set %Alarm_band 10
+set %Wlacz_Menu 1
+set %Ukrywanie 1
+;====================
+menu hide
+menu clear
+menu window size 105 50
+menu window title Menu Leczenia
+menu window color btnface
+menu font bgcolor blue
+menu font name verdana
+menu font size 8
+menu font color white
+menu font style b
+menu button Leczenie 53 26 51 23 LECZ !
+menu font size 7
+menu button Myj_bandaze 1 26 51 23 Myj B.
+menu font bgcolor green
+menu button Wyl_leczenie 1 1 103 23
+if %Wlacz_Menu = 1
+  menu show
+;====================
+set #menubutton N/A
+set %Lecze 0
+set %Uzycie 0
+set %Timer_HP 0
+set %Timer_brak_band 0
+set %Timer_juz_cos_robisz 0
+set %Timer_ukrywania 0
+Petla_glowna:
+if #hits = N/A || #maxhits = N/A
+  event macro 8 2
+if #hits <= %Alarm_HP && %Timer_HP < #scnt2
+  gosub Malo_HP
+scanjournal 1
+if #hits < #maxhits && #targcurs = 1 && Kogo_Chcial in #journal
+  event macro 23
+if #hits < #maxhits && H notin #charstatus && #targcurs = 0 && %Timer_juz_cos_robisz < #scnt2
+  gosub Leczenie 0 0
+if #menubutton <> N/A && #menubutton <> CLOSED
+  gosub #menubutton 0 0
+if %Lecze = 1
+  gosub Czekaj_na_koniec
+if %Timer_ukrywania < #scnt2 && %Ukrywanie = 1
+  gosub Ukrywanie
+goto Petla_glowna
+
+sub Czekaj_na_koniec
+set %Lecze 0
+set %Timer_czekaj_na_koniec #scnt2 + 165
+Petla_czekaj_na_koniec:
+if #menubutton <> N/A && #menubutton <> CLOSED
+  gosub #menubutton 1 1
+scanjournal 1
+if %Timer_czekaj_na_koniec < #scnt2 || #hits = #maxhits || Wyleczyl in #journal || Nie_udalo_Ci_sie_wyleczyc_ in #journal || Przestal in #journal
++ || Ta_osoba_jest_w_pelni_zdrowa in #journal || Your_skill_in_Uzdrawianie in #journal || _umiejetnosci_sa_zbyt_male_by_probowac_wskrzesic_ in #journal
++ || Nie_widzisz_tego in #journal || To_zwierze_jest_w in #journal || Nie_mozesz_go_wyleczyc in #journal || Nie_mozesz_tego_wyleczyc in #journal
++ || Anulowano in #journal
+  return
+if #hits <= %Alarm_HP && %Timer_HP < #scnt2
+  gosub Malo_HP
+goto Petla_czekaj_na_koniec
+
+sub Leczenie
+deletejournal
+set #menubutton N/A
+set %Uzycie 0
+Uzycie_bandazy:
+if #hits <= %Alarm_HP && %Timer_HP < #scnt2
+  gosub Malo_HP
+finditem zlf C
+if #findkind = -1
+{
+  if %Timer_brak_band < #scnt2
+  {
+    set %Timer_brak_band #scnt2 + 1200
+    set #sysmsgcol 1080
+    event sysmessage NIE MASZ BANDAZY
+  }
+  return
+}
+set #lobjectid #findid
+if %Uzycie = 0
+  set %Nr_indexu #jindex
+event macro 17
+set %Uzycie 1
+set %Timer #scnt2 + 10
+repeat
+ if %Timer < #scnt2
+   goto Uzycie_bandazy
+ scanjournal 1
+ if Juz_cos_robisz in #journal || I_am_frozen_ in #journal || Anulowano in #journal || Nie_mozesz_tego_teraz_uzyc in #journal || ( I_am_already_ in #journal && #targcurs = 1 ) || Nie_mozesz_teraz_leczyc in #journal
+ {
+   if Juz_cos_robisz in #journal || Nie_mozesz_tego_teraz_uzyc in #journal || Nie_mozesz_teraz_leczyc in #journal
+     set %Timer_juz_cos_robisz #scnt2 + 10
+   if ( I_am_already_ in #journal || I_am_frozen_ in #journal ) && #targcurs = 1
+   {
+     if #jindex - %Nr_indexu > 1
+     {
+       set %Roznica_indexow #jindex - %Nr_indexu
+       for %i %Roznica_indexow 1
+       {
+         Skanuj_ponownie:
+         scanjournal %i
+         if Kogo_Chcial in #journal
+           goto Jest_cel_i_kogo_chcial
+         if #jindex - %Nr_indexu > %Roznica_indexow
+         {
+           set %Roznica #jindex - %Nr_indexu - %Roznica_indexow
+           set %Roznica_indexow %Roznica_indexow + %Roznica
+           set %i %i + %Roznica
+           goto Skanuj_ponownie
+         }
+       }
+     }
+   }
+   return
+ }
+until #targcurs = 1 && Kogo_Chcial in #journal
+Jest_cel_i_kogo_chcial:
+if #menubutton = Wyl_leczenie
+  gosub #menubutton
+event macro 23
+set %Timer #scnt2 + 3
+repeat
+ if %Timer < #scnt2
+   goto Jest_cel_i_kogo_chcial
+until #targcurs = 0
+if #hits < #maxhits && %1 <> 1
+  set %Lecze 1
+if ( #hits < #maxhits && #findstack - 1 <= %Alarm_band ) || ( #hits = #maxhits && #findstack <= %Alarm_band )
+{
+  set #sysmsgcol 1080
+  if #hits < #maxhits
+    set %Ilosc_bandazy #findstack - 1
+  else
+    set %Ilosc_bandazy #findstack
+  if %Ilosc_bandazy <> 0
+    event sysmessage Koncza Ci sie bandaze: %Ilosc_bandazy
+  else
+    event sysmessage Skonczyly Ci sie bandaze!!!
+}
+if %2 = 1
+  set %Timer_czekaj_na_koniec #scnt2 + 165
+return
+
+sub Malo_HP
+if #hits = 0
+  return
+set %Timer_HP #scnt2 + 45
+set #sysmsgcol 1080
+event sysmessage MASZ #hits HP!!!
+sound %Alarm_HP_dzwiek
+return
+
+sub Myj_bandaze
+set #menubutton N/A
+menu delete Myj_bandaze
+menu font bgcolor blue
+menu button Stop_MB 1 26 51 23 Stop
+set %Myl_bandaze 0
+Br_Bandaze:
+finditem amf C
+if #findkind = -1
+{
+  gosub Button_Myj_B.
+  return
+}
+if #menubutton = Stop_MB
+{
+  gosub Button_Myj_B.
+  return
+}
+set #lobjectid #findid
+event macro 17
+set %Timer #scnt2 + 3
+repeat
+if #menubutton = Stop_MB
+{
+  gosub Button_Myj_B.
+  key ESC
+  return
+}
+if %Timer < #scnt2
+  goto Br_Bandaze
+until #targcurs = 1
+Celuj_wode:
+if %Myl_bandaze = 1
+  event macro 22
+set %Timer #scnt2 + 3
+repeat
+if #menubutton = Stop_MB
+{
+  key ESC
+  gosub Button_Myj_B.
+  return
+}
+onhotkey ESC
+{
+  if #targcurs = 0
+  {
+    gosub Button_Myj_B.
+    return
+  }
+}
+if %Timer < #scnt2
+  goto Celuj_wode
+until #targcurs = 0
+onhotkey ESC
+{
+  gosub Button_Myj_B.
+  return
+}
+set %Myl_bandaze 1
+set %Timer #scnt2 + 45
+repeat
+if %Timer < #scnt2
+  break
+if #menubutton = Stop_MB
+{
+  gosub Button_Myj_B.
+  return
+}
+scanjournal 1
+if Stoisz_za_daleko in #journal || W_tym_nie_umyjesz_bandaza in #journal || Musisz_wskazac_miejsce in #journal || Nie_widzisz_tego in #journal || Oddalil in #journal
+{
+  set %Myl_bandaze 0
+  break
+}
+until Umyl in #journal
+goto Br_Bandaze
+
+sub Button_Myj_B.
+set #menubutton N/A
+menu delete Stop_MB
+menu font bgcolor blue
+menu button Myj_bandaze 1 26 51 23 Myj B.
+return
+
+sub Wla_leczenie
+set #menubutton N/A
+menu delete Wla_leczenie
+menu font bgcolor green
+menu button Wyl_leczenie 1 1 103 23
+return
+
+sub Wyl_leczenie
+set #menubutton N/A
+menu delete Wyl_leczenie
+menu font bgcolor red
+menu button Wla_leczenie 1 1 103 23
+Petla_menu_wylaczone:
+if #menubutton = CLOSED
+  halt
+if #menubutton = Wla_leczenie
+{
+  gosub #menubutton
+  return
+}
+if #menubutton = Leczenie
+  gosub #menubutton 1 0
+if #menubutton = Myj_bandaze
+  gosub #menubutton
+goto Petla_menu_wylaczone
+
+sub Ukrywanie
+deletejournal
+skill_ukrywanie:
+event macro 1 0 .um ukrywanie
+set %Timer #scnt2 + 4
+repeat
+if %Timer < #scnt2
+  goto skill_ukrywanie
+scanjournal 1
+until ukryl in #journal || nie_udalo_Ci_sie_ukryc in #journal || Wrog_Cie_juz in #journal || Nie_uda_Ci_sie_schowac_wierzchowca in #journal
+set %Timer_ukrywania #scnt2 + 83
+;event macro 13 21
+return
+

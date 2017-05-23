@@ -1,0 +1,49 @@
+;Roslinki do zbierania:
+; XIJ - czosnek
+; NIJ - mandragora OIJ - szczepka
+; TIJ - wilcze jagody
+; FJJ - zenszen
+; TIJ - krwawy mech - Findcol = 30
+; KBF - grzybki
+; KBF - trufle -  1153 col - trufle
+;Roslinki do wywalenia:
+; CBF - szczepki grzybkow
+; GJJ - szczepki wilczych jagod
+; OIJ - szczepki mandragory
+
+
+ set %Ziola XIJ_NIJ_TIJ_FJJ_KBF_
+
+; set %Ziola XIJ_NIJ_TIJ_FJJ_
+;set %Ziola TIJ
+
+finditem %Ziola G_ , 14
+for #findindex 1 #findcnt
+{
+
+ if #Findtype = XIJ
+  set %nazwa_ziola Czosnek
+
+ if #Findtype = NIJ
+  set %nazwa_ziola Mandragora
+
+ if #Findtype = TIJ && #findcol = 0
+  set %nazwa_ziola Wilcze
+
+ if #Findtype = FJJ
+  set %nazwa_ziola ZenSzen
+
+ if #Findtype = TIJ && #findcol = 38
+  set %nazwa_ziola KrwawyMech
+
+ if #Findtype = KBF
+  set %nazwa_ziola Grzybki
+  
+ if #Findtype = KBF && #findcol = 1153
+  set %nazwa_ziola TRUFLE
+
+
+ event ExMsg #findID 3 0 %nazwa_ziola - #findcnt
+}
+wait 1s
+

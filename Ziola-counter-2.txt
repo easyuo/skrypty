@@ -1,0 +1,103 @@
+                      ; ========================================
+; Name: Menu Reg Counter
+; Author: Puda
+; Editors: Tecmo, the.WZA
+; Version: 1.31
+; Client Tested with: (need verification)
+; Revision Date: September 4, 2003
+; Thanks to: MightyDuck for menu use idea
+; Purpose: Keeps count of all regs including necro.
+; ========================================
+; Revisions Info
+; v1.31 September 4, 2003
+; Tecmo - Added Script Header, removed goto labels and changed 'by Tecmo to EasyUO'.
+
+; v1.30 March 18, 2003
+; the.WZA - (findItem 'C' modifier and count multiple stacks)
+
+; v1.20 March 17, 2003
+; Puda` - (updated for Necro)
+
+; v1.10 January 4, 2003
+; Tecmo - (menu changes)
+; ========================================
+Initialization:
+        InitEvents
+        display alert Please open the Container you will be counting Regs from.$
+                + Normally this will be your backpack, but you could also$
+                + open a bank bag or secure and count the regs inside it as well.$
+                + Press play after opening your reg container.
+        pause
+        set %searchContainer #lObjectID
+        set %searchContainer #lObjectID
+; ========================================
+        menu hide
+        menu clear
+        menu window title Regs
+        menu window size 1 125
+        menu window color $000000
+        menu font Courier
+        menu font color $ffffff
+        menu font size 8
+        menu font bgcolor $000000
+        menu text stat 10 5 BP:
+        menu text stat 10 20 SA:
+        menu text stat 10 35 MR:
+        menu text stat 10 50 SS:
+        menu text stat 10 65 GD:
+        menu text stat 10 80 NC:
+        menu text stat 10 95 BW:
+        menu text stat 60 5 BM:
+        menu text stat 60 20 GS:
+        menu text stat 60 35 GL:
+        menu text stat 60 50 NS:
+        menu text stat 60 65 PI:
+        menu text stat 60 80 DB:
+        menu text stat 60 95 EasyUO
+        menu show
+        menu hideeuo
+
+Loop:
+        gosub findregs
+        goto Loop
+
+sub findregs
+        gosub regCount KUF BP 30 5
+        gosub regCount SZF SA 30 20
+        gosub regCount MZF MR 30 35
+        gosub regCount RZF SS 30 50
+        gosub regCount TZF GD 30 65
+        gosub regCount UZF NC 30 80
+        gosub regCount IUF BW 30 95
+        gosub regCount JUF BM 80 5
+        gosub regCount JZF GS 80 20
+        gosub regCount KZF BL 80 35
+        gosub regCount WZF NS 80 50
+        gosub regCount YZF PI 80 65
+        gosub regCount DUF DB 80 80
+return
+
+; %1 = regType (i.e. KUF)
+; %2 = regMenuName (i.e. BP)
+; %3 = regMenuPosX (i.e. 30)
+; %3 = regMenuPosY (i.e. 5)
+sub regCount
+        set %regCount 0
+        set %regIgnore #false
+regCount:
+        finditem %1 C_ , %searchContainer
+        if ! #findKind
+        {
+                set %regCount %regCount + #Findstack
+                if #findCnt > 1
+                {
+                set %regIgnore #true
+                        IGNOREITEM #FindID
+                        goto regCount
+                }
+        }
+        menu delete %2
+        menu text %2 %3 %4 %regCount
+        if %regIgnore
+                ignoreitem reset
+return

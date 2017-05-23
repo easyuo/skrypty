@@ -1,0 +1,434 @@
+;Autor: [nGz]
+;Wersja 1.4
+;Wyszukuje drzewa w okreslonym zasiegu i podchodzi do nich.
+;Przerzuca klody do juczniaka.
+;Wazne jest aby nie miec nic zbindowanego pod klawiszami: Cursor Up, Cursor Down, Cursor Left, Cursor Right, Home, End, Page Up i Page Down, poniewaz euo uzywa ich do poruszania sie postacia.
+;Lista nazw drzew:
+;- drzewo
+;- cedr
+;- dab
+;- orzech
+;- wierzba
+;- cyprys
+;- cis
+;- o'hii
+;%Rodzaje_drzew - defaultowo drzewo_cedr_dab_orzech_wierzba_cyprys_cis_o'hii - okresla jakich drzew ma szukac, jesli chcesz tylko zwykle drzewa to zmien na drzewo, a jesli np. cyprysowe i ohii to zmien na cyprys_o'hii (te nazwy musza byc dokladnie takie same jak na liscie)(nie mozna uzywac spacji, zamiast tego stosowac "_" )(kolejnosc jest obojetna, nic nieznaczaca).
+;%Skill - defaultowo 0 - nie robi nic miedzy scinaniami, 1 - Ukrywanie, 2 - Anatomia, 3 - Wiedza o broni, 4 - Wiedza o zwierzetach (po wlaczeniu play skrypt poprosi o wskazanie celu dla skilli, wiedze o broni robi na toporku).
+;%Skill_powtorzenia - defaultowo 1 - okresla co ile powtorzen ma robic skilla.
+;%Sciezka_do_wava - sciezka do pliku wav (nie moze zawierac spacji), ktory bedzie odgrywany przy zatrzymywaniu skryptu.
+;%Max_waga - defaultowo 600 - jesli twoja waga przekroczy ta wartosc skrypt zatrzyma sie.
+;%Max_odleglosc - defaultowo 13 - maxymalna odleglosc od postaci w jakiej beda szukane drzewa (czyli defaultowo przeszukuje kwadrat o boku 27, a postac jest w jego centrum)(jesli ta odleglosc bedzie za duza to nie bedzie w stanie dojsc do drzewa).
+;================
+set %Rodzaje_drzew drzewo_cedr_dab_orzech_wierzba_cyprys_cis_o'hii
+set %Skill 1
+set %Skill_powtorzenia 1
+set %Sciezka_do_wava E:\Mp3\kryt2.wav
+set %Max_waga 600
+set %Max_odleglosc 13
+;================
+set %Id_plecaka_juczniaka 0
+gosub Wskaz_juczniaka
+set #lpc 200
+set %Plecak_lamy_pelny 0
+if %Skill <> 0
+  set %Licznik_powtorzen %Skill_powtorzenia
+if %Skill = 2 || %Skill = 4
+  set %Cel_skilla 0
+tile Init
+if drzewo in %Rodzaje_drzew
+  set %Rodzaje_drzew tree_ , %Rodzaje_drzew
+set %x_poczatek #charposx - %Max_odleglosc
+set %y_poczatek #charposy - %Max_odleglosc
+set %x_koniec #charposx + %Max_odleglosc
+set %y_koniec #charposy + %Max_odleglosc
+for %x %x_poczatek %x_koniec
+{
+  for %y %y_poczatek %y_koniec
+  {
+    tile Cnt %x %y
+    for %i 1 #tilecnt
+    {
+      tile Get %x %y %i
+      if #tilename in %Rodzaje_drzew && Impassable in #tileflags
+      {
+        set #lpc 10
+        gosub Podejdz_do_drzewa
+        if #result
+          gosub Scinaj_drzewo
+        else
+        {
+          set #sysmsgcol 1080
+          event sysmessage Nie udalo mi sie dostac do drzewa.
+          set #sysmsgcol 1152
+          event sysmessage Szukam dalej...
+        }
+        set #lpc 200
+        break
+      }
+    }
+  }
+}
+sound %Sciezka_do_wava
+set #sysmsgcol 1152
+event sysmessage Przeszukiwanie skonczone.
+halt
+
+sub Podejdz_do_drzewa
+set #sysmsgcol 1152
+event sysmessage Znalazlem drzewo o nazwie #tilename , #dot
+if %Id_plecaka_juczniaka <> 0
+  event macro 1 0 za mna
+deletejournal
+set %Uzyte_move_x_y 0
+Zacznij_isc:
+event pathfind %x %y #tilez
+set %Timer #scnt2 + 5
+repeat
+if %Timer < #scnt2
+  goto Zacznij_isc
+scanjournal 1
+if #journal = Can't_get_there
+  return #false
+until #journal = Pathfinding!
+set %Timer 0
+set %Char_x_old -1
+set %Char_y_old -1
+repeat
+if %Timer < #scnt2
+{
+  scanjournal 1
+  if Zapisywanie_Stanu_Swiata in #journal || #journal = Pathfinding!
+  {
+    if #journal = Pathfinding!
+    {
+      scanjournal 2
+      if Zapisywanie_Stanu_Swiata in #journal
+        goto Przeczekaj_zapis
+      goto Omin_przeczekiwanie_zapisu
+    }
+    Przeczekaj_zapis:
+    wait 90
+    continue
+  }
+  Omin_przeczekiwanie_zapisu:
+  if %Char_x_old = #charposx && %Char_y_old = #charposy
+  {
+    if %Uzyte_move_x_y = 2
+      return #false
+    gosub Uzyj_move_x_y
+    if ! #result
+      return #false
+    goto Zacznij_isc
+  }
+  set %Char_x_old #charposx
+  set %Char_y_old #charposy
+  set %Timer #scnt2 + 30
+}
+if #stamina < 1 && %Odleglosc > 1
+{
+  repeat
+  gosub Oblicz_odleglosc
+  until #stamina > 9 || %Odleglosc < 2
+  event pathfind %x %y #tilez
+}
+gosub Oblicz_odleglosc
+until %Odleglosc < 2
+if %Odleglosc < 1
+  return #false
+return #true
+
+sub Oblicz_odleglosc
+set %Odl_x %x - #charposx abs
+set %Odl_y %y - #charposy abs
+if %Odl_x > %Odl_y
+  set %Odleglosc %Odl_x
+else
+  set %Odleglosc %Odl_y
+return
+
+sub Uzyj_move_x_y
+move %x %y 1 9s
+if #charposx = %Char_x_old && #charposy = %Char_y_old
+  return #false
+set %Uzyte_move_x_y %Uzyte_move_x_y + 1
+return #true
+
+sub Scinaj_drzewo
+Petla_scinania_drzewa:
+deletejournal
+if %Licznik_powtorzen = %Skill_powtorzenia && %Skill <> 0
+{
+  if %Skill = 1
+    gosub Ukrywanie
+  if %Skill = 2
+    gosub Anatomia
+  if %Skill = 3
+    gosub Armslore
+  if %Skill = 4
+    gosub Animallore
+}
+if %Skill <> 0
+  set %Licznik_powtorzen %Licznik_powtorzen - 1
+if %Licznik_powtorzen <= 0 && %Skill <> 0
+  set %Licznik_powtorzen %Skill_powtorzenia
+Toporek:
+if #weight > %Max_waga
+{
+  sound %Sciezka_do_wava
+  set #sysmsgcol 1080
+  event sysmessage Przekroczono maxymalna wage - %Max_waga
+  halt
+}
+finditem fsf C_ , #charid
+if #findkind = -1
+{
+  sound %Sciezka_do_wava
+  set #sysmsgcol 1080
+  event sysmessage Nie znaleziono Topora.
+  halt
+}
+set #lobjectid #findid
+event macro 17
+set %Timer #scnt2 + 5
+repeat
+if %Timer < #scnt2
+  goto Toporek
+until #targcurs = 1
+Celownik:
+gosub Ustaw_x_y_drzewa
+event macro 22
+set %Timer #scnt2 + 5
+repeat
+if %Timer < #scnt2
+  goto Celownik
+until #targcurs = 0
+set %Timer_scinania_drzewa #scnt2 + 110
+if %Id_plecaka_juczniaka <> 0 && %Plecak_lamy_pelny = 0
+  gosub Przezuc_klody
+repeat
+scanjournal 1
+if Stoisz_za_daleko in #journal || Nie_wiesz_jak_uzyc_te_przedmioty_razem in #journal || Nie_mozesz_tego_uzyc in #journal || To_drzewo_wyglada_juz_na_wystarczajaco_obciete in #journal
+  return
+until ( s_troche_ in #journal && _klod_i_wlozyl in #journal ) || Zniszczyles_klody in #journal || Zniszczylas_klody in #journal || Oddaliles_sie in #journal || Oddalilas_sie in #journal || %Timer_scinania_drzewa < #scnt2
+goto Petla_scinania_drzewa
+
+sub Ustaw_x_y_drzewa
+set #ltargetx %x
+set #ltargety %y
+set #ltargetz #tilez
+set #ltargetkind 3
+set #ltargettile #tiletype
+return
+
+sub Ukrywanie
+Skill_ukrywanie:
+event macro 1 0 .um ukr
+set %Timer #scnt2 + 2
+repeat
+if %Timer < #scnt2
+  goto Skill_ukrywanie
+scanjournal 1
+until ukryl in #journal || nie_udalo_Ci_sie_ukryc in #journal || Wrog_Cie_juz in #journal || Nie_uda_Ci_sie_schowac_wierzchowca in #journal
+return
+
+sub Anatomia
+if %Cel_skilla = 0
+  gosub Wskaz_Cel Anatomii
+Skill_anatomia:
+event macro 1 0 .um ana
+gosub Obsluz_celownik_skilla
+if ! #result
+  goto Skill_anatomia
+return
+
+sub Armslore
+finditem fsf C_ , #charid
+if #findkind = -1
+  return
+set %Cel_skilla #findid
+Skill_armslore:
+event macro 1 0 .um bro
+gosub Obsluz_celownik_skilla
+if ! #result
+  goto Skill_armslore
+return
+
+sub Animallore
+if %Cel_skilla = 0
+  gosub Wskaz_Cel Animallore
+Skill_animallore:
+event macro 1 0 .um wie
+gosub Obsluz_celownik_skilla
+if ! #result
+  goto Skill_animallore
+return
+
+sub Obsluz_celownik_skilla
+set %Timer #scnt2 + 3
+repeat
+if %Timer < #scnt2
+  return #false
+until #targcurs = 1
+Celownik_skilla:
+set #ltargetkind 1
+set #ltargetid %Cel_skilla
+event macro 22
+set %Timer #scnt2 + 2
+repeat
+if %Timer < #scnt2
+  goto Celownik_skilla
+until #targcurs = 0
+return #true
+
+sub Wskaz_Cel
+set #targcurs 1
+set #sysmsgcol 1152
+Wskaz_cel_skilla:
+if %1 = Animallore
+  event sysmessage Wskaz cel dla Wiedzy o zwierzetach.
+else
+  event sysmessage Wskaz cel dla %1 , #dot
+set %Timer #scnt2 + 90
+repeat
+if %Timer < #scnt2
+  goto Wskaz_cel_skilla
+onhotkey ESC
+  goto Wcisnieto_ESC
+until #targcurs = 0
+onhotkey ESC
+{
+  Wcisnieto_ESC:
+  set #sysmsgcol 1080
+  event sysmessage Nie wskazales celu.
+  halt
+}
+set %Cel_skilla #ltargetid
+return
+
+sub Przezuc_klody
+Poczatek_przezucania_klod:
+finditem zlk C_ , #backpackid
+if #findkind = -1
+  return
+set %Id_klod #findid
+set %Stack_klod #findstack
+set %Kolor_klod #findcol
+Klody_Plecak_juczniaka_petla:
+finditem %Id_plecaka_juczniaka C_ , #charid
+if #findkind = -1
+{
+  finditem %Id_juczniaka
+  if #finddist > 1
+  {
+    Klody_Powiedz_podejdzcie:
+    if #finddist > 8
+    {
+      event sysmessage Juczniak stoi za daleko.
+      return
+    }
+    event macro 1 0 podejdzcie
+    set %Timer #scnt2 + 10
+    repeat
+    if %Timer < #scnt2
+      goto Klody_Powiedz_podejdzcie
+    finditem %Id_juczniaka
+    until #finddist < 2
+  }
+  set #lobjectid #findid
+  event macro 17
+  goto Klody_Plecak_juczniaka_petla
+}
+ExDrag_klod:
+exevent drag %Id_klod %Stack_klod
+set %Timer #scnt2 + 25
+repeat
+if %Timer < #scnt2
+  goto ExDrag_klod
+finditem %Id_klod C_ , #backpackid
+until #findkind = -1
+finditem zlk C_ , %Id_plecaka_juczniaka
+set %Id_klod_w_plecaku_juczniaka 0
+for %k 1 #findcnt
+{
+  if #findkind = -1
+    break
+  set #findindex %k
+  if #findcol = %Kolor_klod
+  {
+    set %Id_klod_w_plecaku_juczniaka #findid
+    set %Stack_klod_w_plecaku_juczniaka #findstack
+    break
+  }
+}
+set %Cnt_drop_klod 0
+ExDrop_klod:
+set %Cnt_drop_klod %Cnt_drop_klod + 1
+if %Cnt_drop_klod > 4
+  goto Poczatek_przezucania_klod
+exevent dropc %Id_plecaka_juczniaka
+set %Timer #scnt2 + 12
+repeat
+if %Timer < #scnt2
+  goto ExDrop_klod
+scanjournal 1
+if That_item_is_too_heavy in #journal
+{
+  set %Plecak_lamy_pelny 1
+  return
+}
+if %Id_klod_w_plecaku_juczniaka = 0
+  finditem %Id_klod C_ , %Id_plecaka_juczniaka
+else
+  finditem %Id_klod_w_plecaku_juczniaka C_ , %Id_plecaka_juczniaka
+until ( #findkind = 0 && %Id_klod_w_plecaku_juczniaka = 0 ) || ( #findstack = %Stack_klod_w_plecaku_juczniaka + %Stack_klod && %Id_klod_w_plecaku_juczniaka <> 0 )
+goto Poczatek_przezucania_klod
+
+sub Wskaz_juczniaka
+set #targcurs 1
+set #sysmsgcol 1152
+Wskaz_juczniaka:
+event sysmessage Wskaz juczniaka.
+set %Timer #scnt2 + 90
+repeat
+if %Timer < #scnt2
+  goto Wskaz_juczniaka
+onhotkey ESC
+  return
+until #targcurs = 0
+onhotkey ESC
+  return
+set %Id_juczniaka #ltargetid
+Sprawdz_tego_juczniaka:
+finditem %Id_juczniaka
+if #findtype <> wn && #findtype <> bo
+{
+  event sysmessage To nie jest ani kon ani lama juczna.
+  return
+}
+if #finddist > 1
+{
+  if #finddist > 8
+  {
+    event sysmessage Juczniak stoi za daleko.
+    return
+  }
+  event macro 1 0 podejdzcie
+  set %Timer #scnt2 + 10
+  repeat
+  if %Timer < #scnt2
+    goto Sprawdz_tego_juczniaka
+  finditem %Id_juczniaka
+  until #finddist < 2
+}
+set %Id_jakiegos_gumpa #contid
+set #lobjectid #findid
+event macro 17
+set %Timer #scnt2 + 10
+repeat
+until #contid <> %Id_jakiegos_gumpa || %Timer < #scnt2
+finditem #contid C_ , #charid
+if #findtype <> zjf || #findid = #backpackid
+  goto Sprawdz_tego_juczniaka
+set %Id_plecaka_juczniaka #contid
+return
+

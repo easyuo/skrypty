@@ -1,0 +1,15 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: Hidding
+; | Serwer: Mysterious World
+; | Autor: m@ti
+; | Data: 2007.04.08 14:14:05
+; \----------koniec----------
+;Autor: krowa
+
+if #ENEMYID <> N/A
+{
+; event macro 1 0 Straze! Straze pomocy!
+ event macro 1 0 Uleczcie sie!
+wait 1s
+}

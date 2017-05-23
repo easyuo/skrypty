@@ -1,0 +1,22 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: Hidding & Stealth
+; | Serwer: Mysterious World
+; | Autor: krowa
+; | Data: 2017.05.17 22:50:05
+; \----------koniec----------
+;Autor: [nGz]
+
+if #hits = #maxhits
+{
+ if H in #charstatus
+ {
+  event macro 13 47
+ }
+ else
+ {
+  event macro 13 21
+ }
+ wait 12s
+}
+

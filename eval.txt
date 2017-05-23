@@ -1,0 +1,78 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: Eval (Madrosc)
+; | Serwer: Mysterious World
+; | Autor: m@ti
+; | Data: 2007.04.20 15:01:54
+; \----------koniec----------
+;Autor: [nGz]
+;Samo wyszukuje osoby znajdujace sie nie wiecej niz 3 kroki od ciebie i na nich robi evala
+initevents
+start:
+ignoreitem reset
+ignoreitem #charid
+anat:
+finditem is
+if #finddist > 3
+{
+ignoreitem #findid
+goto anat
+}
+if #findkind = -1
+{
+finditem wn
+if #finddist > 3
+{
+ignoreitem #findid
+goto anat
+}
+if #findkind = -1
+{
+finditem hs
+if #finddist > 3
+{
+ignoreitem #findid
+goto anat
+}
+if #findkind = -1
+{
+finditem bo
+if #finddist > 3
+{
+ignoreitem #findid
+goto anat
+}
+if #findkind = -1
+{
+finditem of
+if #finddist > 3
+{
+ignoreitem #findid
+goto anat
+}
+if #findkind = -1
+goto start
+}
+}
+}
+}
+wiecej:
+set %licz 0
+event macro 13 16
+czek:
+set #ltargetkind 1
+set #ltargetid #findid
+set %licz %licz + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto dalej
+if %licz > 5
+goto wiecej
+goto czek
+dalej:
+event macro 22
+event macro 22
+event macro 22
+wait 163
+goto start

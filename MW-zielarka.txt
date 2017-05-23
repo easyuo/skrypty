@@ -1,0 +1,878 @@
+                    Makro: Zielarstwo_Menu-v3.0.2.txt
+; Autor: Janusz [Fris]
+;======================================
+;--- OPIS
+; Skrypt zbiera wybrany rodzaj ziolek.
+
+;-- Opis przyciskow:
+; Start - uruchamia zebiranie do okolapostaci
+
+; Sadzenie - sadzi szczepki ktore sa w plecaku postaci
+;          jesli chcesz sadzic tylko jeden rodzaj rosliny trzymaj w lecaku
+;          tylko jeden rodzaj szczepek.
+;          Tak wiem ze mozna sadzic w jednym miescu ale to nie klimatyczne :p
+
+; Stop - przerywa zrywanie, sadzenie, obcinanie i  przezucanie
+
+; Obcinaj - obcina wszystkie krzaczki w plecaku
+
+; Przezucaj - przezuca szczepki i zolka do plecakow o podanym id,
+;     Plecaki te musza byc w skrzynie bankowej lub magazynowej.
+;     Jak sprawdzic id plecaka? Otworz go i po prawej stronie w EasyUO w galezi
+;     Container Info przepisz lub skopiuj zawartosc do zmiennej %ID_Plecaka_Na_Ziola
+;     tak jak jest to nizej to smao ze zmienna %ID_Plecaka_Na_Szczepki
+
+;UWAGA!! Tu wpisz id plecakow !! Mozna podac to samo id, wtedy wszystkie ziola/szczepki/krzaczki
+; wyladuja w tym samym plecaku
+set %ID_Plecaka_Na_Ziola #BACKPACKID     ;Tu wpisz ID plecaka na obciete ziola
+set %ID_Plecaka_Na_Szczepki #BACKPACKID  ;Tu wpisz ID plecaka na szczepki
+set %ID_Plecaka_Na_Krzaczki #BACKPACKID  ;Tu wpisz ID plecaka na nie obciete ziola
+
+set %ukrywaj 1
+
+;======================================
+;UWAGA teco co nizej nie zmieniac
+set %Rodzaj_rosliny XIJ_NIJ_TIJ_FJJ_KBF
+set %Szczepki CBF_GJJ_OIJ_CJJ_UIJ_CBF
+set %TypyKrzaczkow VIJ_LIJ_HJJ_ZIJ
+set %Click_Przerwij_X 187
+set %Click_Przerwij_Y 165
+set %RedColor 1080      ;czerwony
+set %BlueColor 88       ;niebieski
+set %YellowColor 53     ;zolty
+set #lpc 2000
+; menu hideEUO
+menu clear
+menu window color btnface
+menu window size 210 265
+menu window title Zielarstwo 3.0.2
+;=================== Rodzaj setu =====================
+menu font style
+menu font size 8
+menu check mcCzosnek 10 22 90 15 #false Czosnek
+menu check mcMandragora 10 42 90 15 #false Mandragora
+menu check mcWilczeJagody 10 62 90 15 #false Wilcze jagody
+menu check mcZenszen 10 82 90 15 #false Zenszen
+;------------------------------------------------------
+menu check mcKrwawyMech 110 22 98 15 #false Krwawy mech
+menu check mcGrzybki 110 42 90 15 #false Grzybki
+menu check mcTrufle 110 62 90 15 #false Trufle
+;=================== info o rudach ==================
+menu shape msopis_rud 5 1 205 17 3 7 1 blue 2 blue
+menu text mtopis_rudy 6 2 Zaznacz ziola do zrywania:
+menu shape msrudy 5 18 205 85 3 7 1 black 2 black
+menu text mtopis_prziciski 14 105 Przyciski zaznaczania:
+;------------------- Pole szukania ----------------
+menu font bgcolor btnface
+menu font size 8
+menu text mtmiasto 10 156 Pole szukania.
+menu Edit mePoleSz 100 152 25 14
+;------------------ Wywalaj szczepki -----------
+;menu text mtmiasto 135 60 Wywal
+menu check mcWywalSzczepki 10 180 150 20 #false Wyrzucac Szczepki ?
+;-----------------------------------------------
+menu font bgcolor btnface
+menu font size 9
+;=================== przyciski =================
+menu font color green
+menu font style b
+menu font bgcolor btnface
+menu button mbstart 10 235 60 24 Start
+menu font color black
+menu button mbwszystko 10 120 75 20 Wszystko
+menu button mbnic 125 120 75 20 Nic
+menu button mbsadz 75 235 60 24 Sadzenie
+menu button mbstop 140 235 60 24 Stop
+menu button mbobcinaj 10 205 90 24 Obcinaj
+menu button mbprzezucaj 110 205 90 24 Przerzucaj
+menu show
+;===============================================
+set #lpc 10
+set #menubutton N/A
+repeat
+    if #menubutton = mbsadz
+    {
+        set #menubutton N/A
+        gosub ChodzenieDoSadzenia
+    }
+    if #menubutton = mbstart
+    {
+        set #menubutton N/A
+        menu delete mbstart
+        ignoreitem reset
+        gosub menucheck
+        if PetlaPryzciskow notin #RESULT
+        {
+            menu get mePoleSz
+            set %Max_odleglosc #menures
+            menu get mcWywalSzczepki
+            set %WywalanieSzczepek #menures
+            gosub SkanujTeren
+            if PetlaPrzyciskow notin #RESULT
+            {
+               gosub MainLoop
+            }
+        }
+        gosub Rysuj_przycisk_start
+    }
+    if #menubutton = mbobcinaj
+    {
+        set #menubutton N/A
+        gosub Obcinaj
+    }
+    if #menubutton = mbprzezucaj
+    {
+        set #menubutton N/A
+        gosub Przezucaj
+    }
+    if #menubutton = CLOSED ;wcisnieto przycisk X
+    {
+        menu hide
+        set #menubutton N/A
+        halt
+    }
+    if #menubutton = mbwszystko
+    {
+        gosub wszystko mcCzosnek mcMandragora mcWilczeJagody mcZenszen mcKrwawyMech mcGrzybki mcTrufle
+        set #menubutton n/a
+    }
+    if #menubutton = mbnic
+    {
+        gosub nic mcCzosnek mcMandragora mcWilczeJagody mcZenszen mcKrwawyMech mcGrzybki mcTrufle
+        set #menubutton n/a
+    }
+until #false
+;-----------------------------------------------
+sub SkanujTeren
+  if %ukrywaj = 1
+  {
+   event macro 13 21
+  }
+  set %Cnt 0
+  set #sysmsgcol %YellowColor
+  event sysmessage Szukam krzaczkow.
+  finditem %Rodzaj_rosliny G_ , %Max_odleglosc
+  set #lpc 2000
+  if #findcnt = 0
+  {
+     set #sysmsgcol %RedColor
+     event sysmessage Nie znaleziono wybranej rosliny.
+     return PetlaPrzyciskow
+  }
+  for #findindex 1 #findcnt
+  {
+      event Property #findid
+      gosub SprawdzWybot #property
+  }
+  set #lpc 10
+  if %Cnt = 0
+  {
+     set #sysmsgcol %RedColor
+     event sysmessage Nie znaleziono wybranej rosliny.
+     return PetlaPrzyciskow
+  }
+  set %IloscKrzaczkow %Cnt
+  set #sysmsgcol %YellowColor
+  event sysmessage Znaleziono %IloscKrzaczkow krzaczkow.
+return
+;-----------------------------------------------
+sub MainLoop ;parametr: ilosc znalezionych krzaczkw
+  for %j 1 %IloscKrzaczkow
+      {
+      gosub Podejdz_do_rosliny %_x . %j %_y . %j %_z . %j
+      if #RESULT = PetlaPrzyciskow
+         return
+      gosub Zrywaj_rosliny %krzak_id_ . %j
+      if #RESULT = WcisnietoStop
+         return
+      ignoreitem %krzak_id_ . %j
+      gosub WywalSzczepki
+      }
+  set #sysmsgcol %YellowColor
+  event sysmessage KONIEC. Wszystkie rosliny oberwane.
+  gosub Rysuj_przycisk_start
+  ignoreitem reset
+return
+;-----------------------------------------------
+sub Podejdz_do_rosliny
+  set %krzaczek_x %1
+  set %krzaczek_y %2
+  set %krzaczek_z %3
+  move %krzaczek_x %krzaczek_y 0 5s
+  if #menubutton = mbstop
+  {
+     set #menubutton N/A
+     gosub Rysuj_przycisk_start
+     return PetlaPrzyciskow
+  }
+  if #CHARPOSX <> %krzaczek_x && #CHARPOSY <> %krzaczek_y
+     {
+      if %ukrywaj = 1
+      {
+       event macro 13 21
+      }
+      set %czas #scnt + 6
+      event pathfind %krzaczek_x %krzaczek_y %krzaczek_z
+      repeat
+        if #menubutton = mbstop
+        {
+           set #menubutton N/A
+           gosub Rysuj_przycisk_start
+           return PetlaPrzyciskow
+        }
+        if %czas < #scnt
+        {
+            set %czas #scnt + 6
+            event pathfind %krzaczek_x %krzaczek_y %krzaczek_z
+        }
+        scanjournal 1
+        if _Can't_get_there in #journal || stoisz_za_daleko in #journal || _That_is_too in #journal
+        {
+            move %krzaczek_x %krzaczek_y 0 5s
+            return
+        }
+      until #CHARPOSX = %krzaczek_x && #CHARPOSY = %krzaczek_y
+     }
+return
+;-----------------------------------------------
+sub Zrywaj_rosliny
+  if %ukrywaj = 1
+      {
+       event macro 13 21
+      }
+  set %krzak_id %1
+  set #lpc 100
+  set #LTARGETKIND 2
+  set #LOBJECTID %krzak_id
+  event macro 17
+  set %czas #scnt + 9
+  wait 1s
+  scanjournal 1
+  if _I_can't_see_that. in #journal || _That_is_too in #journal
+     {
+     ignoreitem %krzak_id
+     return
+     }
+  repeat
+     scanjournal 1
+     if %czas < #scnt
+        {
+        set #LTARGETKIND 2
+        set #LOBJECTID %krzak_id
+        event macro 17
+        set %czas #scnt + 9
+        wait 1s
+        }
+     if Z_tej_rosliny in #journal || stoisz_za_daleko in #journal
+        return
+  until Zaczynasz in #journal
+
+  set %SprawdzPierwszyRaz 1
+  set %Licznik 0
+  set %JIndexStart #jindex
+  repeat
+      if %JIndexStart = #jindex
+         {
+         wait 1s
+         }
+      else
+         {
+         if %SprawdzPierwszyRaz = 1
+            {
+            set %Licznik #jindex
+            set %SprawdzPierwszyRaz 0
+            scanjournal %Licznik
+            }
+         else
+           {
+            set %Licznik ( %Licznik - 1 )
+            if %JIndexStart = %Licznik
+               set %Licznik #jindex
+            scanjournal %Licznik
+           }
+         }
+      if #menubutton = mbstop
+        {
+        click %Click_Przerwij_X %Click_Przerwij_Y
+        gosub Rysuj_przycisk_start
+        return WcisnietoStop
+        }
+      if Z_tej_rosliny in #journal || _I_can't_see_that. in #journal || _That_is_too in #journal
+         break
+  until #false
+  ignoreitem %krzak_id
+return
+;-----------------------------------------------
+sub Obcinaj
+  if %ukrywaj = 1
+      {
+       event macro 13 21
+      }
+  gosub nozyczki
+  if #RESULT = NozyczekBrak
+     return
+  finditem %TypyKrzaczkow C_ , #backpackid
+  if #findkind = -1
+  {
+     return
+  }
+  set %WyjdzZPetli 0
+  for #findindex 1 #findcnt
+     {
+     set #lobjectid #findid
+     event macro 17
+     set %TimeObcinania #scnt2 + 20
+     repeat
+         if %TimeObcinania < #scnt2
+         {
+             set #lobjectid #findid
+             event macro 17
+             set %TimeObcinania #scnt2 + 20
+         }
+     until Rozpocz in #sysmsg
+     set %jindex #jindex
+     set #lpc 100
+     repeat
+         set %ji #jindex - %jindex
+         for %i 1 %ji
+         {
+             scanjournal %i
+             if Oddalil in #journal
+             {
+                set #lpc 20
+                return
+             }
+             if Udalo in #journal || Obcial in #journal
+             {
+                gosub SprawdzGumpa
+             }
+         }
+     until %WyjdzZPetli = 1
+     set %WyjdzZPetli 0
+     }
+  set #lpc 20
+return
+;-----------------------------------------------
+sub SprawdzGumpa
+  set #lpc 2000
+  set %dziennik #SYSMSG
+  ;event sysmessage dziennik %dziennik
+  str Pos %dziennik )
+  set %Pozycja_nawiasu #StrRes
+  set %end %Pozycja_nawiasu - 2
+  str Mid %dziennik 2 %end
+  set %Tyle_z_Tylu #StrRes
+  str Pos %Tyle_z_Tylu z
+  set %z_end #StrRes - 2
+  str Mid %Tyle_z_Tylu 1 %z_end
+  set %Pierwsza_wartosc #StrRes
+  ;event sysmessage Pierwsza_wartosc %Pierwsza_wartosc
+  str Pos %Tyle_z_Tylu _
+  set %__start #StrRes + 3
+  str Len %Tyle_z_Tylu
+  set %Dlugosc #StrRes
+  str Mid %Tyle_z_Tylu %__start %Dlugosc
+  set %Druga_wartosc #StrRes
+  ;event sysmessage Wartosci: %Pierwsza_wartosc z %Druga_wartosc
+  if %Pierwsza_wartosc > %Druga_wartosc
+     {
+     click %Click_Przerwij_X %Click_Przerwij_Y
+     set %WyjdzZPetli 1
+     wait 6s
+     set #lpc 10
+     return
+     }
+  if %Pierwsza_wartosc = %Druga_wartosc
+     {
+     scanjournal 1
+     if #JCOLOR = 40
+        {
+        click %Click_Przerwij_X %Click_Przerwij_Y
+        wait 6s
+        }
+     set %WyjdzZPetli 1
+     }
+  else
+     {
+     set #lpc 10
+     return
+     }
+  set #lpc 10
+return
+;-----------------------------------------------
+sub Przezucaj
+  if 180_240 notin #CONTSIZE
+  {
+      finditem * G_2  ;szuka wszystkiego
+      for #findindex 1 #findcnt
+      {
+          event Property #findid
+          if Bankier in #property
+          {
+             set %Bank 1
+          }
+          if Magazynier in #property
+          {
+             set %Bank 0
+          }
+      }
+      if %Bank = 1
+      {
+         event macro 1 0 Bankier daj moja skrzynie.
+      }
+      else
+      {
+         event macro 1 0 Magazynier daj moja skrzynie.
+      }
+      set %timer #scnt + 10
+      repeat
+       if #menubutton = mbstop
+       {
+          set #menubutton N/A
+          set #sysmsgcol %RedColor
+          event sysmessage Przezucanie przerwane.
+          return
+       }
+       if %timer < #scnt
+       {
+          set #sysmsgcol %RedColor
+          event sysmessage Nie znaleziono otwartej skrzyni bankowej.
+          return
+       }
+      until 180_240 in #CONTSIZE
+  }
+  set #lobjectid %ID_Plecaka_Na_Ziola
+  event macro 17
+  set %time #scnt2 + 20
+  repeat
+     if #menubutton = mbstop
+     {
+        set #menubutton N/A
+        set #sysmsgcol %RedColor
+        event sysmessage Przezucanie przerwane.
+        return
+     }
+     if %time < #scnt2
+     {
+        set #lobjectid %ID_Plecaka_Na_Ziola
+        event macro 17
+        set %time #scnt2 + 20
+     }
+  until #CONTID = %ID_Plecaka_Na_Ziola
+  ;przezucanie ziol
+  finditem KZF_JUF_JZF_MZF_PZF_WZF_XWS C_ , #backpackid
+  if #findkind <> -1
+  {
+      for #findindex 1 #findcnt
+      {
+           if #findstack = 0
+              exevent drag #findid 1
+           else
+              exevent drag #findid #findstack
+           wait 5
+           exevent dropc %ID_Plecaka_Na_Ziola
+           wait 5
+      }
+  }
+  set %timeBrakPlecaka #scnt2 + 50
+  set #lobjectid %ID_Plecaka_Na_Szczepki
+  event macro 17
+  set %time #scnt2 + 20
+  repeat
+   if #menubutton = mbstop
+      {
+      set #menubutton N/A
+      set #sysmsgcol %RedColor
+      event sysmessage Przezucanie przerwane.
+      return
+      }
+   if %time < #scnt2
+      {
+      set #lobjectid %ID_Plecaka_Na_Szczepki
+      event macro 17
+      set %time #scnt2 + 20
+      }
+   if %timeBrakPlecaka < #scnt2
+      {
+      set #sysmsgcol %RedColor
+      event sysmessage Nie ma plecaka na szczepki.
+      return
+      }
+  until #CONTID = %ID_Plecaka_Na_Szczepki
+  ;przezucanie szczepek
+  finditem %Szczepki C_ , #backpackid
+  if #findkind <> -1
+  {
+      for #findindex 1 #findcnt
+      {
+           if #findstack = 0
+              exevent drag #findid 1
+           else
+              exevent drag #findid #findstack
+           wait 5
+           exevent dropc %ID_Plecaka_Na_Szczepki
+           wait 5
+      }
+  }
+  set %timeBrakPlecaka #scnt2 + 50
+  set #lobjectid %ID_Plecaka_Na_Krzaczki
+  event macro 17
+  set %time #scnt2 + 20
+  repeat
+   if #menubutton = mbstop
+      {
+      set #menubutton N/A
+      set #sysmsgcol %RedColor
+      event sysmessage Przerzucanie przerwane.
+      return
+      }
+   if %time < #scnt2
+      {
+      set #lobjectid %ID_Plecaka_Na_Krzaczki
+      event macro 17
+      set %time #scnt2 + 20
+      }
+   if %timeBrakPlecaka < #scnt2
+      {
+      set #sysmsgcol %RedColor
+      event sysmessage Nie ma plecaka na szczepki.
+      return
+      }
+  until #CONTID = %ID_Plecaka_Na_Krzaczki
+  ;przezucanie szczepek
+  finditem %TypyKrzaczkow C_ , #backpackid
+  if #findkind <> -1
+  {
+      for #findindex 1 #findcnt
+      {
+           if #findstack = 0
+              exevent drag #findid 1
+           else
+              exevent drag #findid #findstack
+           wait 5
+           exevent dropc %ID_Plecaka_Na_Krzaczki
+           wait 5
+      }
+  }
+  set #sysmsgcol %YellowColor
+  event sysmessage Przedmioty przezucone.
+return
+;-----------------------------------------------
+sub WywalSzczepki
+  if %WywalanieSzczepek = #false
+     return
+  finditem %Szczepki C_ , #backpackid
+  if #findkind = -1
+  {
+     return
+  }
+  for #findindex 1 #findcnt
+     {
+       finditem %Szczepki C_ , #backpackid
+       if #findstack = 0
+          exevent drag #findid 1
+       else
+          exevent drag #findid #findstack
+       wait 5
+       exevent dropg #CHARPOSX #CHARPOSY #CHARPOSZ
+       wait 5
+     }
+return
+;-----------------------------------------------
+sub Rysuj_przycisk_start
+  set #menubutton N/A
+  menu font color green
+  menu font style b
+  menu font bgcolor btnface
+  menu button mbstart 10 235 60 24 Start
+return
+;-----------------------------------------------
+sub ChodzenieDoSadzenia
+  set %Start_X #CHARPOSX
+  set %Start_Y #CHARPOSY
+  for %i 1 5
+      {
+      for %j 1 8
+          {
+          set %krok_x %Start_X
+          set %krok_y %Start_Y + %j
+          move %krok_x %krok_y 0 20s
+          gosub Sadzenie
+          if #RESULT = KoniecSadzenia
+             {
+             set #sysmsgcol %RedColor
+             event sysmessage Sadzenie przerwane.
+             return
+             }
+          }
+      set %Start_X %Start_X + 1
+      }
+set #sysmsgcol %YellowColor
+event sysmessage KONIEC SADZENIA.
+return
+;-----------------------------------------------
+sub Sadzenie
+   finditem OIJ_GJJ_CJJ_UIJ_CBF C
+   if #findkind = -1
+      {
+      set #sysmsgcol %RedColor
+      event sysmessage Nie masz szczepek.
+      return
+      }
+   set #lobjectid #findid
+   event macro 17
+   set %TimeCel #scnt2 + 20
+   repeat
+       if %TimeCel < #scnt2
+          {
+           set #lobjectid #findid
+           event macro 17
+           set %TimeCel #scnt2 + 20
+          }
+   until #targcurs = 1
+
+   set #LTARGETX #CHARPOSX
+   set #LTARGETY #CHARPOSY
+   set #LTARGETZ #CHARPOSZ
+   set #LTARGETKIND 2
+   event macro 22
+   set %TimeSadzenia #scnt2 + 20
+   set %Time2 #scnt + 10
+   repeat
+      if %TimeSadzenia < #scnt2
+         {
+         event macro 22
+         set %TimeSadzenia #scnt2 + 20
+         }
+      scanjournal 1
+   until Probujesz in #journal
+
+   repeat
+    set %SprawdzPierwszyRaz 1
+    set %Licznik 0
+    set %JIndexStart #jindex
+    repeat
+        if %JIndexStart = #jindex
+           {
+           wait 1s
+           }
+        else
+           {
+           if %SprawdzPierwszyRaz = 1
+              {
+              set %Licznik #jindex
+              set %SprawdzPierwszyRaz 0
+              scanjournal %Licznik
+              }
+           else
+             {
+              set %Licznik ( %Licznik - 1 )
+              if %JIndexStart = %Licznik
+                 set %Licznik #jindex
+              scanjournal %Licznik
+             }
+           }
+        if #menubutton = mbstop
+          {
+          click %Click_Przerwij_X %Click_Przerwij_Y
+          gosub Rysuj_przycisk_start
+          return KoniecSadzenia
+          }
+   until Udalo in #journal
+return
+;-----------------------------------------------
+sub nozyczki
+  finditem KAG C
+
+  if #findkind = -1 || #findcnt = 0
+  {
+      set #sysmsgcol %RedColor
+      event sysmessage NIE MASZ NOZYCZEK W PLECAKU. SKRYPT ZATRZYMANY.
+      return NozyczekBrak
+  }
+
+  for #findindex 1 #findcnt
+  {
+      if #findtype = KAG
+      {
+          set %nozyczkiID #findid
+          break
+      }
+  }
+
+return
+;-----------------------------------------------
+sub menucheck
+  menu get mcCzosnek
+  if #menures = #true
+     {
+     set %mc1 Czosnku
+     }
+  else
+     {
+     set %mc1
+     }
+
+  menu get mcMandragora
+  if #menures = #true
+     {
+     set %mc2 Mandragory
+     }
+  else
+     {
+     set %mc2
+     }
+
+  menu get mcWilczeJagody
+  if #menures = #true
+     {
+     set %mc3 Wilczych
+     }
+  else
+     {
+     set %mc3
+     }
+
+  menu get mcZenszen
+  if #menures = #true
+     {
+     set %mc4 Zenszenia
+     }
+  else
+     {
+     set %mc4
+     }
+
+  menu get mcKrwawyMech
+  if #menures = #true
+     {
+     set %krwawyColor 38
+     set %mc5 Krwawego
+     }
+  else
+     {
+     set %krwawyColor 38
+     set %mc5
+     }
+
+  menu get mcGrzybki
+  if #menures = #true
+     {
+     set %mc6 Grzybki
+     }
+  else
+     {
+     set %mc6
+     }
+
+  menu get mcTrufle
+  if #menures = #true
+     {
+     set %trufleColor 1153
+     set %mc7 Grzybki
+     }
+  else
+     {
+     set %trufleColor 1153
+     set %mc7
+     }
+
+  if Czosnku notin %mc1 && Mandragory notin %mc2 && Wilczych notin %mc3 && Zenszenia notin %mc4 && Krwawego notin %mc5 && Grzybki notin %mc6 && Grzybki notin %mc7
+  {
+     set #sysmsgcol %RedColor
+     event sysmessage Nie zaznaczyles roslin do zrywania.
+     return PetlaPryzciskow
+  }
+return
+;-----------------------------------------------
+sub wszystko
+  for %i 1 %0
+      {
+      menu Set % . %i #true
+      }
+return
+;-----------------------------------------------
+sub nic
+  for %i 1 %0
+      {
+      menu Set % . %i #false
+      }
+return
+;-----------------------------------------------
+sub SprawdzWybot
+  set #lpc 2000
+  if Czosnku in %mc1 && %mc1 in %1
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+  if Mandragory in %mc2 && %mc2 in %1
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+  if Wilczych in %mc3 && %mc3 in %1
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+  if Zenszenia in %mc4 && %mc4 in %1
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+  if Krwawego in %mc5 && %mc5 in %1
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+  if Grzybki in %mc6 && %mc6 in %1 && #findcol = 0
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+  if Grzybki in %mc7 && %mc7 in %1 && #findcol = %trufleColor
+  {
+      set %Cnt %Cnt + 1
+      set %_x . %Cnt #findx ;tworzenie tablicy
+      set %_y . %Cnt #findy ;tworzenie tablicy
+      set %_z . %Cnt #findz ;tworzenie tablicy
+      set %krzak_id_ . %Cnt #findid
+      ignoreitem #findid
+  }
+return
+;Roslinki do zbierania:
+; XIJ - czosnek
+; NIJ - mandragora OIJ - szczepka
+; TIJ - wilcze jagody
+; FJJ - zenszen
+; TIJ - krwawy mech
+; KBF - grzybki
+;Roslinki do wywalenia:
+; CBF - szczepki grzybkow
+; GJJ - szczepki wilczych jagod
+; OIJ - szczepki mandragory

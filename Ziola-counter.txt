@@ -1,0 +1,126 @@
+;===================================
+;BadScripter's Reagent Counter v1.05
+;===================================
+
+INITEVENTS
+SET %delay 10
+SET %count 0
+DISPLAY OK Target Your Reagent Bag.
+
+        SET #TARGCURS 1
+        SET #LTARGETID null
+        ltargetloop1:
+        IF #LTARGETID = null
+        GOTO ltargetloop1
+        WAIT %delay
+        SET %reg_bag_id #LTARGETID
+        WAIT %delay
+
+loop:
+
+FINDITEM KUF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %black_pearl 0
+                GOSUB title_set
+                GOTO next_1
+                }
+        SET %black_pearl #FINDSTACK
+        GOSUB title_set
+
+next_1:
+
+FINDITEM JUF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %blood_moss 0
+                GOSUB title_set
+                GOTO next_2
+                }
+        SET %blood_moss #FINDSTACK
+        GOSUB title_set
+
+next_2:
+
+FINDITEM KZF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %garlic 0
+                GOSUB title_set
+                GOTO next_3
+                }
+        SET %garlic #FINDSTACK
+        GOSUB title_set
+
+next_3:
+
+FINDITEM JZF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %ginseng 0
+                GOSUB title_set
+                GOTO next_4
+                }
+        SET %ginseng #FINDSTACK
+        GOSUB title_set
+
+next_4:
+
+FINDITEM MZF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %mandrake_root 0
+                GOSUB title_set
+                GOTO next_5
+                }
+
+        SET %mandrake_root #FINDSTACK
+        GOSUB title_set
+
+next_5:
+
+FINDITEM WZF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %night_shade 0
+                GOSUB title_set
+                GOTO next_6
+                }
+
+        SET %night_shade #FINDSTACK
+        GOSUB title_set
+
+next_6:
+
+FINDITEM RZF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %spider_silk 0
+                GOSUB title_set
+                GOTO next_7
+                }
+
+        SET %spider_silk #FINDSTACK
+        GOSUB title_set
+
+next_7:
+
+FINDITEM SZF C_ , %reg_bag_id
+        IF #FINDKIND = -1
+                {
+                SET %sulfurous_ash 0
+                GOSUB title_set
+                GOTO loop
+                }
+
+        SET %sulfurous_ash #FINDSTACK
+        GOSUB title_set
+
+GOTO loop
+
+SUB title_set
+SETUOTITLE BP=> %black_pearl | BM=> %blood_moss | GL=> %garlic
++| GS=> %ginseng | MR=> %mandrake_root | NS=> %night_shade | SS=> %spider_silk
++| SA=> %sulfurous_ash
+RETURN
+

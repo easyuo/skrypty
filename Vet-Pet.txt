@@ -1,0 +1,50 @@
+                                                   ; Script Name: Simple Vet
+    ; Author: Holmedog
+    ; Version: 1.0
+    ; Client Tested with: 6.0.7.0
+    ; EUO version tested with: 1.5 version 111
+    ; Shard OSI / FS: OSI
+    ; Revision Date:  04/25/08
+    ; Public Release: 05/09/08
+    ; Purpose: Train vet/keep pet alive while training
+    ;-------------------------------------------------------------
+    ;Just a basic heal your pet script
+    ;-------------------------------------------------------------
+
+
+    display Target Pet
+    wait 5
+    set #targcurs 1
+    wait 5s
+    set %pet #ltargetid
+    set #lobjectid %pet
+
+    fighting:
+
+    set #ltargetid %pet
+    ; Animal Lore
+;         event macro 13 2
+ ;        wait 10
+  ;       event macro 22 0
+   ;      wait 10
+       findItem ZLF_TOF C_ , #BACKPACKID
+         set #lobjectid #FINDID
+         if #FINDSTACK < 2
+         {
+         ; use greater heal
+         event macro 15 28
+         wait 60
+         }
+         else
+         {
+         ; use bandaids/vet
+         set #lobjectid #FINDID
+         wait 10
+         event macro 17 0
+         }
+         set #ltargetid %pet
+         wait 10
+         event macro 22 0
+         wait 3s
+         set %creature false
+    goto fighting

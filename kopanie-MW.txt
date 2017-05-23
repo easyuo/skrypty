@@ -1,0 +1,591 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: Kopanie
+; | Serwer: Mysterious World
+; | Autor: m@ti
+; | Data: 2007.04.08 14:08:15
+; \----------koniec----------
+;Autor: [nGz]
+;Wersja: 3.7
+;wersja 3.7 - dodana mozliwosc kopania z golemem jako 'juczniakiem'.
+;Ten skrypt powiadamia Cie poprzez sysmessage dlaczego sie zatrzymal lub dlaczego nie przeniosl rudy.
+;Aby widziec te powiadomienia musisz wlaczyc w Easyuo opcje Enable Event Sysmessage(Options-->Configuration).
+;Kopie rude w 25 miejscach dookola postaci, jak nie ma rudy w 1 miejscu to zaczyna kopac w 2,
+;jak sie skonczy w 2 to kopie w 3 itd. Jak juz nigdzie dookola postaci nie bedzie rudy to
+;skrypt SAM SIE ZATRZYMA i wtedy nalezy pojsc kopac w inne miejsce.
+;Zatrzyma sie rowniez jesli bedziecie wazyc ponad 1000 kamieni.
+;Przerzuca rowniez rude do plecaka(musi on byc calkowicie odsloniety)
+;(CHODZI TU O IKONE PLECAKA, A NIE O JEGO WNETRZE),
+;KTORY MOZNA UMIESCIC NA KONIU/LAMIE jucznej(NIE BEDZIE PRZEZUCAL RUDY DO PLECAKA
+;KONIA/LAMY.CHODZI TU O DRUGI PLECAK KTORY UMIESZCZACIE W PLECAKU KONIA/LAMY).
+;Musisz jednak ustawic pewne zmienne, inaczej nie bedzie przenosil rudy.
+;Aby to zrobic musisz miec liste zmiennych po prawej stronie Easyuo(View-->Variables-->Standart nastepnie nacisnij Ctrl+R)
+;Teraz otworz plecak do ktorego ma byc ruda przezucana i nacisnij raz
+;lewym przyciskiem myszy na wnetrze tego plecaka(chodzi tu o to aby ten plecak byl na wierzchu)
+;Znajdz na tej liscie po prawo #CONTID - to bedzie id tego plecaka. Zeby dowiedziec sie
+;id twojego plecaka kliknij lewym myszki na jego wnetrze wtedy #CONTID bedzie pokazywalo id twojego plecaka.
+;Plecak do ktorego bedzie przezucana ruda nie musi byc otwarty ale MUSI byc odsloniety.
+;W zaleznosci na ktorym shardzie grasz tam wprowadz te zmiany.
+;Mozesz tez ustawic czy ma cwiczyc Anatomie(%skill 1), Armslore(%skill 2),
+;Ukrywanie(%skill 3) lub Wykrywanie(%skill 4), czy tez ma nic nie cwiczyc(%skill 0).
+;Anatomie robi na lamie/koniu jucznym ktory stoi w poblizu, jesli takiego nie ma
+;to skrypt poprosi Cie o wskazanie celu.
+;Armslore robi na kilofie.
+set %skill 3 ;<----- TUTAJ ustawiasz czy ma robic Anatomie/Armslore/Ukrywanie
+;czy tez nie(0-nic,1-anatomia,2-armslore,3-ukrywanie,4-wykrywanie,5-identyfikacja)
+
+set %plecakid DQGLGVD  ;<----- TUTAJ wpisz zamiast slmzjmd id plecaka do ktorego ma byc ruda przezucana jesli grasz na MW
+set %twojplecakid #backpackid ;<----- TUTAJ NIC NIE WPISUJ jesli grasz na MW
+set #targcurs 1
+set #sysmsgcol 1264
+event sysmessage Wskaz juczniaka na ktorym jest plecak (jesli nie ma takiego wcisnij ESC).
+repeat
+onhotkey ESC
+goto wcis_esc
+until #targcurs = 0
+onhotkey ESC
+{
+wcis_esc:
+set %idLamy 0
+goto wcis_esc2
+}
+set %idLamy #ltargetid
+wcis_esc2:
+
+initevents
+set %kop 0
+set %runda 0
+set %syspid 0
+set %systid 0
+set %syszleid 0
+set %spr_plecaka_lamy 0
+set %bylPlecak 0
+set %jrud 0
+set %wjt 0
+set %zacz 0
+start:
+set %licz2 0
+if #weight > 600
+{
+set #sysmsgcol 1080
+event sysmessage WAZYSZ PONAD 300 kamieni !
+sound E:\Mp3\kryt.wav
+halt
+}
+if %kop = 0
+{
+set #ltargetx #charposx
+set #ltargety #charposy
+}
+if %kop = 1
+{
+set #ltargetx #charposx
+set #ltargety #charposy + 1
+}
+if %kop = 2
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy
+}
+if %kop = 3
+{
+set #ltargetx #charposx
+set #ltargety #charposy - 1
+}
+if %kop = 4
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy
+}
+if %kop = 5
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy + 1
+}
+if %kop = 6
+{
+set #ltargetx #charposx
+set #ltargety #charposy + 2
+}
+if %kop = 7
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy + 1
+}
+if %kop = 8
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy
+}
+if %kop = 9
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy - 1
+}
+if %kop = 10
+{
+set #ltargetx #charposx
+set #ltargety #charposy - 2
+}
+if %kop = 11
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy - 1
+}
+if %kop = 12
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy
+}
+if %kop = 13
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy + 1
+}
+if %kop = 14
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy + 2
+}
+if %kop = 15
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy + 2
+}
+if %kop = 16
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy + 2
+}
+if %kop = 17
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy + 2
+}
+if %kop = 18
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy + 1
+}
+if %kop = 19
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy - 1
+}
+if %kop = 20
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy - 2
+}
+if %kop = 21
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy - 2
+}
+if %kop = 22
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy - 2
+}
+if %kop = 23
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy - 2
+}
+if %kop = 24
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy - 1
+}
+ignoreitem reset
+kilofek:
+finditem npf C_ , #charid
+if #findkind = -1
+{
+set #sysmsgcol 1080
+event sysmessage Nie znaleziono kilofa
+halt
+}
+set %kilofek #findid
+if %zacz = 0
+{
+set #sysmsgcol 1264
+event sysmessage Zaczynam kopac - 1
+set %zacz 1
+wait 1
+}
+kil:
+set %licz 0
+set #lobjectid #findid
+event macro 17
+loop:
+set #ltargetkind 2
+set %licz %licz + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto dylej
+if %licz > 6
+goto kil
+goto loop
+dylej:
+event macro 22
+event macro 22
+event macro 22
+wait 5
+if Nie_widzisz_tego in #sysmsg
+goto start
+if Tu_nic_nie_wykopiesz in #sysmsg
+{
+if %kop = 24
+{
+set #sysmsgcol 1080
+wait 1
+event sysmessage Skonczono kopac
+halt
+}
+set %kop %kop + 1
+set %rkop %kop + 1
+set #sysmsgcol 1264
+wait 1
+event sysmessage Zaczynam kopac w nastepnym miejscu - %rkop
+goto start
+}
+if lopaty_lub_szufelki in #sysmsg
+{
+if %kop = 24
+{
+set #sysmsgcol 1080
+wait 1
+event sysmessage Skonczono kopac
+halt
+}
+set %kop %kop + 1
+set %rkop %kop + 1
+set #sysmsgcol 1264
+wait 1
+event sysmessage Zaczynam kopac w nastepnym miejscu - %rkop
+goto start
+}
+set %odloz 1
+rudka:
+finditem %plecakid
+set #findmod 25_7
+if #findkind = -1
+{
+if %spr_plecaka_lamy = 0
+{
+gosub otworz
+set %spr_plecaka_lamy 1
+wait 8
+goto rudka
+}
+if %syspid = 1
+goto wtym
+if %jrud = 1
+{
+str lower %plecakid
+set #sysmsgcol 1080
+wait 1
+event sysmessage Nie znaleziono plecaka #strres - Nie przenosze rudy
+set %syspid 1
+}
+goto wtym
+}
+if #findstack = 0
+{
+if %syszleid = 1
+goto wtym
+set #sysmsgcol 1080
+event sysmessage Podales prawdopodobnie ID plecaka lamy, a nie o ten chodzi...
+set %syszleid 1
+goto wtym
+}
+set %x #findx
+set %y #findy
+set %bylPlecak 1
+set %syspid 0
+finditem dwj C_ , %twojplecakid
+if #findkind = -1
+{
+if %systid = 1
+goto wtym
+if %jrud = 1
+{
+str lower %twojplecakid
+set #sysmsgcol 1080
+wait 1
+event sysmessage Nie znaleziono rudy w plecaku - #strres
+set %systid 1
+}
+goto wtym
+}
+set %systid 0
+set %jrud 0
+if #contkind = odob
+{
+set #sysmsgcol 1080
+if %odloz = 1
+event sysmessage Odloz przedmiot !
+set %odloz 0
+goto rudka
+}
+event drag #findid
+if #findstack > 1
+{
+wait 1
+set %licz 0
+kolko:
+set %licz %licz + 1
+if #conttype = dwj
+goto wcis
+if %licz > 15
+goto rudka
+goto kolko
+wcis:
+wait 1
+msg $
+}
+wait 2
+click %x %y
+if That_item_is_too_heavy in #sysmsg
+{
+set #sysmsgcol 1080
+event sysmessage Plecak jest juz pelny
+halt
+}
+if #conttype = dwj
+goto wcis
+goto rudka
+wtym:
+if %bylPlecak = 1
+set %spr_plecaka_lamy 0
+set %jrud 0
+set %licz2 %licz2 + 1
+if That_item_is_too_heavy in #sysmsg
+{
+set #sysmsgcol 1080
+event sysmessage Plecak jest juz pelny
+halt
+}
+if #sysmsg = W_tym_miejscu_nie_ma_juz_rudy.
+{
+if %kop = 24
+{
+set #sysmsgcol 1080
+event sysmessage Skonczono kopac
+sound C:\uwaga.wav
+halt
+}
+set %kop %kop + 1
+set %rkop %kop + 1
+set #sysmsgcol 1264
+wait 1
+event sysmessage Zaczynam kopac w nastepnym miejscu - %rkop
+set %spr_plecaka_lamy 0
+goto next
+}
+if Wlozyl in #sysmsg
+{
+set %jrud 1
+goto next
+}
+if Znalazl in #sysmsg
+{
+;set %jrud 1
+goto next
+}
+if Nie_udalo_ci_sie in #sysmsg
+goto next
+if nic,_co_by_Cie_interesowalo in #sysmsg
+goto next
+if Your_skill_in_Mining in #sysmsg
+{
+scanjournal 1
+if Your_skill_in in #journal
+{
+set %jrud 1
+goto next
+}
+}
+if Your_skill_in_Gornictwo in #sysmsg
+{
+scanjournal 1
+if Your_skill_in in #journal
+{
+set %jrud 1
+goto next
+}
+}
+if Your_strength_has in #sysmsg
+{
+scanjournal 1
+if Your_strength_has in #journal
+{
+set %jrud 1
+goto next
+}
+}
+if To_jest_za_daleko in #sysmsg
+goto next
+if %licz2 > 110
+goto next
+goto wtym
+next:
+if %skill = 0
+goto start
+if %runda = 1
+{
+set %runda 0
+goto start
+}
+wait 1
+if %skill <> 1
+goto armsal
+set %ltn 0
+anat:
+finditem wn
+if #findkind = -1
+{
+finditem bo
+if #findkind = -1
+set %ltn 1
+}
+if #finddist > 3
+{
+ignoreitem #findid
+goto anat
+}
+if %ltn = 0
+goto anat2
+if %wjt = 1
+goto anat2
+ltanat:
+set %licz 0
+event macro 13 1
+petl:
+set %licz %licz + 1
+if #targcurs = 1
+{
+wait 2
+wskter:
+set #sysmsgcol 1152
+event sysmessage Wskaz teraz na czym ma byc robiona Anatomia
+set %licz 0
+goto petl2
+}
+if %licz > 50
+goto ltanat
+goto petl
+petl2:
+set %licz %licz + 1
+set %wjt 1
+if #targcurs = 0
+goto wskaz
+if %licz > 300
+goto wskter
+goto petl2
+wskaz:
+wait 10
+set %lt #ltargetid
+if Anulowano in #sysmsg
+{
+set #sysmsgcol 1080
+event sysmessage Nie wskazano celu!
+set %wjt 0
+}
+goto srund
+anat2:
+set %licz 0
+event macro 13 1
+loop2:
+set #ltargetkind 1
+if %ltn = 0
+set #ltargetid #findid
+if %ltn = 1
+set #ltargetid %lt
+set %licz %licz + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto adalej
+if %licz > 5
+goto anat2
+goto loop2
+armsal:
+if %skill <> 2
+goto identyfikacja
+wiedza:
+set %licz 0
+event macro 13 4
+loop3:
+set #ltargetkind 1
+set #ltargetid %kilofek
+set %licz %licz + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto adalej
+if %licz > 5
+goto wiedza
+goto loop3
+identyfikacja:
+if %skill <> 5
+goto hid
+ident:
+set %licz 0
+event macro 13 3
+identloop:
+set #ltargetkind 1
+set #ltargetid %kilofek
+set %licz %licz + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto adalej
+if %licz > 5
+goto ident
+goto identloop
+adalej:
+event macro 22
+event macro 22
+event macro 22
+hid:
+if %skill <> 3
+goto wykryw
+hid2:
+set %licz 0
+event macro 13 21
+loop4:
+scanjournal 1
+set %licz %licz + 1
+wait 1
+wait 1
+if #charstatus = H
+goto srund
+if nie_udalo_Ci_sie_ in #journal
+goto srund
+if %licz > 10
+goto hid2
+goto loop4
+wykryw:
+if %skill <> 4
+goto srund
+event macro 13 14
+srund:
+set %runda 1
+goto start
+
+sub otworz
+finditem %idLamy
+if #findtype <> wn && #findtype <> bo && #findtype <> yab
+return
+if #finddist > 1
+{
+set #sysmsgcol 1080
+event sysmessage Juczniak stoi za daleko.
+return
+}
+set #lobjectid #findid
+event macro 17
+return

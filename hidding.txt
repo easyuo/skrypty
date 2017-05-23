@@ -1,0 +1,13 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: Hidding
+; | Serwer: Mysterious World
+; | Autor: m@ti
+; | Data: 2007.04.08 14:14:05
+; \----------koniec----------
+;Autor: [nGz]
+
+if #hits = #maxhits
+ event macro 13 21
+wait 3s
+

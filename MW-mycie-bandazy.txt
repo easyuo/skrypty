@@ -1,0 +1,66 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: mycie_bandaz_skill(madrosc)
+; | Serwer: Mysterious World
+; | Autor: Rada
+; | Data: 2007.05.30 12:42:07
+; \----------koniec----------
+;Najpierw trzeba recznie umyc bandaze, skrypt bedzie w tym miejscu plukal bandaze
+;Pozniej trzeba zrobic skill umyslowy na wybranym celu, dopiero wtedy play
+initevents
+set #sysmsgcol 1082
+event sysmessage Skrypt [plukanie_bandazy_skill] odpalony (by Rada)
+wait 1
+set %lt #ltargetid
+set %lol 0
+start:
+finditem AMF
+if #findkind = -1
+{
+set #sysmsgcol 1080
+event sysmessage Nie masz zakrwawionyhc bandarzy! Skrypt wylaczono!
+halt
+}
+if %lol = 0
+goto next
+loop:
+set %licz %licz + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto dalej
+if %licz > 5
+goto loop
+dalej:
+event macro 22
+event macro 22
+event macro 22
+wait 5
+next:
+set #ltargetkind 3
+set #lobjectid #findid
+set %licz2 0
+event macro 17
+loop2:
+set %licz2 %licz2 + 1
+wait 1
+wait 1
+if #targcurs = 1
+goto targ
+if %licz2 > 5
+goto next
+goto loop2
+targ:
+event macro 22
+event macro 22
+event macro 22
+if %lol = 0
+{
+set %lol 1
+goto next2
+}
+if %lol = 1
+set %lol 0
+next2:
+wait 75
+goto start

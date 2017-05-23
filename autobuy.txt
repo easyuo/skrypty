@@ -1,0 +1,198 @@
+                               ;==================================
+    ; Script Name: Auto ,buy
+    ; Author: Janus
+    ; Version: 1.0 Final
+    ; Client Tested with: 4.0.0a
+    ; EUO version tested with: 1.35
+    ; Shard OSI / FS: tested/used on Crystal Gate FS
+    ; Revision Date: 10/27/2003
+    ; Public Release: 10/27/2003
+    ; Purpose: The perfect solution to auto buy items
+    ;          with an auto money calculation
+    ;==================================
+
+    ;******************* Auto Buy Script v.1.0 Final by Janus *******************
+    ;
+    ; introduction:
+    ; you need to set 1 house spot and 1 Bank (the first 2 runes) the rest is variable
+    ; you need a lot of recall regs
+    ; you need a injection ,buy macro set
+    ; you have to set:
+    ; - the buy command in injection - IMPORTANT!: set the command in injection with big letters!
+    ;   like ,buy regs = ,buy REGS
+    ; - the RunebookID, the amount of spots and the #contkind id if runebook is opened
+    ; - the wait time ( 1200 = 1 minute )
+    ; - you can set the amount of gold or let it calculate if you set the amount per vendor
+    ; - the #contkind id when withdraw window is opened
+    ; - the ID's of the items you buy to drop them correctly
+    ; - the drop bag location
+    ;
+    ; features:
+    ; - recalls to variable amount of spots and buys
+    ; - drops the material you bought after a full round and waits a variable time for respawn
+    ; - checks for money and calculates how much you need to get out of the bank
+    ;
+    ; Have fun with it!
+    ; - Janus
+
+    initevents
+
+    set #sysmsgcol 0 0
+
+    set %contkind CJEB
+    set %spots 12
+    set %runebookid SYZXLVF
+    set %wait 3600 ; 1200 = 1 minute
+
+    ;- item settings
+    set %buy bolts
+    set %dropitems IAG_BAG_LAG_OAG_MAG_ZZF_CAG_NAG
+    set %bagx 341
+    set %bagy 173
+
+    ;- gold settings
+    ; set %autocalculate no and the amount here if you dont want to use auto calculation
+    set %goldamount 25000
+    set %autocalculate yes
+    set %amountpervendor 460
+    set %goldround 3 ; after how many buy rounds it should get gold again
+    set %withdrawcontkind AAXC
+
+    ;- dont change this variables!
+    set %click 2
+    set %currentspot 0
+    set %spotcount 0
+
+    ;-------------------------------------------- SCRIPT START ----------------------------------------------
+    ;---- better dont touch this part you can set it all at the beginning of the script. ----
+    ;-------------------------------------------------------------------------------------------------------------------
+
+    event Sysmessage Auto Buy Macro starting...
+
+    set %waittime %wait / 1200
+
+    start:
+    if %autocalculate <> yes
+    {
+    if #gold < 5000
+    goto gold
+    }
+
+    if %autocalculate = yes
+    {
+    set %goldamount 0
+    set %goldamount %spots * %amountpervendor
+    if %goldamount > #gold
+    {
+    set %goldamount %goldamount * %goldround
+    set %goldamount %goldamount - #gold
+    if %goldamount >= 60000
+    {
+    set %goldamount 60000 - #gold
+    }
+    event sysmessage i have to get %goldamount gp for %goldround rounds
+    goto gold
+    }
+    }
+
+    startit:
+    if %currentspot = 2
+    {
+    set %currentspot 0
+    set %click %click + 1
+    }
+
+
+    recalling:
+    set #lobjectid %runebookid
+    event macro 17 0
+    if #contkind <> %contkind
+    goto recalling
+    for %cnt 1 %click
+    {
+    click 335 20
+    wait 7
+    }
+    if %currentspot = 0
+    {
+    click 95 170
+    }
+    if %currentspot = 1
+    {
+    click 260 170
+    }
+    wait 4s
+    gosub buy
+    wait 7
+
+    if %spotcount = %spots
+    goto drop
+    else
+    goto startit
+
+    sub buy
+    msg ,buy %buy $
+    wait 7
+    msg buy $
+    set %currentspot %currentspot + 1
+    set %spotcount %spotcount + 1
+    return
+
+    gold:
+    set #lobjectid %runebookid
+    event macro 17 0
+    if #contkind <> %contkind
+    goto gold
+    click 335 20
+    wait 7
+    click 260 170
+    wait 4s
+    withdraw:
+    msg withdraw $
+    wait 7
+    if #contkind <> %withdrawcontkind
+    goto withdraw
+    msg %goldamount
+    wait 7
+    key ENTER
+    wait 7
+    goto start
+
+    drop:
+    set #lobjectid %runebookid
+    event macro 17 0
+    if #contkind <> %contkind
+    goto drop
+    click 335 20
+    wait 7
+    click 95 170
+    wait 4s
+    event sysmessage dropping items...
+
+    dropit:
+    finditem %dropitems
+
+    if #findkind = 1
+    {
+    ;ignores the items that arent in your bag
+    ignoreitem #findid
+    goto dropit
+    }
+    if #findkind = -1
+    {
+    event sysmessage waiting %waittime minutes now...
+    set %spotcount 0
+    set %currentspot 0
+    set %click 2
+    wait %wait
+    goto start
+    }
+
+    event drag #findid
+    key enter
+    wait 5
+
+    click %bagx %bagy
+    ignoreitem #findid
+
+    goto dropit
