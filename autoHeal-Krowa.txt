@@ -1,6 +1,6 @@
 InitEvents
 IgnoreItem Reset
-set %TnijCiala 0
+set %TnijCiala 1
 set %TnijCialaWPelniZdrowy 1
 set %TnijCialaGdyNieMaWroga 1
 set %AutoGrabCiala 0
@@ -37,8 +37,6 @@ set %hpdiff 1 ; Roznica w HP od ktorej zaczyna leczyc
 ; event sysmessage Lecze bandazami
 ;}
 
-
-
 set #ltargetid RRMMVTD
 set #lobjectid RRMMVTD
 
@@ -65,6 +63,12 @@ finditem VRH_KAG C_ , #BACKPACKID
 if findkind <> -1
 {
  set %sztyletID #FINDID
+ Event SysMessage Narzedzie do ciecia: #FindID
+}
+else
+{
+ set %TnijCiala 0
+ Event SysMessage Nie znalazlem narzedzi do Ciecia. Nie bede cial.
 }
 
 set %czas_anatomia 10

@@ -11,5 +11,6 @@ if #ENEMYID <> N/A
 {
 ; event macro 1 0 Straze! Straze pomocy!
  event macro 1 0 Uleczcie sie!
-wait 1s
+ wait 1s
 }
+
