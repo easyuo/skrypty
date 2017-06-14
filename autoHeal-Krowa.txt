@@ -1,6 +1,6 @@
 InitEvents
 IgnoreItem Reset
-set %TnijCiala 1
+set %TnijCiala
 set %TnijCialaWPelniZdrowy 1
 set %TnijCialaGdyNieMaWroga 1
 set %AutoGrabCiala 0
@@ -59,15 +59,16 @@ set %zbierajPrzedmioty POF_JZF_HUF_MZF_AMF_SZF_EQD_VUF_QVF_WVF_EVF_RVF_TVF_YVF_U
 ; finditem TSF C_ , #BACKPACKID
 ; sztylet - VRH
 ; Nozyczki - KAG
-finditem VRH_KAG C_ , #BACKPACKID
-if findkind <> -1
+finditem VRH_KAG C , #BACKPACKID
+if #findkind <> -1
 {
  set %sztyletID #FINDID
- Event SysMessage Narzedzie do ciecia: #FindID
+ set %TnijCiala
+ Event SysMessage Narzedzie do ciecia: #FindID #findkind
 }
 else
 {
- set %TnijCiala 0
+ set ! %TnijCiala
  Event SysMessage Nie znalazlem narzedzi do Ciecia. Nie bede cial.
 }
 
@@ -81,6 +82,8 @@ set %timer_anatomia #SCNT
 
 Event SysMessage [AA] Auto Anatomia + autobandaz.....ver 1.0.5 (modyfikacje: Krowa)
 petla:
+ onhotkey f12
+          gosub ToggleCiecie
  if yes in #charghost
     {
        Event SysMessage U... padlem a niech to szlag!
@@ -144,7 +147,7 @@ FINDITEM YFM G_2
 IF #FINDCNT > 0
  {
 
-  if %AutoGrabCiala = 1
+  if %AutoGrabCiala
    {
 ;     event macro 1 0 .grab
       event macro 1 0 .grab ziola klejnoty zloto strzaly belty druid nekro wampir wilkolak magiczne
@@ -186,7 +189,7 @@ IF #FINDCNT > 0
   }
 
 
-if %TnijCiala = 1
+if %TnijCiala
 {
     FINDITEM YFM G_1
 ;    FINDITEM YFM G_2
@@ -261,6 +264,14 @@ sub LeczenieIVM
     target 3s
     event macro 23 0
 
+return
+
+sub ToggleCiecie
+    set %TnijCiala ! %TnijCiala
+    if %TnijCiala
+            event sysmessage Ciecie cial ON
+    if ! %TnijCiala
+            event sysmessage Ciecie cial OFF
 return
 
 sub ZbierzRzeczy

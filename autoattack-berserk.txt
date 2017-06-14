@@ -89,7 +89,7 @@
     if %bestenemy = N/A
     {
             if ! %alwayson
-                    event sysmessage enemy not found
+
     }
     if %bestenemy <> N/A
     {
