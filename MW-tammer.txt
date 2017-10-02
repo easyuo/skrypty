@@ -344,7 +344,7 @@ sub TamingCheckSkill
     if %tameskill = 0
         set %tameable CO_CG_JG_ZGB_XF_SF_MG_SG_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_YG_KG_JD_LD_LD_OB_BB_TG_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_YG_KG_JD_LD_XG_KD_OH_YG_KG_JD_LD_OB_XG_KD_QF_LB_EHB
     if %tameskill > 0 && %tameskill < 40
-        set %tameable HG_RD_NF_BE_NF_GO_WC
+        set %tameable HG_RD_NF_BE_NF_GO_WC_CO_CG_JG_ZGB_XF_SF_MG_SG_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_YG_KG_JD_LD_LD_OB_BB_TG_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_YG_KG_JD_LD_XG_KD_OH_YG_KG_JD_LD_OB_XG_KD_QF_LB_EHB
     if %tameskill >= 40 && %tameskill < 160
         set %tameable HG_RD_NF_BE_NF_GO_WC_RF_AG_KB_WG_WG
     if %tameskill >= 160 && %tameskill < 220

@@ -1,0 +1,59 @@
+
+sub killTarget
+        if ! %killTargetConfigured || %killTargetConfigured = N/A
+        {
+                set %killedTargetList 10
+                set %killTargetConfigured #true
+        }
+;--
+        if %0 = 1
+        {
+                set %target %1
+        }
+        else
+                return #false , _ , INCORRECTARGS
+;--
+        set %lTargetID #lTargetID
+        set #lTargetID %target
+        event macro 27 0
+        set #lTargetID %lTargetID
+        for %_attackLoop 1 -1
+        {
+
+                set %_attackLoop 1
+                finditem %target G_18
+                if #findKind <> -1
+                {
+                        if #systime > %attackTimer || %attackTimer = N/A
+                        {
+                                set %lTargetID #lTargetID
+                                set #lTargetID %target
+                                event macro 27 0
+                                set #lTargetID %lTargetID
+                                set %attackTimer #sysTime + 800
+                        }
+                        if #systime > %chaseTimer || %chaseTimer = N/A
+                        {
+                                if #findDist > 1
+                                {
+                                        event pathfind #findX #findY #findZ
+                                }
+                                set %chaseTimer #sysTime + 200
+                        }
+                }
+                if #findKind = -1 || #enemyHits = N/A || #charGhost = yes ||
+                {
+                        event pathfind #charPosX #charPosY #charPosZ
+                        ignoreItem #findID %killedTargetsList
+                        set %_attackLoop -1
+                }
+                onHotKey C ALT
+                {
+                        event exMsg #charID 3 0 Bailing Out and Pausing!!!
+                        set %_attackLoop -1
+                        pause
+                }
+        }
+        if G in #charStatus
+                event macro 6 0
+return

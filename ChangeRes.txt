@@ -1,0 +1,5 @@
+ set #cliXRes 1100
+ set #cliYRes 800
+ event macro 8 1
+ halt
+

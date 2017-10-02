@@ -1,6 +1,6 @@
 InitEvents
 IgnoreItem Reset
-set %TnijCiala
+set ! %TnijCiala
 set %TnijCialaWPelniZdrowy 1
 set %TnijCialaGdyNieMaWroga 1
 set %AutoGrabCiala 0
@@ -55,22 +55,6 @@ set %zbierajPrzedmioty POF_JZF_HUF_MZF_AMF_SZF_EQD_VUF_QVF_WVF_EVF_RVF_TVF_YVF_U
 
 
 ;----------TU ZMIENIAJ-------------------
-; Kryss = VRH
-; finditem TSF C_ , #BACKPACKID
-; sztylet - VRH
-; Nozyczki - KAG
-finditem VRH_KAG C , #BACKPACKID
-if #findkind <> -1
-{
- set %sztyletID #FINDID
- set %TnijCiala
- Event SysMessage Narzedzie do ciecia: #FindID #findkind
-}
-else
-{
- set ! %TnijCiala
- Event SysMessage Nie znalazlem narzedzi do Ciecia. Nie bede cial.
-}
 
 set %czas_anatomia 10
 set %czas_bandarz 10
@@ -82,11 +66,13 @@ set %timer_anatomia #SCNT
 
 Event SysMessage [AA] Auto Anatomia + autobandaz.....ver 1.0.5 (modyfikacje: Krowa)
 petla:
- onhotkey f12
+ onhotkey f9
           gosub ToggleCiecie
  if yes in #charghost
     {
        Event SysMessage U... padlem a niech to szlag!
+       Event SysMessage Wylaczam Ciecie cial
+       set ! %TnijCiala
        wait 5s
     }
  if H in #charstatus
@@ -267,11 +253,34 @@ sub LeczenieIVM
 return
 
 sub ToggleCiecie
+    ; Kryss = VRH
+    ; finditem TSF C_ , #BACKPACKID
+    ; sztylet - VRH
+    ; Nozyczki - KAG
+
     set %TnijCiala ! %TnijCiala
+
     if %TnijCiala
-            event sysmessage Ciecie cial ON
+    {
+     finditem VRH_KAG C , #BACKPACKID
+     if #findkind <> -1
+     {
+      set %sztyletID #FINDID
+      Event SysMessage Narzedzie do ciecia: #FindID #findkind
+      event sysmessage Ciecie cial ON
+     }
+    else
+     {
+      set ! %TnijCiala
+      Event SysMessage Nie znalazlem narzedzi do Ciecia. Nie bede cial.
+     }
+    }
+    
     if ! %TnijCiala
-            event sysmessage Ciecie cial OFF
+    {
+     event sysmessage Ciecie cial OFF
+    }
+    
 return
 
 sub ZbierzRzeczy

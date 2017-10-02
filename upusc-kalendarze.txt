@@ -1,0 +1,14 @@
+FindItem TVH C_ , #BACKPACKID
+if #FindKind <> -1
+{
+          set %upuscID #FindID
+          gosub upusc
+}
+
+sub upusc
+ event macro 1 0 .upusc
+ target
+ set #LTargetID %upuscID
+ set #LTargetKind 1 ; http://wiki.easyuo.com/index.php?title=LTargetKind
+ event macro 22 0 ;LastTarget
+return

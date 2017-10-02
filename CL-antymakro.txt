@@ -1,0 +1,37 @@
+; /----------EasyUO script----------
+; | Ultima Online www.kopalnia.elnar.com.pl
+; | Nazwa skryptu: Antymakro
+; | Serwer: Mysterious World
+; | Autor: m@ti
+; | Data: 2007.04.03 15:45:00
+; \----------koniec----------
+;skrypt bY rada
+gosub 1
+sub 1
+if #CONTNAME = generic_gump
+{
+ gosub czekanie
+}
+
+sub czekanie
+{
+ wait 1s
+}
+
+; 1806_1599
+; 1141_1645
+
+if #CONTNAME = generic_gump && #CONTSIZE <> 640_500
+{
+  gosub dajsygnal
+}
+
+else
+{
+ gosub 1
+}
+
+sub dajsygnal
+sound C:\uwaga.wav
+wait 1,6s
+return

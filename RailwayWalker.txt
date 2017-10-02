@@ -1,0 +1,60 @@
+;===========================================================================
+; Script Name: Skitch's Easy Temp Rail Subs
+; Author: Skitch
+; Version: 1.0
+; Client Tested with: 5.0.6c
+; EUO version tested with: 1.5.97
+; Shard OSI / FS:  FS
+;     ***Not tested on OSI servers but should work the same***
+; Revision Date:
+; Public Release: 12/10/06
+; Global Variables Used:
+; Purpose: Lets you set up a rail with unlimited spots.
+; Requirements:
+; Setup Directions: Place all three subs in your script. Call the first sub
+;                   railsetup at the begining of your script. Call the move
+;                   sub when you have completed your task ie mining, casting
+;                   skill use etc.
+; How to use: Press f2 at each location for your rail then press f3 to
+;             begin script.
+;===========================================================================
+
+gosub railsetup
+
+gosub move
+
+;Call this sub towards the biginning of your script where you want to start
+;to setup the rail.
+sub railsetup
+ setup:
+ onhotkey f2
+  gosub spot
+ onhotkey f3
+  gosub move
+ goto setup
+return
+
+;This sub is where the rail positions are set up. From what I understand
+;about euo you should be able to set up a virtually unlimited number of rail
+;spots. Try to end your rail near the first spot so that it will loop for you.
+sub spot
+ event sysmessage Spot , #spc , %w , #spc , set
+ set %a . %w #charposx
+ set %b . %w #charposy
+ set %c . %w #charposz
+ set %w %w + 1
+return
+
+; Call this sub from your script where you want to move to the next location.
+sub move
+ set %x % . a . %m
+ set %y % . b . %m
+ set %z % . c . %m
+ event pathfind %x %y %z
+ event sysmessage Ide do %x %y %z pozycja nr %m
+ set %m %m + 1
+ if %m >= %w
+ set %m 0
+return
+
+
