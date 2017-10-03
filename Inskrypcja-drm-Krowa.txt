@@ -48,7 +48,11 @@ if #menubutton <> n/a
 goto czekaj
 
 startuj:
+
+; Ustawienie wartosci wpisanej w polu INT
 menu get int_1
+set %ile_inta #menures
+
 if #contsize = 560_340
   click 360 200 r
 goto jazda
@@ -185,31 +189,29 @@ wait 1
 
 UruchomMedytacje:
 event macro 13 46 ; Medytacja
-wait 5
 if #sysmsg <> Zaczynasz_medytowac...
 {
+ wait 1s
  goto UruchomMedytacje
 }
 
 CzekajNaPelnaMane:
 if #mana <> #maxmana
 {
-; wait 5
-; event macro 13 46 ; Medytacja
  goto CzekajNaPelnaMane
 }
 
 wait 1s
-
 if #int < %ile_inta + 1
   gosub blessuj
 wait 1s
+
 return
 
 sub blessuj
-event macro 15 9
-target 2s
-event macro 23 0
+ event macro 15 9
+ target 2s
+ event macro 23 0
 return
 
 sub xy
