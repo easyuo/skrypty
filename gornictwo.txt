@@ -12,8 +12,28 @@ set %plyta HSH_MSH
 ; POZYCJE DO KOPANIA W MINOC - START przy zjezdzie winy !
 
 set %X1 2587
-set %Y1 458
-set %Z1 5
+set %Y1 462
+set %Z1 15
+
+set %X2 2587
+set %Y2 456
+set %Z2 15
+
+set %X3 2587
+set %Y3 450
+set %Z3 15
+
+set %X4 2592
+set %Y4 449
+set %Z4 15
+
+set %X5 2594
+set %Y5 456
+set %Z5 15
+
+set %X6 2594
+set %Y6 463
+set %Z6 15
 
 
 ; KONIEC POZYCJI !!!
