@@ -1,0 +1,661 @@
+set %sklad XBZMZDE
+set %kilofy XBZMZDE
+
+set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
+set %piece_do_przetapiania JBG
+
+; Zmienne dla ArmsLore
+set %armslore_badaj HSH_LSH_MSH_YSF_CIK_
+set %ostatnieUzycieAL 0
+
+set %czas 0
+set %wagajes 300
+set %timeout 20
+set #sysmsgcol 154
+
+set %ileBandazy 30
+
+chooseskill medi
+if #skill >= 800
+{
+ set %leczBandazami 0
+ set %leczMagia 1
+}
+else
+{
+ set %leczBandazami 1
+ set %leczMagia 0
+}
+
+gosub r_menu
+
+pokaz_menu:
+set #menubutton n/a
+menu show
+repeat
+until #menubutton <> n/a
+if #menubutton = closed
+halt
+else
+goto #menubutton
+
+start:
+
+menu get tryb_select
+set *gornictwo_tryb #menures
+menu get armslore_check
+set *trenujArmsLore #menures
+menu get odkladanie_check
+set *gornictwo_odkladanie #menures
+
+
+
+if *gornictwo_odkladanie = #true
+{
+ finditem BUD_ZTD_HKF_UYD_GZD_CZD_OZD_IIF_HIF_KIF_JIF_IKF_RLL_CML_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP_CUD_KUD_ZJF_KKF G_2
+
+ if #findid = x || #finddist > 2
+ {
+  event sysmessage Musisz miec pojemnik w zasiegu przy starcie skryptu!
+  goto pokaz_menu
+ }
+
+ set %pojemnik #findid
+
+}
+
+set %pozycja_startowa_x #charposx
+set %pozycja_startowa_y #charposy
+
+menu hide
+gosub ustaw_narzedzie
+gosub zmiana_miejsca
+goto loop
+
+loop:
+
+if #targcurs = 1
+ key esc
+
+if *trenujArmsLore = #true
+{
+ gosub ArmsLore
+}
+
+if *gornictwo_tryb = 1
+{
+finditem %narzedzie C_ , #CharID
+if #findkind = -1
+ gosub ustaw_narzedzie
+}
+
+if *gornictwo_tryb = 3
+{
+finditem %narzedzie C
+if #findkind = -1
+ gosub ustaw_narzedzie
+}
+
+if #enemyid <> N/A
+{
+ goto zabij
+}
+
+if #weight >= %wagajes
+{
+ event sysmessage Za duzo waze. Odkladam rzeczy
+ run:
+ gosub odkladanie
+ gosub zmiana_miejsca
+}
+
+if %kop = 0 || %kop = n/a
+{
+set #ltargetx #charposx
+set #ltargety #charposy
+}
+
+if %kop = 1
+{
+set #ltargetx #charposx
+set #ltargety #charposy + 1
+}
+
+if %kop = 2
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy
+}
+
+if %kop = 3
+{
+set #ltargetx #charposx
+set #ltargety #charposy - 1
+}
+
+if %kop = 4
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy
+}
+
+if %kop = 5
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy + 1
+}
+
+if %kop = 6
+{
+set #ltargetx #charposx
+set #ltargety #charposy + 2
+}
+
+if %kop = 7
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy + 1
+}
+
+if %kop = 8
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy
+}
+
+if %kop = 9
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy - 1
+}
+
+if %kop = 10
+{
+set #ltargetx #charposx
+set #ltargety #charposy - 2
+}
+
+if %kop = 11
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy - 1
+}
+
+if %kop = 12
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy
+}
+
+if %kop = 13
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy + 1
+}
+
+if %kop = 14
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy + 2
+}
+
+if %kop = 15
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy + 2
+}
+
+if %kop = 16
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy + 2
+}
+
+if %kop = 17
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy + 2
+}
+
+if %kop = 18
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy + 1
+}
+
+if %kop = 19
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy - 1
+}
+
+if %kop = 20
+{
+set #ltargetx #charposx - 2
+set #ltargety #charposy - 2
+}
+
+if %kop = 21
+{
+set #ltargetx #charposx - 1
+set #ltargety #charposy - 2
+}
+
+if %kop = 22
+{
+set #ltargetx #charposx + 1
+set #ltargety #charposy - 2
+}
+
+if %kop = 23
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy - 2
+}
+
+if %kop = 24
+{
+set #ltargetx #charposx + 2
+set #ltargety #charposy - 1
+}
+
+set %_JIndex #JIndex
+set #lobjectid %narzedzie
+event macro 17 0
+target 2s
+set #ltargetkind 2
+event macro 22 0
+
+;                                 1                   2                3              4               5         6              7                           8                 9           10                11         12
+gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_ Nie_mozesz_tutaj Wybrane_miejsce Nie_ma_tu_wiecej Wykopales Anulowano Twoje_narzedzie_do_niczego Nie_mozesz_tutaj Wybrane_miejsce You_see:_ameba You_see:_zywiolak You_see:
+event sysmessage Po skanowaniu Journala
+if #result = 11 || #result = 12
+{
+ zabij:
+if %leczMagia = 1
+{
+ repeat
+ event macro 15 41
+ set #ltargetid #enemyid
+ set #ltargetkind 1
+ wait 10
+ until #targcurs = 1
+
+ set #ltargetid #enemyid
+ set #ltargetkind 1
+ event macro 22 0
+}
+
+if %leczBandazami = 1
+{
+ event macro 1 0 .lecz
+ wait 2s
+}
+ return
+}
+
+if #result = 13
+{
+ if #scnt > %czas
+ {
+  set %czas #scnt + 10
+  goto run
+ }
+}
+
+if #result = 2 || #result = 6 || #result = 7 || #result = 8
+ wait 1
+
+if #result = 5 || #result = 3 || #result = 4 || #result = 9 || #result = 10
+{
+ if %kop <> 24
+ {
+  set %kop %kop + 1
+  event sysmessage Kop: %kop Miejsce: %miejsce > *gornictwo_miejs
+ }
+ else
+ {
+ set %miejsce %miejsce + 1
+ if %miejsce > *gornictwo_miejsca
+  {
+  event sysmessage Kop: %kop Miejsce: %miejsce > *gornictwo_miejsce
+   if *gornictwo_przetapianie = #true
+    gosub przetapianie
+   if *gornictwo_odkladanie = #true
+    gosub odkladanie
+  }
+
+ event sysmessage Zmiana miejsca a potem kop 0
+ gosub zmiana_miejsca
+ set %kop 0
+ }
+}
+
+goto loop
+
+sub zmiana_miejsca
+ event sysmessage Zmiana miejsca: %miejsce z *gornictwo_miejsca
+ if %miejsce = 0 || %miejsce = n/a || %miejsce > *gornictwo_miejsca
+  set %miejsce 1
+
+ for %i 1 *gornictwo_miejsca
+ {
+  event sysmessage Miejsce i: %i miejsce: %miejsce
+  if %miejsce = %i
+  {
+   repeat
+    event pathfind *xpos . %i *ypos . %i
+    wait 1s
+   until #charposx = *xpos . %i && #charposy = *ypos . %i
+   event sysmessage Jestem w miejscu i: %i X: #charposX Y: #charposY
+   break
+  }
+ }
+
+return
+
+sub przetapianie
+ event sysmessage Przetapianie
+ repeat
+  event pathfind %pozycja_startowa_x %pozycja_startowa_y
+  wait 1s
+ until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
+
+ repeat
+  finditem TIJ_HJJ_ZIJ_OIJ C
+  if #findid <> x
+  {
+  set #lobjectid #findid
+  set #ltargetid %brazier
+  set #ltargetkind 1
+
+  event macro 17 0
+  target 1s
+  event macro 22 0
+  }
+  wait 2
+ until #findid = x
+
+return
+
+sub odkladanie
+ event sysmessage Odkladanie rzeczy
+ if #charposx <> %pozycja_startowa_x || #charposy <> %pozycja_startowa_y
+ {
+  repeat
+   event pathfind %pozycja_startowa_x %pozycja_startowa_y
+   wait 1s
+  until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
+ }
+
+ repeat
+  finditem %przedmioty_do_skladu C
+  if #findid <> x
+  {
+   exevent drag #findid #findstack
+   exevent dropc %pojemnik
+  }
+ wait 2
+ until #findid = x
+
+ event sysmessage Otwieranie pojemnika przed uzupelnianiem
+ set #lobjectid %pojemnik
+ set #ltargetkind 1
+ event macro 17 0
+ wait 1s
+
+  event sysmessage Uzupelnianie stuffu (bandaze, ziola)
+  ; Bandaze
+ finditem ZLF C_ , #BACKPACKID
+ if #findstack < %ileBandazy
+  {
+   set #lobjectid %pojemnik
+   set #ltargetkind 1
+   event macro 17 0
+   wait 1s
+   finditem ZLF C_ , %pojemnik
+   exevent drag #findid 5
+   exevent dropc #backpackid
+   wait 10
+ }
+
+  ; Ziola
+ finditem WZF C_ , #BACKPACKID
+  if #findstack = 0
+  {
+   set #lobjectid %pojemnik
+   set #ltargetkind 1
+   event macro 17 0
+   wait 1s
+
+   finditem WZF C_ , %pojemnik
+   exevent drag #findid 1
+   exevent dropc #backpackid
+   wait 10
+
+   finditem KUF C_ , %pojemnik
+   exevent drag #findid 1
+   exevent dropc #backpackid
+   wait 10
+ }
+
+return
+
+sub ustaw_narzedzie
+ event sysmessage Ustawiam narzedzie
+
+ if *gornictwo_tryb = 1
+ {
+  finditem NPF C_ , #charid
+  if #findkind = -1
+  {
+   finditem NPF C
+   if #findkind = -1
+   {
+    if #charposx <> %pozycja_startowa_x || #charposy <> %pozycja_startowa_y
+    {
+    repeat
+     event pathfind %pozycja_startowa_x %pozycja_startowa_y
+     wait 1s
+    until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
+    }
+
+    if #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
+    {
+     if #hits < 5 || #stamina = 0
+     {
+      dupa:
+       sound C:\WINDOWS\Media\Kopia.wav
+      goto dupa
+     }
+     set #lobjectid %pojemnik
+     event macro 17 0
+     wait 1s
+
+     set #lobjectid %kilofy
+     event macro 17 0
+     wait 1s
+
+     finditem NPF C
+     exevent drag #FINDID 1
+     exevent dropc #backpackid 90 20
+
+     gosub zmiana_miejsca
+
+    }
+
+   }
+  set %narzedzie #findid
+  exevent drag %narzedzie
+  exevent droppd
+ }
+ else
+  set %narzedzie #findid
+}
+
+if *gornictwo_tryb = 3
+ {
+  finditem TBG C
+  if #findkind = -1
+   {
+    display Nie masz lopatki zielarza!
+    halt
+   }
+
+  set %narzedzie #findid
+ }
+
+ wait 1s
+return
+
+miejsce_dodaj:
+ event sysmessage Dodaje miejsce, aktualna pozycja : *gornictwo_miejsca
+ if *gornictwo_miejsca = N/A
+  set *gornictwo_miejsca 0
+
+ set *gornictwo_miejsca *gornictwo_miejsca + 1
+ set *xpos . *gornictwo_miejsca #charposx
+ set *ypos . *gornictwo_miejsca #charposy
+ event sysmessage Zapisano miejsce nr: *gornictwo_miejsca
+ menu delete miejsca_txt
+ menu font bgcolor btnface
+ menu font color green
+ menu text miejsca_txt 165 125 *gornictwo_miejsca
+
+goto pokaz_menu
+
+miejsce_usun_ostatnie:
+ if *gornictwo_miejsca > 0
+ {
+  event sysmessage Usunieto ostatnie miejsce.
+  set *gornictwo_miejsca *gornictwo_miejsca - 1
+  menu delete miejsca_txt
+  menu font bgcolor btnface
+
+ if *gornictwo_miejsca = 0
+  menu font color red
+ else
+  menu font color green
+
+ menu text miejsca_txt 165 125 *gornictwo_miejsca
+
+}
+
+else
+ event sysmessage Lista jest pusta.
+
+goto pokaz_menu
+
+miejsce_usun_wszystkie:
+ event sysmessage Usunieto wszystkie miejsca.
+ set *gornictwo_miejsca 0
+ menu delete miejsca_txt
+ menu font bgcolor btnface
+ menu font color red
+ menu text miejsca_txt 165 125 *gornictwo_miejsca
+goto pokaz_menu
+
+sub r_menu
+ menu Clear
+ menu window title Gornictwo by Krowa!
+ menu window size 250 250
+ menu shape ramka 5 10 240 80 3 5 1 black 2 0
+ menu shape ramka 5 110 240 100 3 5 1 black 2 0
+ menu font style b
+ menu text narzedzie_txt 5 2 Ustawienia
+ menu text narzedzie_txt 5 102 Miejsca - ziemia
+ menu font style
+ menu text narzedzie_txt 20 25 Tryb pracy:
+ menu text przetapianie_txt 27 60 ArmsLore:
+
+ if *trenujArmsLore = n/a
+  set *trenujArmsLore #false
+
+ if *gornictwo_odkladanie = n/a
+  set *gornictwo_odkladanie #false
+
+ menu check armslore_check 95 59 18 20 *trenujArmsLore
+ menu text odkladanie_txt 130 60 Odkladanie:
+ menu check odkladanie_check 210 59 18 20 *gornictwo_odkladanie
+ menu text ilosc_miejsc_txt 15 125 Ilosc zapisanych miejsc:
+
+ if *gornictwo_miejsca = n/a
+ {
+  menu font color red
+  menu text miejsca_txt 165 125 0
+ }
+ else
+ {
+  menu font color green
+  menu text miejsca_txt 165 125 *gornictwo_miejsca
+ }
+
+ menu font color black
+ menu button miejsce_dodaj 74 147 100 23 Dodaj miejsce
+ menu button miejsce_usun_ostatnie 18 177 95 23 Usun ostatnie
+ menu button miejsce_usun_wszystkie 123 177 107 23 Usun wszystkie
+ menu button start 84 217 80 23 Start
+ menu font bgcolor white
+ menu combo create tryb_select 95 22 130
+
+ menu combo add tryb_select Nozyk - ziemia
+ menu combo add tryb_select Nozyk - drzewa
+ menu combo add tryb_select Lopatka - ziemia
+
+ menu combo select tryb_select 1
+
+return
+
+sub ScanJournal
+ event sysmessage ScanJournal
+ set %JIndex %1
+ set %_timeout #SCNT
+
+ ScanLoop:
+  set %x %timeout + %_timeout
+  if #SCNT > %_timeout + %timeout
+   return TIMEOUT
+  if #JIndex > %JIndex
+  {
+   set %JIndex %JIndex + 1
+   ScanJournal %JIndex
+   for %i 2 %0
+   {
+    if % . %i in #journal
+     return %i
+   }
+  }
+ goto ScanLoop
+
+return
+
+sub ArmsLore
+ FindItem %armslore_badaj C_ , #BackPackID
+ if #FindKind <> -1
+ {
+  set %ALtimeDiff #TIME - %ostatnieUzycieAL
+  if %ALtimeDiff > 10
+  {
+   event sysmessage AL time diff: %ALtimeDiff
+   event macro 13 4
+   set %lastTarget #FindID
+   event sysmessage LT: %lastTarget
+   target 3s
+   set #LTargetID %lastTarget
+   set #LTargetKind 1
+   event macro 22 0
+   ignoreitem %lastTarget
+   set %ostatnieUzycieAL #TIME
+  }
+  else
+  {
+   event sysmessage AL Time diff: %ALtimeDiff
+  }
+ }
+if #FindKind = -1
+ {
+  event sysmessage Reset ignorowanych przedmiotow dla ArmsLore
+  ignoreItem reset
+ }
+}
+return

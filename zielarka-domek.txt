@@ -1,0 +1,500 @@
+;==============================================================================================================================
+;                                      #####  #####         #####  ###############        ######
+;                                      #####  ######        #####  ###############     ############
+;                                      #####  #######       #####  ###############   #####      #####
+;                                             ########      #####  #####            #####        #####
+;                                             #########     #####  #####            #####        #####
+;                                      #####  ##########    #####  #####            #####        #####
+;                                      #####  ##### #####   #####  ##########       #####        #####
+;                                      #####  #####  #####  #####  ##########       #####        #####
+;                                      #####  #####   ##### #####  ##########       #####        #####
+;                                      #####  #####    ##########  #####            #####        #####
+;                                      #####  #####     #########  #####            #####        #####
+;                                      #####  #####      ########  #####            #####        #####
+;                                      #####  #####       #######  #####             #####      #####
+;                                      #####  #####        ######  #####               ############
+;                                      #####  #####         #####  #####                  ######
+;
+;
+;                                                    Zielarz ver.2.4.1 Â© by Holuo
+;Po odpaleniu skryptu stan w miejscu skad mozesz siegnac do braziera i skrzynki do ktorej bedziesz wrzucac ziola.
+;Pomiedzy toba a tymi przedmiotami moze sie znajdowac najwyzej 1 kratka odstepu.
+;==============================================================================================================================
+
+gosub ustawienia
+wait 1s
+gosub susz_ziola
+gosub zbieraj_ziola
+stop
+
+;==============================================================================================================================
+sub ustawienia
+ tile init
+ set %drzewa |3274|3275|3276|3277|3278|3279|3280|3281|3282|3283|3284|3285|3286|
++3287|3288|3289|3290|3291|3292|3293|3294|3295|3296|3297|3298|3299|
++3300|3301|3302|3304|3320|3321|3322|3323|3324|3325|3326|3327|3328|
++3329|3330|3331|3393|3394|3395|3396|3397|3398|3399|3400|3401|3402|
++3403|3404|3405|3406|3407|3408|3409|3410|3411|3415|3416|3417|3418|
++3419|3420|3421|3422|3423|3424|3425|3426|3427|3428|3429|3430|3431|
++3432|3433|3438|3439|3440|3441|3442|3443|3444|3445|3446|3447|3448|
++3449|3450|3451|3452|3453|3454|3455|3460|3461|3462|3463|3464|3465|
++3466|3467|3468|3469|3470|3471|3472|3477|3478|3479|3481|3482|3483|
++3485|3486|3487|3489|3490|3491|3493|3494|3495|3497|3498|3499|4789|
++4790|4791|4792|4793|4794|4795|4796|4797|4798|4799|4801|4802|4803|
++4804|4805|4806|4807|8781|8778|3496|8780|8779|3230|3220|3221|3222|
++3492|3484|3488|3480|
+
+ set %zioloSurowe1 ZIJ ;czosnek
+ set %zioloSurowe2 OIJ ;mandragora
+ set %zioloSurowe3 HJJ ;zen-szen
+ set %zioloSurowe4 TIJ ;belladona
+ set %ileSurowych 4
+
+ set %kodZiolo1 KZF
+ set %nazwaZiolo1 Czosnek
+ set %iloscZiolo1 0
+ set %kodZiolo2 JZF
+ set %nazwaZiolo2 Zen-szen
+ set %iloscZiolo2 0
+ set %kodZiolo3 MZF
+ set %nazwaZiolo3 Mandragora
+ set %iloscZiolo3 0
+ set %kodZiolo4 JUF
+ set %nazwaZiolo4 Krwawnik
+ set %iloscZiolo4 0
+ set %kodZiolo5 WZF
+ set %nazwaZiolo5 Belka
+ set %iloscZiolo5 0
+ set %ileRodzajowZiol 5
+
+ set %jrnl #jindex
+ set %licz_plecak 0
+
+ set %postac #CHARID
+ set %plecak #BACKPACKID
+ gosub zmien_nozyk
+
+ gosub nowe_okno 200 125
+ Menu Window Title Ustawienia
+ menu check suszenie 20 10 100 20 #false Suszenie
+ menu check pojemnik 20 35 100 20 #false Pojemnik
+ menu check pajeczyny 20 60 200 20 #false Zbieraj tylko pajeczyny
+ Menu Button ustawienia 20 90 160 22 OK
+
+ while #menubutton <> ustawienia
+ {
+ }
+ set #MENUBUTTON null
+ menu get suszenie
+ if #MENURES = #TRUE
+  set %suszenie prawda
+ else
+  set %suszenie falsz
+ menu get pojemnik
+ if #MENURES = #TRUE
+  set %pojemnik prawda
+ else
+  set %pojemnik falsz
+ menu get pajeczyny
+ if #MENURES = #TRUE
+  set %pajeczyny prawda
+ else
+  set %pajeczyny falsz
+ set %loot #menures
+
+ event sysmessage Suszenie - %suszenie
+ event sysmessage Pojemnik - %pojemnik
+
+ gosub nowe_okno 200 100
+ Menu Window Title Przywrocic?
+ menu check przywroc 50 10 175 50 #false Uzyc poprzednich wspolrzednych?
+ Menu Button przywroc 20 65 160 22 OK
+
+ while #menubutton <> przywroc
+ {
+ }
+ set #MENUBUTTON null
+ menu get przywroc
+ if #MENURES = #TRUE
+  gosub wczytajpunkty
+ else
+  gosub nowe_punkty
+
+ return
+
+sub nowe_punkty
+ gosub nowe_okno 400 100
+ Menu Window Title Ile punktow? (domyslnie 15, min 2)
+ menu Text iloscpkt_nazwa 10 5 Wpisz ilosc punktow...
+ menu Edit iloscpkt_pole 10 30 350 15
+ Menu Button iloscpkt_btn 20 65 160 22 OK
+
+ while #menubutton <> iloscpkt_btn
+ {
+ }
+ set #MENUBUTTON null
+ menu getNum iloscpkt_pole 15
+ set %iloscpkt #MENURES
+
+ repeat
+ {
+  set %blad 0
+  gosub nowe_okno 200 65
+  Menu Window Title Krok 1 / %iloscpkt
+  Menu Text 1 40 5 IdL¸ na miejsce startu.
+  Menu Button punkt1 20 25 160 22 Jestem na miejscu!
+
+  while #menubutton <> punkt1
+  {
+  }
+  set %waypointx1 #CHARPOSX
+  set %waypointy1 #CHARPOSY
+  set %waypointz1 #CHARPOSZ
+
+  if %suszenie = prawda
+  {
+   gosub brazier
+   set %blad #RESULT
+
+   if ( %pojemnik = prawda && %blad <> 1 )
+   {
+    gosub pojemnik
+    set %blad #RESULT
+
+    set %waypointx1 #charposx
+    set %waypointy1 #charposy
+    set %waypointz1 #CHARPOSZ
+   }
+  }
+ }
+ until %blad <> 1
+
+ for %pktlicz 2 %iloscpkt + 1
+ {
+  gosub nowe_okno 200 65
+  Menu Window Title Krok %pktlicz / %iloscpkt
+  Menu Text 1 40 5 IdL¸ do nastepnego punktu.
+  Menu Button punkt 20 25 160 22 Jestem na miejscu!
+
+  while #menubutton <> punkt
+  {
+  }
+  set %waypointx , %pktlicz #charposx
+  set %waypointy , %pktlicz #charposy
+  set %waypointz , %pktlicz #CHARPOSZ
+  set #MENUBUTTON null
+ }
+
+ Menu Clear
+ Menu Hide
+ display yesno Zapisac ustawienia?
+ if #DISPRES = yes
+  gosub zapisz_ustawienia
+ return
+
+sub brazier
+ set %braziertype TXL_FWJ
+ event sysmessage "Wskaz brazier na ktorym chcesz suszyc ziola."
+ set #TARGCURS 1
+ repeat
+ until #TARGCURS = 0
+ finditem #LTARGETID
+ if #FINDTYPE in %braziertype
+ {
+  if #FINDDIST > 2
+  {
+   event sysmessage "Musisz stanac blizej braziera!"
+   return 1
+  }
+  set %brazierid #LTARGETID
+  set %brazierx #FINDX
+  set %braziery #FINDY
+  set %brazierz #FINDZ
+  event sysmessage "Wybrano brazier."
+  return 0
+ }
+ ;error
+ event sysmessage "Musisz wskazac brazier!"
+ gosub brazier
+ return 0
+
+sub pojemnik
+ finditem ZTD_BUD_UYD_GZD_CZD_OZD_IIF_HIF_KIF_JIF_IKF_RLL_CML_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP_CUD_KUD_LKF_UMF G_3
+ if #FINDID = x
+ {
+  event sysmessage "Musisz stanac obok pojemnika!"
+  return 1
+ }
+ if #FINDDIST > 3
+ {
+  event sysmessage "Musisz stanac blizej pojemnika!
+  return 1
+ }
+ set %pojemnikid #FINDID
+ event sysmessage "Wybrano pojemnik."
+ return 0
+
+sub zapisz_ustawienia
+; call iloscplikow.txt
+; set %iloscplikow %iloscplikow + 1
+ gosub nowe_okno 400 100
+ Menu Window Title Zapisywanie...
+ menu text zapisuje 10 10 Zapisuje...
+ for %x 1 %iloscpkt
+ {
+  execute cmd.exe /c "echo set % , waypointx , %x %waypointx . %x >> , zapis.txt
+  + && echo set % , waypointy , %x %waypointy . %x >> , zapis.txt
+  + && echo set % , waypointz , %x %waypointz . %x >> , zapis.txt"
+ }
+ execute cmd.exe /c "echo set % , BRAZIERID %brazierid >> , zapis.txt
+ + && echo set % , BRAZIERx %brazierx >> , zapis.txt
+ + && echo set % , braziery %braziery >> , zapis.txt
+ + && echo set % , iloscpkt %iloscpkt >> , zapis.txt
+ + && echo set % , pojemnikid %pojemnikid >> , zapis.txt
+ + && echo exit >> , zapis.txt"
+ ;execute cmd.exe /c echo set % , iloscplikow %iloscplikow >>iloscplikow.txt
+ Menu Clear
+ Menu Hide
+ display ok Zapisano pod nazwa zapis.txt , #SPC , Pamietaj by zmienic nazwe pliku!
+ return
+
+;==============================================================================================================================
+sub zbieraj_ziola
+ initEvents
+ event SysMessage "Do roboty"
+
+ repeat
+ {
+  for %pktlicz 1 %iloscpkt + 1
+  {
+   ;event SysMessage %iloscpkt
+   ;event SysMessage %pktlicz
+   gosub licz_plecak
+   ;if %licz_plecak > 340
+   if #WEIGHT > 130
+   {
+    event sysmessage Plecak prawie pelen!
+    gosub susz_ziola
+   }
+
+   event pathfind %waypointx . %pktlicz %waypointy . %pktlicz %waypointz . %pktlicz
+   wait 5s
+   gosub zbierz_ziola
+  }
+ }
+ until #FALSE
+ return
+
+sub licz_plecak
+ finditem * C_ , %plecak
+ while #FINDID <> x
+ {
+  set %licz_plecak %licz_plecak + 1
+  ignoreitem #FINDID
+  finditem * C_ , %plecak
+ }
+ ;event SysMessage %licz_plecak
+ ignoreitem reset
+ return
+
+;---------------------------------------
+sub susz_ziola
+ if %suszenie = falsz
+ {
+  set %licz_plecak 0
+  return
+ }
+ wait 1s
+ event pathfind %waypointx1 %waypointy1
+ wait 10s
+
+ ignoreitem reset
+
+ set #LTARGETID %BRAZIERID
+ set #LTARGETKIND 1
+
+ for %i 1 %ileSurowych
+ {
+  set %ziolo %zioloSurowe . %i
+  FindItem %ziolo C_ , %plecak
+  set #LOBJECTID #findid
+  set #LOBJECTTYPE %ziolo
+  event macro 17
+  target
+  event macro 22
+  if spaliles_troche_ziol in #SYSMSG
+  {
+   wait 1s
+   set %i %i - 1
+  }
+ }
+
+ set %licz_plecak 0
+ if %pojemnik = prawda
+ {
+  for %i 1 %ileRodzajowZiol
+  {
+   set %kod %kodZiolo . %i
+   finditem %kod C_ , %plecak
+   exevent Drag #findid #findstack
+   exevent dropc %pojemnikid
+   set %ilosc %iloscZiolo . %i
+   set %ilosc %ilosc + #FINDSTACK
+   set %iloscZiolo . %i  %ilosc
+   wait 1s
+  }
+
+  gosub nowe_okno 200 200
+  Menu Window Title Licznik
+  for %i 1 %ileRodzajowZiol
+  {
+   set %y 20 + 30 * ( %i - 1 )
+   set %nazwa %nazwaZiolo . %i
+   set %ilosc %iloscZiolo . %i
+   Menu Text ziola . %i 20 %y %nazwa
+   Menu Text ziola2 . %i 110 %y %ilosc
+  }
+ }
+ return
+
+;================================================================
+sub zmien_nozyk
+ finditem WSF C_ , %postac
+ if #FINDID = x
+ {
+  finditem WSF C_ , %plecak
+  if #FINDID = x
+  {
+   event sysmessage "Nie masz nozyka!"
+   halt
+  }
+ }
+ wait 1s
+ set #LOBJECTID #FINDID
+ set #LOBJECTTYPE #FINDTYPE
+ set %nozykid #FINDID
+ wait 1s
+ return
+;================================================================
+sub zabij
+event macro 24 2
+while #ENEMYID <> N/A
+{
+  set #LTARGETID #ENEMYID
+  set #ltargetkind 1
+  event macro 15 11
+  wait 1s
+  event macro 22
+}
+event macro 15 24
+wait 3s
+event macro 23 0
+wait 1s
+event macro 15 28
+wait 3s
+event macro 23 0
+wait 1s
+set #LOBJECTID %nozykid
+ return
+
+sub wczytajpunkty
+ gosub nowe_okno 400 100
+ Menu Window Title Podaj nazwe pliku (bez rozszerzenia .txt)
+ menu Text wczytaj_napis 10 5 Podaj nazwe pliku z punktami
+ menu Edit wczytaj_nazwa 10 30 350 zapis
+ Menu Button wczytaj_btn 20 65 160 22 OK
+
+ while #MENUBUTTON <> wczytaj_btn
+ {
+ }
+ Menu get wczytaj_nazwa
+ call #MENURES , .txt
+ Menu Clear
+ Menu Hide
+ return
+
+sub szukaj_pajeczyn
+ tile cnt #LTARGETX #LTARGETY
+ for %licz_tile 1 #TILECNT
+ {
+  tile get #LTARGETX #LTARGETY %licz_tile
+  if tree in #TILENAME
+  {
+   set #LTARGETTILE #TILETYPE
+   set #LTARGETKIND 3
+   zbierz_pajeczynke:
+   event macro 17
+   target
+   event macro 22
+   wait 1s
+   if Nie_dostrzegasz_tu_nic_nadajacego_sie_do_uzytku! in #SYSMSG
+   {
+    set #LTARGETKIND 2
+    break
+   }
+
+   if  ( NIE_UDALO_CI_SIE_NIC in #SYSMSG || ZNALAZLES_JAKIES_ZIOLO in #SYSMSG )
+   ; wait 1s
+
+   goto zbierz_pajeczynke
+  }
+ }
+ return
+;================================================================
+sub zbierz_ziola
+ set #LOBJECTID %nozykid
+ set #LTARGETKIND 2
+ For %x -1 1
+ {
+  For %y -1 1
+  {
+   set %nr ( %x + 1 ) * 3 + ( %y + 1 ) + 1
+   Event sysmessage szukam ziola w miejscu %nr ( %x %y )
+   set #ltargetx #charposx + %x
+   set #ltargety #charposy + %y
+   event macro 17
+   target
+   event macro 22
+   wait 1s
+
+   if %pajeczyny = prawda
+    gosub szukaj_pajeczyn
+   else
+   {
+    while N/A in #SYSMSG
+    {
+     ;event SysMessage MG : #SYSMSG
+     event macro 17
+     target
+     event macro 22
+    }
+
+    finditem WSF C_ , %postac
+    if ( #FINDID = x || przez_nieuwage in #SYSMSG )
+    {
+     wait 10s
+     gosub zmien_nozyk
+    }
+
+if #enemyid <> N/A
+{
+set #LTARGETID #enemyid
+gosub zabij
+}
+
+    if Nie_dostrzegasz_tu_nic_nadajacego_sie_do_uzytku! in #SYSMSG
+     gosub szukaj_pajeczyn
+
+    if ( NIE_UDALO_CI_SIE_NIC in #SYSMSG || ZNALAZLES_JAKIES_ZIOLO in #SYSMSG )
+     wait 1s
+   } ;koniec else
+  } ;koniec for
+ }
+ return
+
+sub nowe_okno
+ Menu Clear
+ Menu HideEUO
+ Menu Window size %1 %2
+ Menu Font Name tahoma
+ return
