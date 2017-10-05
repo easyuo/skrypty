@@ -1,4 +1,4 @@
-                           ; BOD Inskrypcja - v1.1(09.11.2010 - 17:20) by drm
+; BOD Inskrypcja - v1.1(09.11.2010 - 17:20) by drm
 ; v1.2 - by Krowa (Edytowane 02/02/2013)
 ; Poprawiona medytacja
 ; ===============================================
@@ -176,7 +176,11 @@ goto rob
 
 sub klik
 click 529 478
+
+set %time #SCNT2
 czekaj04:
+if #SCNT2 - %time > 500
+ event macro 13 23 ; Inskrypcja
 if #contsize <> 640_500
   goto czekaj04
 if #sysmsg = Udalo_Ci_sie_przepisac_zwoj_i_wlozyles_go_do_plecaka.
@@ -202,6 +206,15 @@ if #skill = 1000
 
 if #mana < #maxmana
 {
+ ; Int bless, jezeli mozna
+ if #mana >= 6
+ {
+  if #int < %ile_inta + 1
+  {
+   gosub blessuj
+  }
+ }
+
  event macro 13 46 ; Medytacja
 
  if #sysmsg <> Zaczynasz_medytowac...
@@ -217,10 +230,8 @@ if #mana < #maxmana
  }
 }
 
-wait 1s
 if #int < %ile_inta + 1
   gosub blessuj
-wait 1s
 
 return
 

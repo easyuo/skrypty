@@ -1,0 +1,25 @@
+; Skrypt pij¹cy zó³te / odtrutki dla [god]zik - by krowa (c) 10-2017
+; Sssij pa³ê GODZIK
+
+set %PijZoltePonizej 50
+
+if #hits < %PijZoltePonizej
+{
+;  event macro 1 0 .wypij mala leczenia
+;  event macro 1 0 .wypij srednia leczenia
+  event macro 1 0 .wypij duza leczenia
+}
+
+if C in #charstatus || CB in #charstatus
+{
+;  event macro 1 0 .wypij mala odtruka
+;  event macro 1 0 .wypij srednia odtruka
+  event macro 1 0 .wypij duza odtruka
+}
+
+if #EnemyID <> N/A
+{
+;  event macro 1 0 .wypij mala odtruka
+;  event macro 1 0 .wypij srednia odtruka
+  event macro 1 0 .wypij duza odtruka
+}
