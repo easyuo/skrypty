@@ -1,5 +1,6 @@
 ; BOD Inskrypcja - v1.1(09.11.2010 - 17:20) by drm
 ; v1.2 - by Krowa (Edytowane 02/02/2013)
+; v1.3 - by Krowa (Edytowane 05/10/2017)
 ; Poprawiona medytacja
 ; ===============================================
 ;
