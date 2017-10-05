@@ -188,17 +188,33 @@ click 427 320 r ; Zamykanie okna Inskrypcji
 wait 1
 
 UruchomMedytacje:
-event macro 13 46 ; Medytacja
-if #sysmsg <> Zaczynasz_medytowac...
-{
- wait 1s
- goto UruchomMedytacje
-}
 
-CzekajNaPelnaMane:
-if #mana <> #maxmana
+; Wrzucic po koksie ;)
+; Wrzucic po koksie ;)
+
+chooseSkill inscription
+if #skill = 1000
 {
- goto CzekajNaPelnaMane
+ halt
+}
+; Wrzucic po koksie ;)
+; Wrzucic po koksie ;)
+
+if #mana < #maxmana
+{
+ event macro 13 46 ; Medytacja
+
+ if #sysmsg <> Zaczynasz_medytowac...
+ {
+  wait 1s
+  goto UruchomMedytacje
+ }
+ 
+ CzekajNaPelnaMane:
+ if #mana < #maxmana
+ {
+  goto CzekajNaPelnaMane
+ }
 }
 
 wait 1s
