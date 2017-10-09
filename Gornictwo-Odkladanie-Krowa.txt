@@ -1,5 +1,5 @@
-set %sklad XBZMZDE
-set %kilofy XBZMZDE
+set %sklad KVHLAOE
+set %kilofy ZXLFXNE
 
 set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
 set %piece_do_przetapiania JBG
@@ -9,11 +9,19 @@ set %armslore_badaj HSH_LSH_MSH_YSF_CIK_
 set %ostatnieUzycieAL 0
 
 set %czas 0
-set %wagajes 300
+set %wagajes 260
 set %timeout 20
 set #sysmsgcol 154
 
-set %ileBandazy 30
+chooseskill medi
+if #skill >= 500
+{
+ set %ileBandazy 0
+}
+else
+{
+ set %ileBandazy 10
+}
 
 chooseskill medi
 if #skill >= 800

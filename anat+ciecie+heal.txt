@@ -2,10 +2,10 @@ InitEvents
 IgnoreItem Reset
 set %TnijCiala 1
 set %AutoGrabCiala 0
-set %AutoGrabZiemia 1
+set %AutoGrabZiemia 0
 set %UzywajAnatomii 0
-set %Lecz 1
-set %PijZolte 1
+set %Lecz 0
+set %PijZolte 0
 set %PijZoltePonizej 60
 
 ; OKF - koszyk na ziola

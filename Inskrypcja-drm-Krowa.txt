@@ -180,7 +180,7 @@ click 529 478
 
 set %time #SCNT2
 czekaj04:
-if #SCNT2 - %time > 500
+if #SCNT2 - %time > 30
  event macro 13 23 ; Inskrypcja
 if #contsize <> 640_500
   goto czekaj04
@@ -193,17 +193,6 @@ click 427 320 r ; Zamykanie okna Inskrypcji
 wait 1
 
 UruchomMedytacje:
-
-; Wrzucic po koksie ;)
-; Wrzucic po koksie ;)
-
-chooseSkill inscription
-if #skill = 1000
-{
- halt
-}
-; Wrzucic po koksie ;)
-; Wrzucic po koksie ;)
 
 if #mana < #maxmana
 {

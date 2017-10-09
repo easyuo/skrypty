@@ -1,0 +1,5 @@
+if #ENEMYID <> N/A
+{
+ msg RATUJCIE cherlawca! Ratujcie! Straze pomocy! $
+ wait 1s
+}

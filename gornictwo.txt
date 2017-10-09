@@ -289,10 +289,10 @@ if %zbierajRude = 1
 gosub ScanJournal %_JIndex Nie_udalo_ci_sie Wykopales Nie_ma_tu_wiecej_rudy. Wybrane_miejsce_jest doing_something Nie_mozesz Musisz_uzyc_lopaty already
 if #Result = 2
    wait 5
-   event sysmessage Resoult: #Result : %_JIndex : Weight: #weight
+   event sysmessage Waga: #weight
 if #Result = 3
    {
-   event sysmessage Resoult: #Result : %_JIndex : Weight: #weight
+   event sysmessage Waga: #weight
 
 ; Mapy
 

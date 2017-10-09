@@ -1,0 +1,36 @@
+; Krowa 06-10-2017
+; Tnie ciala gdy nie ma wroga.
+
+ ; Szukanie sztyletu w plecaku
+ finditem TSF C_ , #BACKPACKID
+ if findkind <> -1
+ {
+  set %sztyletID #FINDID
+   event sysmessage Sztylet: %sztyletID
+ }
+
+loop:
+
+if #ENEMYID = N/A
+{
+ FINDITEM YFM G_2
+ if #FINDCNT > 0
+ {
+ set #lobjectid %SztyletID ; sztylet w plecaku
+ event sysmessage Tne #findCNT cial
+     for #findindex 1 #findcnt
+     {
+      event sysmessage Tne cialo # #findindex
+      event Macro 17 ; Last Object
+      target
+      set #ltargetid #findID
+      set #LTargetKind 1
+      event Macro 22  ; Last Target
+;      wait 1
+     }
+     event SysMessage Pociete
+    }
+}
+
+
+goto loop
