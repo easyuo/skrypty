@@ -1,0 +1,240 @@
+;KrawiecCLR by Kargul
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ustaw ponizej:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Rzecz wykonywana
+set %rzecz 11 ; rzecz: 1 jedwabne koszule; 2 - plaszcze; 3 plaszcz z zap.; 4 - karczek; 5 - nogawice; 6 - tunika; 7 - nab kark; 8 - nab rekawice; 9 - nab. zarekawia; 10 - nab. spodnie ;11 - nab. tuniki
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ItemType tkaniny/skory
+set %dechy DDG
+; tkanina: CUI
+; skrawki: DDG
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ItemType narzedzia
+set %narzedzie HAG ;narzedzia do szyvcia - hag
+; Pojemnik z narzedziami
+;set %pojemmninznarzedziami #backpackid ;MUVBKSG ;NWOTUNG
+; Pojemnik z deskami
+;set %plecak #charid ;TPDJKSG w banku
+; Lokacja repeat
+set %x3 211
+set %y3 501
+; Przybli¿ony czas robienia danej rzeczy (10-20 bêdzie okej)
+set %timeout 13
+
+initevents
+if %rzecz = 1 ;jedwabne koszule
+{
+set %x1 40
+set %y1 152
+set %x2 217
+set %y2 193
+}
+if %rzecz = 2 ;plaszcze
+{
+set %x1 40
+set %y1 196
+set %x2 211
+set %y2 261
+}
+if %rzecz = 3 ;plascz z zap.
+{
+set %x1 36
+set %y1 196
+set %x2 204
+set %y2 336
+}
+if %rzecz = 4 ;pkarczek
+{
+set %x1 40
+set %y1 124
+set %x2 215
+set %y2 193
+}
+if %rzecz = 5 ;nogawice
+{
+set %x1 40
+set %y1 124
+set %x2 206
+set %y2 405
+}
+if %rzecz = 6 ;tunika
+{
+set %x1 40
+set %y1 124
+set %x2 333
+set %y2 130
+}
+if %rzecz = 7 ;nab kark
+{
+set %x1 40
+set %y1 149
+set %x2 207
+set %y2 130
+}
+if %rzecz = 8 ;nab rekawice
+{
+set %x1 40
+set %y1 149
+set %x2 207
+set %y2 192
+}
+if %rzecz = 9 ;nab zarek
+{
+set %x1 40
+set %y1 149
+set %x2 207
+set %y2 268
+}
+if %rzecz = 10 ;nab. spodnie
+{
+set %x1 40
+set %y1 146
+set %x2 211
+set %y2 337
+}
+if %rzecz = 11 ;nab. spodnie
+{
+set %x1 40
+set %y1 146
+set %x2 211
+set %y2 405
+}
+
+;-------------------------
+; POCZATEK SKRYPTU
+;-------------------------
+
+
+jeszczeraz:
+set %loop 0
+start:
+finditem %dechy C
+set %ile #findstack
+if #findkind = -1
+{
+display ok Nie znalazlo materialu/skrawkow!
+HALT
+}
+ponownie:
+set #ltargetid #findid
+finditem %narzedzie ;C_%pojemmninznarzedziami
+if #findid = x
+{
+menu hide
+menu clear
+menu window size 100 50
+menu button ponownie 1 1 100 50 brak narzedzi
+set #menubutton n/a
+menu show
+menu:
+if #menubutton <> n/a
+{
+set #menubutton n/a
+menu clear
+menu hide
+goto ponownie
+}
+else
+goto menu
+}
+set #lobjectid #findid
+set #scnt 0
+df:
+if #CONTSIZE = 660_520
+goto kl
+event macro 17
+wait 3
+if #scnt > 10
+goto start
+if #targcurs = 0
+goto df
+
+wait 8
+kl:
+event macro 22
+wait 3
+if #targcurs = 1
+goto kl
+wait 10
+
+rob:
+set %czas #scnt
+repeat
+{
+if #scnt > %czas + 10
+goto jeszczeraz
+}
+until #CONTSIZE = 660_520
+
+if %rzeczy > 110
+{
+repeat
+{
+onhotkey esc
+set %rzeczy 0
+goto po
+}
+until
+}
+po:
+if %loop = 1
+{
+rob1:
+click %x3 %y3
+if #CONTSIZE = 660_520
+{
+goto rob1
+}
+goto dalej
+}
+click %x1 %y1
+wait 2s
+click %x2 %y2
+wait 1s
+if #contsize = 660_520
+{
+click 44 498
+goto rob
+}
+set %loop 1
+dalej:
+event sysmessage kolko: %loop
+set #scnt 0
+goto check
+set #scnt 0
+check:
+if #scnt => 10
+goto start
+set %ms #sysmsg
+menu delete bg
+menu text bg 30 30 %ms
+scanjournal 5
+if Twoje in %ms
+{
+deletejournal
+goto jeszczeraz
+}
+if Zniszczylo_sie in %ms
+{
+deletejournal
+goto rob
+}
+if nie_udalo in %ms
+{
+deletejournal
+goto rob
+}
+if Stworzyles in %ms
+{
+deletejournal
+goto rob
+}
+if Zrobiles in %ms
+{
+deletejournal
+goto rob
+}
+goto check

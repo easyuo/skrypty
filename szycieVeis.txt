@@ -1,0 +1,237 @@
+set %expy 5 ;ile skorek uszyc
+set %item 1 ; 0 - czepek 1 - karczek 2 rekawice 3 zarekawia 4 - nogi 5 - klata
+set %narzedzia UYYXLEE ; pojemnik z narzedziami klik 2x na pojemnik i spisujemy z #LOBJECTID tutaj ;)
+set %narzedzia #BACKPACKID ; pojemnik z narzedziami klik 2x na pojemnik i spisujemy z #LOBJECTID tutaj ;)
+set %nozyczki UYYXLEE ; pojemnik z nozyczkami j.w.
+set %magazyn AGRUMCE  ; skrzynia w domku ;) w ktorej sa dwa powyzsze lub jeden
+;==========================================================
+;      N I E    R U S Z A C   T E G O   N I Z E J
+;                                      by Veis
+;==========================================================
+set %zestaw 1
+set %proba 0
+
+event sysmessage Wskaz gdzie wkladac expy:
+ set #targcurs 1
+repeat
+until #targcurs = 0
+set %poj_e #ltargetid
+
+event sysmessage Wskaz gdzie wkladac zwyklaki:
+set #targcurs 1
+repeat
+until #targcurs = 0
+set %poj_z #ltargetid
+
+event sysmessage Wskaz Skore na zyczenie:
+set #targcurs 1
+repeat
+until #targcurs = 0
+set %skora #ltargetid
+wait 1s
+
+start:
+set %go 1
+finditem HAG C_ , #backpackid
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+set #ltargetid %skora
+event macro 22 0
+wait 1s
+if %item = 0
+{
+click 40 125
+}
+if %item = 1 || %item = 2 || %item = 3 || %item = 4 || %item = 5
+{
+click 40 150
+}
+wait 1s
+szycie:
+if %item = 0
+{
+set %x 210
+set %y 125
+set %item_type NJL  ; id czepka ( 2x klik i tak samo po prawej #lobjecttype )
+set %msg czepek
+}
+if %item = 1
+{
+set %x 210
+set %y 125
+set %item_type ALH       ; jak w 1
+set %msg karczek
+}
+if %item = 2
+{
+set %x 210
+set %y 195
+set %item_type XKH        ; jak w 1
+set %msg rekawice
+}
+if %item = 3
+{
+set %x 210
+set %y 265
+set %item_type YKH        ; jak w 1
+set %msg zarekawia
+}
+if %item = 4
+{
+set %x 210
+set %y 335
+set %item_type MLH       ; jak w 1
+set %msg nogawice
+}
+if %item = 5
+{
+set %x 210
+set %y 405
+set %item_type LLH      ; jak w 1
+set %msg napiersnik
+}
+if %go = 1
+{
+click %x %y
+set %go 0
+}
+finditem HAG C_ , #backpackid
+if #findkind = -1
+{
+finditem %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem %narzedzia C_ , %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem HAG C_ , %narzedzia
+set #lobjectid #findid
+exevent drag #findid 1
+exevent dropc , #backpackid
+goto start
+}
+if #contname = generic_gump
+{
+if #sysmsg = Stworzyles_przedmiot_i_umiesciles_go_w_plecaku. || #sysmsg = Stworzyles_przedmiot,_ale_jest_on_kiepskiej_jakosci.
+{
+finditem %item_type c_ , #backpackid
+exevent drag #findid #findstack
+exevent dropc %poj_z
+set %proba %proba + 1
+if %proba = 100 || #sysmsg = Nie_masz_dosc_skory,_aby_to_zrobic.
+{
+finditem KAG c_ , #backpackid
+if #findkind = -1
+{
+finditem %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem %nozyczki C_ , %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem KAG C
+exevent drag #findid 1
+exevent dropc , #backpackid
+}
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+set #ltargetkind
+set #ltargetid %poj_z
+event macro 22 0
+repeat
+finditem * C_ , %poj_z
+event sysmessage Rozcinam smieci - zostalo #findcnt przedmiotow
+wait 3s
+until #findcnt = 0
+wait 1s
+if #findcnt = 0
+{
+set %proba 0
+goto start
+}
+}
+}
+
+if #sysmsg = Stworzyles_rzecz_wyjatkowa!
+{
+finditem %item_type c_ , #backpackid
+exevent drag #findid #findstack
+exevent dropc %poj_e
+set %item %item + 1
+set %proba 0
+wait 1s
+click 40 500 d
+wait 1s
+finditem KAG c_ , #backpackid
+if #findkind = -1
+{
+finditem %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem %nozyczki C_ , %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem KAG C
+exevent drag #findid 1
+exevent dropc , #backpackid
+}
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+set #ltargetkind
+set #ltargetid %poj_z
+event macro 22 0
+wait 1s
+click 230 110 d
+repeat
+finditem * C_ , %poj_z
+event sysmessage Rozcinam smieci - zostalo #findcnt przedmiotow
+wait 3s
+until #findcnt = 0
+wait 1s
+if %item = 5
+{
+if %tarcza = 0
+{
+set %zestaw %zestaw + 1
+set %item 0
+if %zestaw > %expy
+{
+display Skonczylem szyc!
+halt
+}
+goto start
+}
+goto start
+}
+if %tarcza <> 0 && %item = 6
+{
+goto start
+}
+if %tarcza <> 0 && %item > 6
+{
+set %zestaw %zestaw + 1
+set %item 0
+if %zestaw > %expy
+{
+display Skonczylem szyc!     ;gotowe
+halt
+}
+}
+goto start
+}
+wait 10
+click %x %y
+Event sysmessage Szyje %zestaw zestaw - %msg
+event sysmessage Przedmiot %item Proba: %proba
+}
+
+goto szycie

@@ -1,5 +1,6 @@
 set %sklad KVHLAOE
 set %kilofy ZXLFXNE
+set %dragPauza 15
 
 set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
 set %piece_do_przetapiania JBG
@@ -55,8 +56,6 @@ menu get armslore_check
 set *trenujArmsLore #menures
 menu get odkladanie_check
 set *gornictwo_odkladanie #menures
-
-
 
 if *gornictwo_odkladanie = #true
 {
@@ -401,7 +400,9 @@ sub odkladanie
   if #findid <> x
   {
    exevent drag #findid #findstack
+   wait %dragPauza
    exevent dropc %sklad
+   wait %dragPauza
   }
  wait 2
  until #findid = x
@@ -423,8 +424,9 @@ sub odkladanie
    wait 1s
    finditem ZLF C_ , %pojemnik
    exevent drag #findid 5
+   wait %dragPauza
    exevent dropc #backpackid
-   wait 10
+   wait %dragPauza
  }
   
   ; Ziola
@@ -438,13 +440,15 @@ sub odkladanie
    
    finditem WZF C_ , %pojemnik
    exevent drag #findid 1
+   wait %dragPauza
    exevent dropc #backpackid
-   wait 10
+   wait %dragPauza
 
    finditem KUF C_ , %pojemnik
    exevent drag #findid 1
+   wait %dragPauza
    exevent dropc #backpackid
-   wait 10
+   wait %dragPauza
  }
 
 return
@@ -486,7 +490,9 @@ sub ustaw_narzedzie
 
      finditem NPF C
      exevent drag #FINDID 1
+     wait %dragPauza
      exevent dropc #backpackid 90 20
+     wait %dragPauza
 
      gosub zmiana_miejsca
 
@@ -495,7 +501,9 @@ sub ustaw_narzedzie
    }
   set %narzedzie #findid
   exevent drag %narzedzie
+  wait %dragPauza
   exevent droppd
+  wait %dragPauza
  }
  else
   set %narzedzie #findid
