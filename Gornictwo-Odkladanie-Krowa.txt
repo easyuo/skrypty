@@ -1,6 +1,15 @@
-set %sklad KVHLAOE
-set %kilofy ZXLFXNE
-set %dragPauza 55
+; by Krowa and autor nieznany.
+; Gornictwo z odkladaniem rudy do domku. Edytujesz wiersze ponizej:
+
+; ==== EDYCJA ====
+
+set %sklad KVHLAOE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
+set %kilofy ZXLFXNE            ; Pojemnik z kilofami
+set %dragPauza 15              ; Pauza przy drag/drop
+set %ileZiol 3                 ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %wagajes #MAXWEIGHT - 50   ; Powyzej jakiej wagi mam odkladac
+
+; ==== Koniec EDYCJI ====
 
 set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
 set %piece_do_przetapiania JBG
@@ -10,7 +19,6 @@ set %armslore_badaj HSH_LSH_MSH_YSF_CIK_
 set %ostatnieUzycieAL 0
 
 set %czas 0
-set %wagajes 260
 set %timeout 20
 set #sysmsgcol 154
 
@@ -431,21 +439,21 @@ sub odkladanie
   
   ; Ziola
  finditem WZF C_ , #BACKPACKID
-  if #findstack = 0
+  if #findstack < %ileZiol
   {
    set #lobjectid %pojemnik
-   set #ltargetkind 1
+   set #ltargetkind %ileZiol
    event macro 17 0
    wait 1s
    
    finditem WZF C_ , %pojemnik
-   exevent drag #findid 1
+   exevent drag #findid %ileZiol
    wait %dragPauza
    exevent dropc #backpackid
    wait %dragPauza
 
    finditem KUF C_ , %pojemnik
-   exevent drag #findid 1
+   exevent drag #findid %ileZiol
    wait %dragPauza
    exevent dropc #backpackid
    wait %dragPauza
@@ -614,9 +622,7 @@ sub r_menu
  menu font bgcolor white
  menu combo create tryb_select 95 22 130
 
- menu combo add tryb_select Nozyk - ziemia
- menu combo add tryb_select Nozyk - drzewa
- menu combo add tryb_select Lopatka - ziemia
+ menu combo add tryb_select Kilof
 
  menu combo select tryb_select 1
 
