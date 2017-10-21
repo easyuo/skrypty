@@ -1,0 +1,7 @@
+if #ENEMYID <> N/A
+{
+ event macro 13 9
+ target 1s
+}
+;event macro 23
+;event macro 49 1
