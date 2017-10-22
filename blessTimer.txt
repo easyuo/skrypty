@@ -1,0 +1,24 @@
+; Licznik czasu blesow by Krowa
+
+set %czasBlesow 540
+set %informujOd 500
+
+loop:
+
+if #STR > 100
+{
+ set %startBlesow #TIME
+ blesLoop:
+  if #STR <= 100
+   goto loop
+  set %doKoncaBlesow %startBlesow - #TIME + %czasBlesow
+  if %doKoncaBlesow < %informujOd
+  {
+   event sysmessage Blesy koncza sie za: %doKoncaBlesow
+  }
+  wait 1s
+ goto blesLoop
+}
+
+goto loop
+
