@@ -1,0 +1,35 @@
+; Lowcy dusz
+; Krowa 22-10-2017
+; IJB - dusza
+; SEE - waza
+
+set %wazaType SEE
+set %duszaType IJB
+
+; Szukanie sztyletu w plecaku
+finditem %wazaType C_ , #BACKPACKID
+if findkind <> -1
+{
+ set %wazaID #FINDID
+ event sysmessage Waza ID: %wazaID
+}
+
+loop:
+
+FINDITEM %duszaType G_3
+if #FINDCNT > 0
+{
+ set #lobjectid %wazaID ; sztylet w plecaku
+ for #findindex 1 #findcnt
+ {
+  event sysmessage Dusza od ID #findID Index: #findindex
+  event Macro 17 ; Last Object
+  target
+  set #ltargetid #findID
+  set #LTargetKind 1
+  event Macro 22  ; Last Target
+ }
+}
+
+
+goto loop

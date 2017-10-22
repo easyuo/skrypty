@@ -1,13 +1,13 @@
 InitEvents
 IgnoreItem Reset
-set ! %TnijCiala
-set %TnijCialaWPelniZdrowy 1
-set %TnijCialaGdyNieMaWroga 1
+set %TnijCiala 0
+set %TnijCialaWPelniZdrowy 0
+set %TnijCialaGdyNieMaWroga 0
 set %AutoGrabCiala 0
 set %AutoGrabZiemia 0
 set %UzywajAnatomii 0
 set %Lecz 1
-set %PijZolte 0
+set %PijZolte 1
 set %PijZoltePonizej 45
 
  set %leczBandazami 1

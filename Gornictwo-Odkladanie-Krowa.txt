@@ -3,9 +3,9 @@
 
 ; ==== EDYCJA ====
 
-set %sklad KVHLAOE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
-set %kilofy ZXLFXNE            ; Pojemnik z kilofami
-set %dragPauza 15              ; Pauza przy drag/drop
+set %sklad KVHLAOE ; Veis GIILMPE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
+set %kilofy KVHLAOE ; Veis GIILMPE            ; Pojemnik z kilofami
+set %dragPauza 12            ; Pauza przy drag/drop
 set %ileZiol 3                 ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50   ; Powyzej jakiej wagi mam odkladac
 
@@ -280,21 +280,21 @@ event macro 17 0
 target 2s
 set #ltargetkind 2
 event macro 22 0
-
-;                                 1                   2                3              4               5         6              7                           8                 9           10                11         12
+                                1                   2                3              4               5         6              7                           8                 9           10                11         12
 gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_ Nie_mozesz_tutaj Wybrane_miejsce Nie_ma_tu_wiecej Wykopales Anulowano Twoje_narzedzie_do_niczego Nie_mozesz_tutaj Wybrane_miejsce You_see:_ameba You_see:_zywiolak You_see:
-event sysmessage Po skanowaniu Journala
+; event sysmessage Po skanowaniu Journala
+
 if #result = 11 || #result = 12
 {
  zabij:
 if %leczMagia = 1
 {
- repeat
+; repeat
  event macro 15 41
  set #ltargetid #enemyid
  set #ltargetkind 1
  wait 10
- until #targcurs = 1
+; until #targcurs = 1
  
  set #ltargetid #enemyid
  set #ltargetkind 1
@@ -629,7 +629,7 @@ sub r_menu
 return
 
 sub ScanJournal
- event sysmessage ScanJournal
+; event sysmessage ScanJournal
  set %JIndex %1
  set %_timeout #SCNT
 

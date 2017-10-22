@@ -1,0 +1,14 @@
+FINDITEM TSF C_, #BACKPACKID
+IF #FINDCNT > 0
+{
+ for #findindex 1 #findcnt
+ {
+  event macro 14 0
+  target
+  set #ltargetid #findID
+  set #LTargetKind 1
+  event Macro 22  ; Last Target
+  wait 10s
+ }
+}
+
