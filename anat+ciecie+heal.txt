@@ -16,7 +16,7 @@ ELSE
  set %pojemnikNaZiola #BackPACKID
 
 
-set %hpdiff 1 ; Roznica w HP od ktorej zaczyna leczyc
+set %hpdiff 50 ; Roznica w HP od ktorej zaczyna leczyc
 
 chooseskill medi
 if #skill >= 800

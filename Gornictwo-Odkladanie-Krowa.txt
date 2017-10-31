@@ -1,13 +1,13 @@
-; by Krowa and autor nieznany.
+; (c) 2017.11.01 by Krowa and drm (Przeróbka z Zielarstwa)
 ; Gornictwo z odkladaniem rudy do domku. Edytujesz wiersze ponizej:
 
 ; ==== EDYCJA ====
 
 set %sklad KVHLAOE ; Veis GIILMPE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
 set %kilofy KVHLAOE ; Veis GIILMPE            ; Pojemnik z kilofami
-set %dragPauza 12            ; Pauza przy drag/drop
-set %ileZiol 3                 ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
-set %wagajes #MAXWEIGHT - 50   ; Powyzej jakiej wagi mam odkladac
+set %dragPauza 11                             ; Pauza przy drag/drop
+set %ileZiol 4                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
 
 ; ==== Koniec EDYCJI ====
 
@@ -23,25 +23,17 @@ set %timeout 20
 set #sysmsgcol 154
 
 chooseskill medi
-if #skill >= 500
-{
- set %ileBandazy 0
-}
-else
-{
- set %ileBandazy 10
-}
-
-chooseskill medi
 if #skill >= 800
 {
  set %leczBandazami 0
+ set %ileBandazy 0
  set %leczMagia 1
 }
 else
 {
  set %leczBandazami 1
  set %leczMagia 0
+ set %ileBandazy 15
 }
 
 gosub r_menu
@@ -286,27 +278,28 @@ gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_ Nie_mozesz_tutaj Wybrane_miejsc
 
 if #result = 11 || #result = 12
 {
- zabij:
-if %leczMagia = 1
-{
-; repeat
- event macro 15 41
- set #ltargetid #enemyid
- set #ltargetkind 1
- wait 10
-; until #targcurs = 1
- 
- set #ltargetid #enemyid
- set #ltargetkind 1
- event macro 22 0
-}
-
-if %leczBandazami = 1
-{
- event macro 1 0 .lecz
- wait 2s
-}
+zabij:
+ if %leczMagia = 1
+ {
+  repeat
+  finditem NPF
+  exevent drag #FindID
+  wait 10
+  exevent dropc #BackPackID
+  wait 10
+  if #enemyid <> N/A
+  {
+   gosub CzarujCorpPor
+  }
  return
+ }
+
+ if %leczBandazami = 1
+ {
+  event macro 1 0 .lecz
+  wait 2s
+ }
+return
 }
 
 if #result = 13
@@ -648,7 +641,6 @@ sub ScanJournal
    }
   }
  goto ScanLoop
-
 return
 
 sub ArmsLore
@@ -682,3 +674,19 @@ if #FindKind = -1
 }
 return
 
+; Czaruje Energy Bolta
+sub CzarujCorpPor
+ ; Cast Spell Energy Bolt
+ event macro 15 41
+ if #targcurs <> 1
+ {
+  gosub CzarujCorpPor
+ }
+ set #ltargetid #enemyid
+ set #ltargetkind 1
+ event macro 22 0
+ if #enemyid <> N/A
+ {
+  gosub CzarujCorpPor
+ }
+return

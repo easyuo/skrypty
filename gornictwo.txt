@@ -44,7 +44,7 @@ set %starttime #SCNT
 set %lasttime %starttime
 set %timeout 10
 set %gleba 0 ; Wyrzucac rude na glebe? 1 = tak inna wartosc = nie
-set %przetapiaj 0 ; Przetapia, jezeli stoisz przy piecu
+set %przetapiaj 1 ; Przetapia, jezeli stoisz przy piecu
 
 set %teleportuj 1
 set %zbierajRude 1
