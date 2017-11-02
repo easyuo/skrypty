@@ -1,0 +1,8 @@
+; Kordian sprzedajny judasz BYWSQD
+
+findItem BYWSQD G_ , 16
+if #findkind <> -1
+{
+ event macro 1 0 Kordianie, ty sprzedajny judaszu za 50 srebrnikow!
+ wait 2s
+}

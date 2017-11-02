@@ -5,8 +5,8 @@
 
 set %sklad KVHLAOE ; Veis GIILMPE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
 set %kilofy KVHLAOE ; Veis GIILMPE            ; Pojemnik z kilofami
-set %dragPauza 11                             ; Pauza przy drag/drop
-set %ileZiol 4                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %dragPauza 3                              ; Pauza przy drag/drop
+set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
 
 ; ==== Koniec EDYCJI ====
@@ -319,21 +319,19 @@ if #result = 5 || #result = 3 || #result = 4 || #result = 9 || #result = 10
  if %kop <> 24
  {
   set %kop %kop + 1
-  event sysmessage Kop: %kop Miejsce: %miejsce > *gornictwo_miejs
  }
  else
  {
  set %miejsce %miejsce + 1
  if %miejsce > *gornictwo_miejsca
   {
-  event sysmessage Kop: %kop Miejsce: %miejsce > *gornictwo_miejsce
    if *gornictwo_przetapianie = #true
     gosub przetapianie
    if *gornictwo_odkladanie = #true
     gosub odkladanie
   }
   
- event sysmessage Zmiana miejsca a potem kop 0
+ event sysmessage Zmiana miejsca.
  gosub zmiana_miejsca
  set %kop 0
  }
@@ -348,14 +346,14 @@ sub zmiana_miejsca
 
  for %i 1 *gornictwo_miejsca
  {
-  event sysmessage Miejsce i: %i miejsce: %miejsce
+  event sysmessage Miejsce %i miejsce: %miejsce
   if %miejsce = %i
   {
    repeat
     event pathfind *xpos . %i *ypos . %i
     wait 1s
    until #charposx = *xpos . %i && #charposy = *ypos . %i
-   event sysmessage Jestem w miejscu i: %i X: #charposX Y: #charposY
+   event sysmessage Jestem w miejscu: %miejsce z *gornictwo_miejsca
    break
   }
  }
