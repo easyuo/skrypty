@@ -7,7 +7,7 @@ loop:
 if #CONTNAME = trade_gump
 {
 
- set %zlotoPrze #GOLD
+ set %zlotoPrzed #GOLD
 
  repeat
   gosub TradeAkceptuj 65 40
