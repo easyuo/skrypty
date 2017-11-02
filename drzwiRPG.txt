@@ -39,6 +39,15 @@ sub SzukajPostaci
  if #FINDKIND <> -1
  {
   set %postacID #FINDID
+  
+  if %postacID = BYWSQD
+  {
+  ; event macro 1 0 Ty Kordzianie, judaszu, drzwi otworzysz sobie sam!
+  ; event macro 2 0 splunal na ziemie
+  ; wait 3s
+   return
+  }
+  
   if %licznik . %postacID <> N/A
   {
    set %ostatnioWidziany #TIME - %ostatnioWidziany . %postacID
