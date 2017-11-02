@@ -1,0 +1,79 @@
+; Akceptowanie TRADE_GUMP
+; X 65
+; Y 40
+; Size 348x203
+
+loop:
+if #CONTNAME = trade_gump
+{
+
+ set %zlotoPrze #GOLD
+
+ repeat
+  gosub TradeAkceptuj 65 40
+  wait 1s
+ until #CONTNAME <> trade_gump
+
+ set %jestZloto #GOLD - %zlotoPrzed
+
+ if %jestZloto > 9999
+ {
+  event macro 1 0 Czym sobie na to zasluzylem?
+  event macro 2 0 klania sie nisko calujac stopy
+  event macro 1 0 .tancz
+  goto loop
+ }
+
+ if %jestZloto > 999
+ {
+  event macro 1 0 Bardzo dziekuje za tak sowita zaplate
+  event macro 2 0 klania sie nisko
+  goto loop
+ }
+
+ if %jestZloto > 99
+ {
+  event macro 1 0 Dziekuje
+  event macro 2 0 mrugnal lewym okiem
+  goto loop
+ }
+
+ if %jestZloto > 9
+ {
+  event macro 1 0 Zawsze moglo byc wiecej
+  event macro 2 0 burknal pod nosem
+  goto loop
+ }
+
+ if %jestZloto < 10 && %jestZloto > 0
+ {
+  event macro 1 0 Na piwo nawet nie wystarczy
+  event macro 2 0 szepnal do siebie
+  goto loop
+ }
+
+ if %jestZloto = 0
+ {
+  event macro 1 0 Nie wiem co to jest ale i tak wezme. POTRZEBUJE ZLOTA!
+  event macro 2 0 machnal reka
+  goto loop
+ }
+
+}
+
+goto loop
+
+sub TradeAkceptuj
+ set !clickx ( #CONTPOSX + %1 )
+ set !clicky ( #CONTPOSX + %2 )
+ click !clickx !clicky %3 %4 %5
+return
+
+sub TradeSprawdzZloto
+ findItem POF C_ , #CONTID
+ if #FINDCNT > 0
+ {
+  event sysmessage Znalazlem #FINDSTACK zlota
+  set %jestZloto #FINDSTACK
+ }
+return

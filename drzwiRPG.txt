@@ -1,0 +1,123 @@
+; Drzwi RPG
+; Autor: Krowa
+; Data: 2017-11-01
+; =========================
+
+ignoreItem reset
+set #RESULT N/A
+set %delay 15 ;-The pause between each opening attempt, 20 = 1 second
+              ; default is 15 (.75s), increase this if its a laggy day
+set %doorsRange 2  ;-The distance from a door to attempt opening
+              ; default (and max) is 2
+set %szukajGraczaObszar 4
+set %ignorujPoczatkowoObszar 10
+
+;;;;; ;;;;; ;;;;; ;;;;; ;;;;;
+set %doors PHI_UBD_SBD_GCD_ECD_MBD_WBD_YBD_KBD_EDD_YCD_CDD_SCD_WCD_QCD_KCD_UCD_KIB_IIB_YHB_WHB_AIB_CIB_OHB_
++QHB_IFB_GFB_WEB_UEB_OEB_MEB_AFB_YEB_RUN_FUN_CEB_AEB_OIB_MIB_QIB_SIB_EIB_GIB_SEB_QEB_GEB_EEB_IEB_KEB_
++WDB_YDB_TFD_VFD_XFD_RFD_GFD_IFD_UED_WED_BOC_NNC_PNC_ZNC_JNC_LNC_XMC_ZMC_BRC_DRC_PQC_RQC_BQC_ZPC_NQC_
++LQC_FBD_HBD_BBD_DBD_QFD_OFD_CFD_EFD_XQC_ZQC_LMC_NMC_FNC_HNC_RNC_TNC_JOC_HOC_XNC_VNC_VQC_TQC_JQC_HQC_
++VPC_XPC_JPC_LPC_RPC_TPC_DQC_FQC_LAM_BAM_NAM_ZZL_HAM_JAM_TAM_VAM_ZOC_XOC_PJC_NJC_RJC_TJC_FJC_HJC_UXS_
++SXS_DDR_WXS_NTU_FOU_JOU_DOU_LTU_PTU_JTU_BUU_LUU_ZTU_FUU_DUU_XTU_RTU_TTU_VTU_MBR_WBR_PCR_OXS_VCR_QXS_
++RCR_MXS_BDR_KXS_YXS_XCR_AHB_IHB_TMC_VMC_HMC_JMC_RMC_PMC_PAQ_RAQ_DBQ_BBQ_CXS_MBS_EXS_VAQ_TAQ_JAQ_HAQ_
++ZAQ_XAQ_LBQ_JBQ_GBS_GHB_LOP_BNC_DNC_FPC_TOC_DPC_BPC_NPC_PPC_KHB_JCB_SUX_DUX_GWX_FFD_AKG_OXD_RXD_WDG_RDG_
+
+; ZE - Puma
+set %graczType IS_HS_ZE
+
+gosub IgnorujInit
+
+event sysmessage Zaczynamy prace!
+
+loop:
+  gosub SzukajPostaci
+goto loop
+
+sub SzukajPostaci
+ set %postacID N/A
+ finditem %graczType G_ , %szukajGraczaObszar
+ if #FINDKIND <> -1
+ {
+  set %postacID #FINDID
+  if %licznik . %postacID <> N/A
+  {
+   set %ostatnioWidziany #TIME - %ostatnioWidziany . %postacID
+   set %ostatnioWidziany . %postacID #TIME
+   if %ostatnioWidziany > 5
+   {
+    if %ostatnioWidziany < 30
+    {
+     gosub OtworzDrzwi
+     set %licznik . %postacID %licznik . %postacID + 1
+     event macro 1 0 Dokad tak pedzisz. Pospiech nie jest wskazany.
+     wait 10
+     event macro 2 0 otwiera drzwi pospiesznie
+    }
+    if %ostatnioWidziany > 30
+    {
+     gosub OtworzDrzwi
+     set %licznik . %postacID %licznik . %postacID + 1
+     event macro 2 0 rozglada sie uwaznie
+     event macro 1 0 Witam ponownie!
+     wait 10
+     event macro 2 0 otwiera drzwi
+     event exmsg %postacID 3 30 %postacID [ %licznik . %postacID ] [ %ostatnioWidziany , s ]
+     wait 10
+     if %licznik . %postacID > 5
+     {
+      if %licznik . %postacID < 10
+      {
+       event macro 1 0 Nie powiem, ale przydala by sie w koncu jakas zaplata za moja prace.
+      }
+
+      event macro 1 0 Otworzylem te drzwi dla ciebie juz %licznik . %postacID razy.
+      event macro 1 0 Daj PROSZE troszke zlota!
+
+     }
+     wait 3s
+    }
+   }
+  }
+  else
+  {
+   set %licznik . %postacID 1
+   set %ostatnioWidziany . %postacID #TIME
+   gosub OtworzDrzwi
+   event macro 2 0 rozglada sie uwaznie
+   event macro 1 0 Jestem odzwiernym w tym banku. Widzimy sie chyba pierwszy raz.
+   wait 10
+   event macro 2 0 otwiera drzwi
+   event exmsg %postacID 3 30 %postacID [1] [NEW]
+   wait 1s
+  }
+
+ }
+return
+
+; OtworzDrzwi
+sub OtworzDrzwi
+  finditem %doors G_ , %doorsRange
+  if #findkind <> -1
+  {
+   set #lobjectid #findid
+   event macro 17
+  }
+return
+
+sub IgnorujInit
+ event sysmessage Inicjalizacja ignorowanych postaci.
+ event sysmessage Wszyscy w odleglosci %ignorujPoczatkowoObszar kratek beda ignorowani.
+
+ ignoreItem #CHARID 1
+
+ findItem %graczType G_ , %ignorujPoczatkowoObszar
+ if #FINDCNT > 0
+ {
+  event sysmessage Znalazlem #FINDCNT osob
+  for #findindex 1 #findcnt
+  {
+   ignoreitem #FINDID 1
+   event sysmessage Ignoruje #FINDID
+  }
+ }
+return

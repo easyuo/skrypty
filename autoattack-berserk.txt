@@ -25,17 +25,17 @@
     ; If the script has to choose between more enemies, it chooses between the ones with the greater level.
 
       ;blue (innocent)
-    set %enemylevel1 0
+    set %enemylevel1 1
       ;green (friend)
-    set %enemylevel2 0
+    set %enemylevel2 1
       ;grey (grey - animal)
-    set %enemylevel3 1
+    set %enemylevel3 0
       ;grey (criminal)
-    set %enemylevel4 1
+    set %enemylevel4 0
       ;orange (enemy)
-    set %enemylevel5 1
+    set %enemylevel5 0
       ;red (murderer)
-    set %enemylevel6 1
+    set %enemylevel6 0
       ;yellow (invulnerable)
     set %enemylevel7 0
 

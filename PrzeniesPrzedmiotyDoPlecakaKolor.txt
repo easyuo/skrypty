@@ -1,0 +1,43 @@
+; Drag przedmioty do plecaka
+
+set %dragPauza 5
+set %plecakType ZJF
+ignoreItem reset
+
+; Szukam plecaka w glownym plecaku
+
+finditem %plecakType C_ , #BACKPACKID
+ if #findid <> x
+ {
+  set %sklad #FINDID
+  event sysmessage Plecak: #FINDID
+ }
+ else
+ {
+  event sysmessage Nie znaleziono plecaka.
+  halt
+ }
+
+
+repeat
+ finditem * C_ , #BACKPACKID
+  if #findid <> x
+  {
+   if #FINDCOL = 38
+   {
+    exevent drag #findid #findstack
+    wait %dragPauza
+    exevent dropc %sklad
+    exevent dropc %sklad
+    wait %dragPauza
+   }
+
+   ignoreItem #FINDID
+
+  }
+ wait 2
+until #findid = x
+
+halt
+
+

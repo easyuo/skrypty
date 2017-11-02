@@ -10,7 +10,6 @@
 ; Purpose: To display Item ID and Type
 ; #################################
 GoSub MainMenu
-GoSub FindID
 
 Sub MainMenu
 ;Menu HideEUO
@@ -61,38 +60,44 @@ if #menuButton = Quit
    Halt
    }
 if #menubutton = FindID
-   return
-    else
-     goto MenuLoop
+   {
+    GoSub FindID
+    goto MenuLoop
+   }
+  else
+  {
+   goto MenuLoop
+  }
+
 Return
 
 ; #######################
 ; # ID Loop and Display #
 ; #######################
 sub FindID
-set #targCurs 1
-settarget:
-if #menubutton = Quit
+ set #targCurs 1
+ settarget:
+ if #menubutton = Quit
    {
    Menu Hide
    Halt
    }
-if #menubutton = Link
+ if #menubutton = Link
    {
    Set #menuButton N/A
    execute http://www.winuo.org
    }
-if #targCurs = 1
+ if #targCurs = 1
    goto settarget
-menu delete data
-finditem #ltargetid
-event property #findid
+ menu delete data
+ finditem #ltargetid
+ event property #findid
   str pos #property $
 	str left #property #strres
-menu text data 60 40 #strres
-menu text data 60 60 #ltargetid
-menu text data 60 80 #findtype
-menu text data 60 100 #findcol
+ menu text data 60 40 #strres
+ menu text data 60 60 #ltargetid
+ menu text data 60 80 #findtype
+ menu text data 60 100 #findcol
 return
 
 
