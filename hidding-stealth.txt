@@ -1,22 +1,57 @@
 ; /----------EasyUO script----------
-; | Ultima Online www.kopalnia.elnar.com.pl
-; | Nazwa skryptu: Hidding & Stealth
-; | Serwer: Mysterious World
 ; | Autor: krowa
 ; | Data: 2017.05.17 22:50:05
 ; \----------koniec----------
-;Autor: [nGz]
 
-if #hits = #maxhits
+event sysmessage F1 [pojedynczo] | ALT F1 [automat]
+set %aktywny #false
+
+loop:
+
+onhotkey F1 ALT
+  gosub toggleSub
+onhotkey F1
+  gosub goShadow
+gosub stealth
+
+goto loop
+  
+sub stealth
+
+if %aktywny = #true
 {
- if H in #charstatus
+ if %lastUsed = N/A || #TIME - %lastUsed > 10
  {
-  event macro 13 47
+  gosub goShadow
+  set %lastUsed #TIME
+ }
+}
+
+return
+
+sub toggleSub
+
+ if %aktywny = #false
+ {
+  event sysmessage Stealth aktywowany.
+  set %aktywny #true
  }
  else
  {
-  event macro 13 21
+  event sysmessage Stealth deaktywowany.
+  set %aktywny #false
  }
- wait 12s
-}
 
+return
+
+
+sub goShadow
+if H in #charstatus
+  {
+   event macro 13 47
+  }
+  else
+  {
+   event macro 13 21
+  }
+return
