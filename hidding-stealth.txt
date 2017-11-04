@@ -10,19 +10,31 @@ loop:
 
 onhotkey F1 ALT
   gosub toggleSub
+  
 onhotkey F1
   gosub goShadow
+
 gosub stealth
 
 goto loop
   
+  
+; ===== SUBy ====
+
 sub stealth
 
 if %aktywny = #true
 {
  if %lastUsed = N/A || #TIME - %lastUsed > 10
  {
+ 
+  if #CHARGHOST = YES
+  {
+    goto loop
+  }
+
   gosub goShadow
+  
   set %lastUsed #TIME
  }
 }

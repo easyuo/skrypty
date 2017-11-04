@@ -11,26 +11,36 @@
 
 loop:
 
+if #CHARGHOST = YES
+  goto loop
+
 if #ENEMYID = N/A
 {
  FINDITEM YFM G_2
  if #FINDCNT > 0
  {
- set #lobjectid %SztyletID ; sztylet w plecaku
- event sysmessage Tne #findCNT cial
-     for #findindex 1 #findcnt
-     {
-      event sysmessage Tne cialo # #findindex
-      event Macro 17 ; Last Object
-      target
-      set #ltargetid #findID
-      set #LTargetKind 1
-      event Macro 22  ; Last Target
-;      wait 1
-     }
-     event SysMessage Pociete
-    }
+  if H in #charstatus
+  {
+  ; Jestesmy ukryci. Nie tniemy
+   event sysmessage Jestesmy ukryci. Nie TNIEMY!
+   wait 1s
+  }
+  else
+  {
+   set #lobjectid %SztyletID ; sztylet w plecaku
+   event sysmessage Tne #findCNT cial
+   for #findindex 1 #findcnt
+   {
+    event sysmessage Tne cialo # #findindex
+    event Macro 17 ; Last Object
+    target
+    set #ltargetid #findID
+    set #LTargetKind 1
+    event Macro 22  ; Last Target
+   }
+   event SysMessage Pociete
+  }
+ }
 }
-
 
 goto loop
