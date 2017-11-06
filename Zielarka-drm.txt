@@ -210,13 +210,13 @@ set %kop %kop + 1
 else
 {
 set %miejsce %miejsce + 1
-if %miejsce > *zielarka_miejsca
-{
-if *zielarka_suszenie = #true
-gosub suszenie
-if *zielarka_odkladanie = #true
-gosub odkladanie
-}
+; if %miejsce > *zielarka_miejsca
+; {
+; if *zielarka_suszenie = #true
+; gosub suszenie
+; if *zielarka_odkladanie = #true
+; gosub odkladanie
+;}
 gosub zmiana_miejsca
 set %kop 0
 }
@@ -231,6 +231,18 @@ goto loop
 ;  Zmiana miejsca
 ; ================
 sub zmiana_miejsca
+
+ if *zielarka_suszenie = #true
+ {
+  gosub idzPozycjaStartowa
+  gosub suszenie
+ }
+ if *zielarka_odkladanie = #true
+ {
+  gosub idzPozycjaStartowa
+  gosub odkladanie
+ }
+
  if %miejsce = 0 || %miejsce = n/a || %miejsce > *zielarka_miejsca
  set %miejsce 1
  for %i 1 *zielarka_miejsca
