@@ -5,7 +5,8 @@
 
 set %sklad KVHLAOE ; Veis GIILMPE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
 set %kilofy KVHLAOE ; Veis GIILMPE            ; Pojemnik z kilofami
-set %dragPauza 3                              ; Pauza przy drag/drop
+set %dragPauza 4                              ; Pauza przy drag/drop
+set %dropPauza 8                              ; Pauza przy drag/drop
 set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
 
@@ -428,26 +429,33 @@ sub odkladanie
    wait %dragPauza
  }
   
-  ; Ziola
+; Ziola
  finditem WZF C_ , #BACKPACKID
-  if #findstack < %ileZiol
-  {
-   set #lobjectid %pojemnik
-   set #ltargetkind %ileZiol
-   event macro 17 0
-   wait 1s
-   
-   finditem WZF C_ , %pojemnik
-   exevent drag #findid %ileZiol
-   wait %dragPauza
-   exevent dropc #backpackid
-   wait %dragPauza
+ if #findstack < %ileZiol
+ {
+  set %ilePrzeniesc %ileZiol - #FINDSTACK
+  event sysmessage Uzupe³niam belladone: %ilePrzeniesc
+  gosub otworzPojemnik %sklad
 
-   finditem KUF C_ , %pojemnik
-   exevent drag #findid %ileZiol
-   wait %dragPauza
-   exevent dropc #backpackid
-   wait %dragPauza
+  finditem WZF C_ , %pojemnik
+  exevent drag #findid %ilePrzeniesc
+  wait %dragPauza
+  exevent dropc #backpackid
+  wait %dropPauza
+ }
+
+ finditem KUF C_ , #BACKPACKID
+ if #findstack < %ileZiol
+ {
+  set %ilePrzeniesc %ileZiol - #FINDSTACK
+  event sysmessage Uzupe³niam perly: %ilePrzeniesc
+  gosub otworzPojemnik %sklad
+
+  finditem KUF C_ , %pojemnik
+  exevent drag #findid %ilePrzeniesc
+  wait %dragPauza
+  exevent dropc #backpackid
+  wait %dropPauza
  }
 
 return
@@ -507,18 +515,6 @@ sub ustaw_narzedzie
  else
   set %narzedzie #findid
 }
-
-if *gornictwo_tryb = 3
- {
-  finditem TBG C
-  if #findkind = -1
-   {
-    display Nie masz lopatki zielarza!
-    halt
-   }
-
-  set %narzedzie #findid
- }
 
  wait 1s
 return

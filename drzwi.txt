@@ -1,4 +1,4 @@
-  ; BlaZin' Doorman
+; BlaZin' Doorman
 ; by BlaZe Buddle of Excelsior's ?ud ?rothers
 ; v1.5 Completed 1/8/11
 ;;;;; ;;;;; ;;;;; ;;;;; ;;;;;

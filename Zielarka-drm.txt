@@ -5,6 +5,19 @@
 ; Krowa:
 ;  2017.11.06 - Modyfikacje dla dziewczecej postaci (CLka) - Znalazlas
 
+
+; ==== EDYCJA ====
+
+; Zmienna %sklad ustawi siê automatycznie, bêdzie to pojemnik w którym przechowywane bêd¹ wykopane zio³a.
+; Standardowo: %sklad to bezpieczny pojemnik domku a w nim znajduje siê %skladNarzedzia
+set %skladNarzedzia YHBQPPE
+set %dragPauza 4                              ; Pauza przy drag/drop
+set %dropPauza 8                              ; Pauza przy drag/drop
+set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac / Lub gdy przekopie wszystkie zaznaczone pozycje
+
+; ==== Koniec EDYCJI ====
+
 set %timeout 20
 set #sysmsgcol 154
 gosub r_menu
@@ -43,10 +56,12 @@ event sysmessage Musisz miec pojemnik w zasiegu przy starcie skryptu!
 goto pokaz_menu
 }
 set %pojemnik #findid
+set %sklad #FINDID
 }
 set %pozycja_startowa_x #charposx
 set %pozycja_startowa_y #charposy
 menu hide
+gosub odkladanie
 gosub ustaw_narzedzie
 gosub zmiana_miejsca
 goto loop
@@ -211,89 +226,150 @@ if #enemyid <> N/A
 goto zabij
 }
 goto loop
+
+; ================
+;  Zmiana miejsca
+; ================
 sub zmiana_miejsca
-if %miejsce = 0 || %miejsce = n/a || %miejsce > *zielarka_miejsca
-set %miejsce 1
-for %i 1 *zielarka_miejsca
-{
-if %miejsce = %i
-{
-repeat
-event pathfind *xpos . %i *ypos . %i
-wait 1s
-until #charposx = *xpos . %i && #charposy = *ypos . %i
-break
-}
-}
+ if %miejsce = 0 || %miejsce = n/a || %miejsce > *zielarka_miejsca
+ set %miejsce 1
+ for %i 1 *zielarka_miejsca
+ {
+  if %miejsce = %i
+  {
+  repeat
+   event pathfind *xpos . %i *ypos . %i
+   wait 1s
+  until #charposx = *xpos . %i && #charposy = *ypos . %i
+ break
+  }
+ }
 return
+
+; ===========
+;  Suszenie
+; ===========
 sub suszenie
-repeat
-event pathfind %pozycja_startowa_x %pozycja_startowa_y
-wait 1s
-until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
-repeat
-finditem TIJ_HJJ_ZIJ_OIJ C
-if #findid <> x
-{
-set #lobjectid #findid
-set #ltargetid %brazier
-set #ltargetkind 1
-event macro 17 0
-target 1s
-event macro 22 0
-}
-wait 2
-until #findid = x
+ event sysmessage Suszenie.
+ gosub idzPozycjaStartowa
+ repeat
+  finditem TIJ_HJJ_ZIJ_OIJ C
+  if #findid <> x
+  {
+   set #lobjectid #findid
+   set #ltargetid %brazier
+   set #ltargetkind 1
+   event macro 17 0
+   target 1s
+   event macro 22 0
+  }
+  wait 2
+ until #findid = x
 return
+
+; ==============================================
+;  Odk³adanie + Uzupe³nianie rzeczy (ziola itd)
+; ==============================================
 sub odkladanie
-if #charposx <> %pozycja_startowa_x || #charposy <> %pozycja_startowa_y
-{
-repeat
-event pathfind %pozycja_startowa_x %pozycja_startowa_y
-wait 1s
-until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
-}
-repeat
-finditem KZF_JUF_MZF_JZF_TZF_VZF_NZF_HUF_YZF_XZF_OIJ_HJJ_ZIJ C
-if #findid <> x
-{
-exevent drag #findid #findstack
-exevent dropc %pojemnik
-}
-wait 2
-until #findid = x
+ event sysmessage Odkladanie.
+ gosub idzPozycjaStartowa
+ repeat
+  finditem KZF_JUF_MZF_JZF_TZF_VZF_NZF_HUF_YZF_XZF_OIJ_HJJ_ZIJ C
+  if #findid <> x
+  {
+  exevent drag #findid #findstack
+  wait %drapPauza
+  exevent dropc %pojemnik
+  wait %dropPauza
+  }
+  wait 2
+ until #findid = x
+ 
+ ; Ziola
+ finditem WZF C_ , #BACKPACKID
+ if #findstack < %ileZiol
+ {
+  set %ilePrzeniesc %ileZiol - #FINDSTACK
+  event sysmessage Uzupe³niam belladone: %ilePrzeniesc
+  gosub otworzPojemnik %sklad
+
+  finditem WZF C_ , %pojemnik
+  exevent drag #findid %ilePrzeniesc
+  wait %dragPauza
+  exevent dropc #backpackid
+  wait %dropPauza
+ }
+
+ finditem KUF C_ , #BACKPACKID
+ if #findstack < %ileZiol
+ {
+  set %ilePrzeniesc %ileZiol - #FINDSTACK
+  event sysmessage Uzupe³niam perly: %ilePrzeniesc
+  gosub otworzPojemnik %sklad
+  
+  finditem KUF C_ , %pojemnik
+  exevent drag #findid %ilePrzeniesc
+  wait %dragPauza
+  exevent dropc #backpackid
+  wait %dropPauza
+ }
+
 return
+
+
+; =================
+;  Ustaw narzêdzie
+; =================
 sub ustaw_narzedzie
-if *zielarka_tryb = 1
-{
-finditem WSF C_ , #charid
-if #findkind = -1
-{
-finditem WSF C
-if #findkind = -1
-{
-display Nie masz nozyka zielarza!
-halt
-}
-set %narzedzie #findid
-exevent drag %narzedzie
-exevent droppd
-}
-else
-set %narzedzie #findid
-}
-if *zielarka_tryb = 3
-{
-finditem TBG C
-if #findkind = -1
-{
-display Nie masz lopatki zielarza!
-halt
-}
-set %narzedzie #findid
-}
-wait 1s
+ event sysmessage Ustawiam narzedzie.
+ if *zielarka_tryb = 1
+ {
+  set %narzedzieTyp WSF
+  set %narzedzieNazwa Nozyk zielarza
+ }
+ if *zielarka_tryb = 3
+ {
+  set %narzedzieTyp TBG
+  set %narzedzieNazwa Lopatka zielarza
+ }
+
+ finditem %narzedzieTyp C_ , #charid
+  if #findkind = -1
+  {
+   gosub idzPozycjaStartowa
+
+   gosub otworzPojemnik %sklad
+   gosub otworzPojemnik %skladNarzedzia
+
+   finditem %narzedzieTyp C_ , %skladNarzedzia
+   if #findkind = -1
+   {
+    display Brakuje: %narzedzieNazwa
+    halt
+   }
+   else
+   {
+    ; Przenosimy ze skladu do glownego plecaka
+    set %narzedzie #findid
+    exevent drag %narzedzie 1
+    wait %dragPauza
+    exevent dropc #BACKPACKID 90 20
+    wait %dropPauza
+    gosub zmiana_miejsca
+   }
+  }
+
+  ; Znalezione narzedzie wkladamy do reki.
+  set %narzedzie #findid
+  exevent drag %narzedzie
+  wait %dragPauza
+  exevent droppd
+  wait %dropPauza
+
+  wait 1s
+
 return
+
 miejsce_dodaj:
 if *zielarka_miejsca = n/a
 set *zielarka_miejsca 0
@@ -372,23 +448,46 @@ menu combo add tryb_select Nozyk - drzewa
 menu combo add tryb_select Lopatka - ziemia
 menu combo select tryb_select 1
 return
+
 sub ScanJournal
-set %JIndex %1
-set %_timeout #SCNT
+ set %JIndex %1
+ set %_timeout #SCNT
 ScanLoop:
-set %x %timeout + %_timeout
-if #SCNT > %_timeout + %timeout
+ set %x %timeout + %_timeout
+ if #SCNT > %_timeout + %timeout
 return TIMEOUT
 if #JIndex > %JIndex
 {
-set %JIndex %JIndex + 1
-ScanJournal %JIndex
-for %i 2 %0
-{
-if % . %i in #journal
+ set %JIndex %JIndex + 1
+ ScanJournal %JIndex
+ for %i 2 %0
+ {
+ if % . %i in #journal
 return %i
-}
+ }
 }
 goto ScanLoop
 return
 
+; ==========================
+;  IdŸ do Pozycji Startowej
+; ==========================
+sub idzPozycjaStartowa
+event sysmessage Ide do pozycji startowej (sklad).
+if #charposx <> %pozycja_startowa_x || #charposy <> %pozycja_startowa_y
+{
+ repeat
+  event pathfind %pozycja_startowa_x %pozycja_startowa_y
+  wait 1s
+ until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
+}
+return
+
+; ==========================
+;  otworzPojemnik %pojemnikID
+; ==========================
+sub otworzPojemnik
+ set #lobjectid %1
+ event macro 17 0
+ wait 1s
+return
