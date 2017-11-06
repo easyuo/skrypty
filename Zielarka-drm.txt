@@ -1,6 +1,9 @@
 ; Zielarstwo
 ; Autor: drm
 ; Modyfikacja: Niewiedza, krowa
+; Chagnelog
+; Krowa:
+;  2017.11.06 - Modyfikacje dla dziewczecej postaci (CLka) - Znalazlas
 
 set %timeout 20
 set #sysmsgcol 154
@@ -182,7 +185,7 @@ set #ltargety #charposy + 2
 }
 set #ltargetkind 2
 event macro 22 0
-gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_znalezc Nie_udalo_Ci_sie_niczego_znalezc Nie_udalo_Ci_sie_zebrac_nic_pozytecznego Nie_dostrzegasz_tu_nic_nadajacego_sie_do_uzytku Zakonczono_prace Znalazles_jakies_ziolo Twoje_narzedzie_do_niczego
+gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_znalezc Nie_udalo_Ci_sie_niczego_znalezc Nie_udalo_Ci_sie_zebrac_nic_pozytecznego Nie_dostrzegasz_tu_nic_nadajacego_sie_do_uzytku Zakonczono_prace Znalazles_jakies_ziolo Znalazlas_jakies_ziolo Twoje_narzedzie_do_niczego
 if #result = 2 || #result = 3 || #result = 4 || #result = 6 || #result = 7 || #result = 8
 wait 1
 if #result = 5
