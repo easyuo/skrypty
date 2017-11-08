@@ -12,7 +12,7 @@
 ; HJJ - Krzew ZenShenia
 ; ZIJ - Krzew Czosnku
 ; TIJ - ??? [Krzew Krwawnika?]
- set %ziolaDoSuszenia TIJ_OIJ_HJJ_ZIJ
+set %ziolaDoSuszenia TIJ_OIJ_HJJ_ZIJ
 
 ; ==== EDYCJA ====
 ; Zmienna %sklad ustawi siê automatycznie, bêdzie to pojemnik w którym przechowywane bêdš wykopane zio³a.
@@ -20,7 +20,7 @@
 set %skladNarzedzia YHBQPPE
 set %dragPauza 6           ; Pauza przy drag/drop
 set %dropPauza 10          ; Pauza przy drag/drop
-set %ileZiol 3             ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %ileZiol 6             ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 ; ==== Koniec EDYCJI ====
 
 set %timeout 20
