@@ -266,7 +266,6 @@ sub suszenie
   if #FINDCNT > 0
   {
    set %iloscKupek #FINDCNT
-   event sysmessage Susze #FINDTYPE [ #FINDID ] Ilosc: #FINDSTACK FindCNT #FINDCNT
    set #lobjectid #findid
    set #ltargetid %brazier
    set #ltargetkind 1
