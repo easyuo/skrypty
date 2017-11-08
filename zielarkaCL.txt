@@ -8,19 +8,44 @@
 ;  * Dobieranie pojedynczego nozyka ze skladu
 ;  * Dobieranie tylko odpowiedniej ilosci ziol do Corpa
 
+; Krzewy
 ; OIJ - Krzew Mandragory
 ; HJJ - Krzew ZenShenia
 ; ZIJ - Krzew Czosnku
 ; TIJ - ??? [Krzew Krwawnika?]
-set %ziolaDoSuszenia TIJ_OIJ_HJJ_ZIJ
+
+; Ziola
+set %zioloTyp1 RZF ; sieci pajecze
+set %zioloNazwa1 Sieci pajecze
+
+set %zioloTyp2 KZF ; czosnek
+set %zioloNazwa2 Czosnek
+
+set %zioloTyp3 JZF ; zenshen
+set %zioloNazwa3 ZenShen
+
+set %zioloTyp4 MZF ; mandragora
+set %zioloNazwa4 Mandragora
+
+set %zioloTyp5 KUF ; perly
+set %zioloNazwa5 Perly
+
+set %zioloTyp6 WZF ; belladona
+set %zioloNazwa6 Belladona
+
+set %zioloTablicaRozmiar 6
+
+set %ziolaDoSuszenia TIJ_OIJ_HJJ_ZIJ_
+set %doOdlozenia KZF_JUF_MZF_JZF_TZF_VZF_NZF_HUF_YZF_XZF_
 
 ; ==== EDYCJA ====
 ; Zmienna %sklad ustawi siê automatycznie, bêdzie to pojemnik w którym przechowywane bêdš wykopane zio³a.
 ; Standardowo: %sklad to bezpieczny pojemnik domku a w nim znajduje siê %skladNarzedzia
 set %skladNarzedzia YHBQPPE
-set %dragPauza 6           ; Pauza przy drag/drop
-set %dropPauza 10          ; Pauza przy drag/drop
+set %dragPauza 1           ; Pauza przy drag/drop
+set %dropPauza 1          ; Pauza przy drag/drop
 set %ileZiol 6             ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %roznicaLeczenie 60    ; Roznica w HP przy ktorej ma leczyc IVM
 ; ==== Koniec EDYCJI ====
 
 set %timeout 20
@@ -79,16 +104,26 @@ start:
 
 goto loop
 
+sub odlozNozyk
+ event sysmessage Odkladam nozyk do glownego plecaka.
+ finditem WSF C_ , #CHARID
+ if #FINDCNT > 0
+ {
+  exevent drag #FindID
+  wait %dragPauza
+  exevent dropc #BACKPACKID
+  repeat
+   wait 1
+   finditem WSF C_ , #CHARID
+  until #FINDCNT = 0
+ }
+return
+
 ; =======
 ;  Zabij
 ; =======
 zabij:
- repeat
- finditem WSF C_ , #CHARID
- exevent drag #FindID
- wait 10
- exevent dropc #BackPackID
- wait 10
+ gosub odlozNozyk
  if #enemyid <> N/A
  {
   goto czaruj
@@ -104,7 +139,8 @@ czaruj:
  event macro 15 41
  if #targcurs <> 1
  {
- goto czaruj
+  wait 2
+  goto czaruj
  }
  event macro 22 0
  wait 10
@@ -169,9 +205,20 @@ loop:
    set %kop 0
   }
  }
- if #enemyid <> N/A
+ 
+ if #ENEMYID <> N/A
  {
   goto zabij
+ }
+ 
+ if C in #CHARSTATUS
+ {
+  gosub LeczenieOdtruj
+ }
+ 
+ if #HITS < #MAXHITS - %roznicaLeczenie
+ {
+  gosub LeczenieIVM
  }
 
 goto loop
@@ -216,18 +263,22 @@ sub suszenie
   gosub idzPozycjaStartowa
  repeat
   finditem %ziolaDoSuszenia C_ , #BACKPACKID
-  if #findid <> x
+  if #FINDCNT > 0
   {
-   event sysmessage Susze #FINDTYPE [ #FINDID ] Ilosc: #FINDSTACK
+   set %iloscKupek #FINDCNT
+   event sysmessage Susze #FINDTYPE [ #FINDID ] Ilosc: #FINDSTACK FindCNT #FINDCNT
    set #lobjectid #findid
    set #ltargetid %brazier
    set #ltargetkind 1
    event macro 17 0
-   target 2s
+   target 5s
    event macro 22 0
+   repeat
+    wait 1
+    finditem %ziolaDoSuszenia C_ , #BACKPACKID
+   until #FINDCNT < %iloscKupek
   }
-;  wait 2
- until #findid = x
+ until #FINDCNT = 0
 return
 
 ; ==============================================
@@ -237,45 +288,29 @@ sub odkladanie
  event sysmessage Odkladanie.
  gosub idzPozycjaStartowa
  repeat
-  finditem KZF_JUF_MZF_JZF_TZF_VZF_NZF_HUF_YZF_XZF_ C_ , #BACKPACKID
-  if #findid <> x
+  finditem %doOdlozenia C_ , #BACKPACKID
+  if #FINDCNT > 0
   {
-   exevent drag #findid #findstack
-   wait %drapPauza
-   exevent dropc %pojemnik
-   wait %dropPauza
+   gosub przeniesPrzedmiot #findid %pojemnik #FINDSTACK
+   finditem %doOdlozenia C_ , #BACKPACKID
   }
-  wait 2
- until #findid = x
+ until #FINDCNT = 0
 
- ; Ziola
- finditem WZF C_ , #BACKPACKID
- if #findstack < %ileZiol
+ ; Uzupe³nianie ziol w glownym plecaku
+
+ for %i 1 %zioloTablicaRozmiar
  {
-  set %ilePrzeniesc %ileZiol - #FINDSTACK
-  event sysmessage Uzupe³niam belladone: %ilePrzeniesc
-  gosub otworzPojemnik %sklad
-
-  finditem WZF C_ , %pojemnik
-  exevent drag #findid %ilePrzeniesc
-  wait %dragPauza
-  exevent dropc #BACKPACKID
-  wait %dropPauza
+  finditem %zioloTyp . %i C_ , #BACKPACKID
+  if #findstack < %ileZiol
+  {
+   set %ilePrzeniesc %ileZiol - #FINDSTACK
+   event sysmessage Uzupelniam %zioloNazwa . %i : %ilePrzeniesc
+   gosub otworzPojemnik %sklad
+   finditem %zioloTyp . %i C_ , %sklad
+   gosub przeniesPrzedmiot #findid #BACKPACKID %ilePrzeniesc
+  }
  }
 
- finditem KUF C_ , #BACKPACKID
- if #findstack < %ileZiol
- {
-  set %ilePrzeniesc %ileZiol - #FINDSTACK
-  event sysmessage Uzupe³niam perly: %ilePrzeniesc
-  gosub otworzPojemnik %sklad
-
-  finditem KUF C_ , %pojemnik
-  exevent drag #findid %ilePrzeniesc
-  wait %dragPauza
-  exevent dropc #BACKPACKID
-  wait %dropPauza
- }
 return
 
 ; =================
@@ -313,24 +348,14 @@ sub ustaw_narzedzie
      display Brakuje narzedzi: %narzedzieNazwa KONCZE
      halt
     }
-    else
-    {
-     ; Przenosimy ze skladu do glownego plecaka
-     exevent drag #findid 1
-     wait %dragPauza
-     exevent dropc #BACKPACKID
-     wait %dropPauza
-    }
    }
   }
 
-   set %narzedzie #findid
-   exevent drag %narzedzie
-   wait %dragPauza
-   exevent droppd
-   wait %dropPauza
-
-  wait 1s
+  set %narzedzie #findid
+  exevent drag %narzedzie
+  wait %dragPauza
+  exevent droppd
+  wait %dropPauza
   
   gosub zmiana_miejsca
 
@@ -356,32 +381,32 @@ goto pokaz_menu
 ;  Usun ostatnie miejsce
 ; =======================
 miejsce_usun_ostatnie:
-if *zielarka_miejsca > 0
-{
-event sysmessage Usunieto ostatnie miejsce.
-set *zielarka_miejsca *zielarka_miejsca - 1
-menu delete miejsca_txt
-menu font bgcolor btnface
-if *zielarka_miejsca = 0
-menu font color red
-else
-menu font color green
-menu text miejsca_txt 165 125 *zielarka_miejsca
-}
-else
-event sysmessage Lista jest pusta.
+ if *zielarka_miejsca > 0
+ {
+  event sysmessage Usunieto ostatnie miejsce.
+  set *zielarka_miejsca *zielarka_miejsca - 1
+  menu delete miejsca_txt
+  menu font bgcolor btnface
+  if *zielarka_miejsca = 0
+   menu font color red
+  else
+   menu font color green
+  menu text miejsca_txt 165 125 *zielarka_miejsca
+ }
+ else
+  event sysmessage Lista jest pusta.
 goto pokaz_menu
 
 ; ========================
 ;  Usun wszystkie miejsca
 ; ========================
 miejsce_usun_wszystkie:
-event sysmessage Usunieto wszystkie miejsca.
-set *zielarka_miejsca 0
-menu delete miejsca_txt
-menu font bgcolor btnface
-menu font color red
-menu text miejsca_txt 165 125 *zielarka_miejsca
+ event sysmessage Usunieto wszystkie miejsca.
+ set *zielarka_miejsca 0
+ menu delete miejsca_txt
+ menu font bgcolor btnface
+ menu font color red
+ menu text miejsca_txt 165 125 *zielarka_miejsca
 goto pokaz_menu
 
 ; ================
@@ -451,7 +476,7 @@ goto ScanLoop
 return
 
 ; ==========================
-;  Id? do Pozycji Startowej
+;  Idz do Pozycji Startowej
 ; ==========================
 sub idzPozycjaStartowa
 event sysmessage Ide do pozycji startowej (sklad).
@@ -470,7 +495,9 @@ return
 sub otworzPojemnik
  set #lobjectid %1
  event macro 17 0
- wait 1s
+ repeat
+  wait 1
+ until #CONTID = #LOBJECTID
 return
 
 ; ====================
@@ -564,3 +591,33 @@ set #ltargety #charposy + 2
 }
 return
 
+sub LeczenieOdtruj
+ gosub odlozNozyk
+ if #mana < 11
+  event macro 1 0 .wypij duza mana
+ event macro 15 10
+ target 3s
+ event macro 23 0
+ wait 10
+return
+
+sub LeczenieIVM
+ gosub odlozNozyk
+ if #mana < 11
+  event macro 1 0 .wypij duza mana
+ event macro 15 28
+ target 3s
+ event macro 23 0
+ wait 10
+return
+
+; gosub przeniesPrzedmiot %1 [przedmiot] %2 [lokalizacja docelowa] %3 [ile]
+sub przeniesPrzedmiot
+  exevent drag %1 %3
+  wait %dragPause
+  exevent dropc %2
+  repeat
+   wait %dropPause
+   finditem %1 C
+  until #FINDBAGID = %2 || #FINDKIND = -1
+return
