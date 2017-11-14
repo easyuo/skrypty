@@ -7,7 +7,6 @@
 ; \----------koniec----------
 ;Autor: [nGz]
 
-if #hits = #maxhits
- event macro 13 21
-wait 3s
+event macro 13 21
+wait 1s
 

@@ -1,10 +1,21 @@
 ; Drag przedmioty do plecaka
 
-set %dragPauza 5
+set %dragPauza 10
+set %dropPauza 10
 set %plecakType ZJF
+
 ignoreItem reset
 
+loop:
+
+onhotkey F2
+  gosub rzeczy
+
+goto loop
+
 ; Szukam plecaka w glownym plecaku
+
+sub rzeczy
 
 finditem %plecakType C_ , #BACKPACKID
  if #findid <> x
@@ -23,14 +34,13 @@ repeat
  finditem * C_ , #BACKPACKID
   if #findid <> x
   {
-   if #FINDCOL = 38
-   {
+  ; if #FINDCOL = 38 || #FINDCOL = 104
+  ; {
     exevent drag #findid #findstack
     wait %dragPauza
     exevent dropc %sklad
-    exevent dropc %sklad
-    wait %dragPauza
-   }
+    wait %dropPauza
+  ; }
 
    ignoreItem #FINDID
 
@@ -38,6 +48,4 @@ repeat
  wait 2
 until #findid = x
 
-halt
-
-
+return

@@ -81,7 +81,7 @@ Sub Setup
 Return
 
 Sub SaveJournal
-  Execute %Cmd /c Echo %1 >> %JournalFile
+  Execute %Cmd /c Echo #DATE #TIME : %1 >> %JournalFile
   Wait 10
 Return
 

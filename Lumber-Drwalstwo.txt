@@ -21,8 +21,6 @@ set %zarcie HND_END_
 set %jablka QQD_
 ; bedzie karmic lamke :
 
-set %pudelko_podroznika_typ LKF
-
 ; nie rusz!;>
 ;-----------------------------------------------------
 set %HID_SCNT #SCNT
@@ -231,36 +229,40 @@ goto loop
 ; jedzenie :)
 
 sub spr_glod
-glodloop:
-set %_JIndex #JIndex
-event macro 1 0 .glod
-gosub ScanJournal %_JIndex Twoja_postac_jest_tak_najedzona Twoja_postac_jest_najedzona_do_syta_i_nic_wiecej Twoja_postac_jest_najedzona_do_syta Twoja_postac_jest_najedzona Twoja_postac_nie_jest_glodna Twoja_postac_czuje_oznaki_glodu Twoja_postac_jest_nieco_glodna Twoja_postac_jest_glodna Twoja_postac_jest_bardzo_glodna Twoja_postac_przymiera_glodem Twoja_postac_jest_bliska_smierci_glodowej
-;                           2                               3                                                4                                   5                           6                            7                               8                              9                        10                              11                            12
-if #Result < 5
-   {
-   FindItem %zarcie C
-   if #FindKind = -1
-      {
-      event sysmessage Nie znalazle jedzenia:(
-      return
-      }
-   set #LObjectID #FindID
-   event macro 17 0
-   }
-if #Result = 5
+ glodloop:
+ set %_JIndex #JIndex
+ event macro 1 0 .glod
+ wait 10
+ gosub ScanJournal %_JIndex Twoja_postac_jest_tak_najedzona Twoja_postac_jest_najedzona_do_syta_i_nic_wiecej Twoja_postac_jest_najedzona_do_syta Twoja_postac_jest_najedzona Twoja_postac_nie_jest_glodna Twoja_postac_czuje_oznaki_glodu Twoja_postac_jest_nieco_glodna Twoja_postac_jest_glodna Twoja_postac_jest_bardzo_glodna Twoja_postac_przymiera_glodem Twoja_postac_jest_bliska_smierci_glodowej
+ ;                           2                               3                                                4                                   5                           6                            7                               8                              9                        10                              11                            12
+ event sysmessage #RESULT
+ if #RESULT < 5
+ {
+  FindItem %zarcie C
+  if #FindKind = -1
+  {
+   event sysmessage Nie znalazle jedzenia:(
    return
-if #Result > 5
-   {
-   FindItem %zarcie C
-   if #FindKind = -1
-      {
-      event sysmessage Nie znalazle jedzenia:(
-      return
-      }
-   set #LObjectID #FindID
-   event macro 17 0
-   }
-goto glodloop
+  }
+  set #LObjectID #FindID
+  event macro 17 0
+  return
+ }
+ if #RESULT = 5
+  return
+ if #RESULT > 5
+ {
+  FindItem %zarcie C
+  if #FindKind = -1
+  {
+   event sysmessage Nie znalazle jedzenia:(
+   return
+  }
+  set #LObjectID #FindID
+  event macro 17 0
+ }
+ 
+ goto glodloop
 return
 
 ; hiding :)
@@ -289,8 +291,6 @@ set %HID_SCNT #SCNT
 return
 
 ; ----------------------------------
-
-
 ; szukanie siekierki ;]
 
 sub findtopor
@@ -314,9 +314,8 @@ set %siekiera #FindID
 return
 
 ; --------------------------------
-
-
 ; Scanjournal
+; --------------------------------
 
 sub ScanJournal
 set %__JIndex %1
@@ -455,6 +454,7 @@ set !mining _220_221_222_223_224_225_226_227_268_269_270_271_276
 +2105_430_556_557_558_559_2028_240_241_242_243_
 
 set !layer_lumbering 2
+event sysmessage Lumbering - ustawianie warstw?
 set !lumbering _3274_3275_3276_3277_3278_3279_3280_3281_3282_3283_3284_3285_3286_
 +3287_3288_3289_3290_3291_3292_3293_3294_3295_3296_3297_3298_3299_
 +3300_3301_3302_3304_3320_3321_3322_3323_3324_3325_3326_3327_3328_
@@ -540,7 +540,7 @@ for !cnt_x !direction1 !direction2
       }
    }
 
-if !debug
+if %debug
 {
 display yes found tiles in reach in grids: !search_for_in $$ Remember the grids:$
 +(Tilted by 45 degrees to represent the UO-world)$
