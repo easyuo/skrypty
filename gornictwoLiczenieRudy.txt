@@ -1,0 +1,346 @@
+;co ile sekund ma odswiezac okno (nie polecam odswiezac czesciej niz co 5 sek - moze zjadac procka
+set %refresh 5
+event SysMessage Licze rudy w plecaku. Odswiezam co 5 sekund. Nie spierdol tego.
+;czy ma otwierac wszystkie pojemniki, czy sami otworzymy wlasciwe pojemniki przed rozpoczeciem zliczania
+set %open #true
+
+;czy ma zliczac rude/sztaby rowniez w jakims pojemniku (i jego podpojemnikach) poza plecakiem?
+set %another #false
+
+
+set %containers KUD_ZJF_CKF_AUD_CUD_HKF_SPF_GRL_FRL_BUD_IIF_HIF_KIF_JIF_IKF_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP
+set %ore DWJ_ENK
+
+set %zelazo _0
+set %miedz _1548
+set %malachit _2130
+set %rdzawa_ruda _1541
+set %srebro _1301
+set %zloto _1121
+set %syderyt _1109
+set %agapit _1024
+set %valorite _2001
+set %verite _1424
+set %azuryt _1247
+set %mithril _1320
+set %magnetyt _1309
+set %krwawnik _1209
+set %terathryt _2007
+
+
+if %another = #true 1
+   gosub pointAnotherCont
+
+set #lpc 150
+set %title -= Mining Info =- by Deathek
+;kolorki
+namespace local ns1
+set !bgcolor $FFB09F
+set !color $711400
+set !rys $FF0099
+namespace local ns2
+set !bgcolor $71E2FF
+set !color $0467CA
+set !rys $71E2FF
+namespace local ns3
+set !bgcolor lime
+set !color black
+set !rys lime
+namespace local ns4
+set !bgcolor $00C800
+set !color $BE1305
+set !rys $F44D5E
+namespace local ns5
+set !bgcolor $0000C8
+set !color $000064
+set !rys $0000C8
+if *miningInfoFirstrun <> 1 1
+   gosub skin
+gosub count #backpackid
+if %another = #true 1
+   gosub count *minForeignCont
+gosub main_menu
+gosub getInfo
+
+sub main_menu
+    menu clear
+    menu window title %title
+    set %w 120
+    set %h 370
+    menu window size %w %h
+    menu window color *bgc
+    menu font size 8
+    menu font align left
+
+    menu font color *mainfc
+    menu font BGColor *bgc
+
+    namespace local %zelazo
+    menu text zelazo 5 8 Zelazo:
+    menu text zelazo_v 70 8 !ore
+
+    namespace local %miedz
+    menu text miedz 5 30 Miedü:
+    menu text miedz_v 70 30 !ore
+
+    namespace local %malachit
+    menu text malachit 5 52 Malachit:
+    menu text malachit_v 70 52 !ore
+
+    namespace local %rdzawa_ruda
+    menu text rdzawa_ruda 5 74 Rdzawa:
+    menu text rdzawa_ruda_v 70 74 !ore
+
+    namespace local %srebro
+    menu text srebro 5 96 Srebro:
+    menu text srebro_v 70 96 !ore
+
+    namespace local %zloto
+    menu text zloto 5 118 Zloto:
+    menu text zloto_v 70 118 !ore
+
+    namespace local %syderyt
+    menu text syderyt 5 140 Syderyt:
+    menu text syderyt_v 70 140 !ore
+
+    namespace local %agapit
+    menu text agapit 5 162 Agapit:
+    menu text agapit_v 70 162 !ore
+
+    namespace local %valorite
+    menu text valorite 5 184 Valorite:
+    menu text valorite_v 70 184 !ore
+
+    namespace local %verite
+    menu text verite 5 206 Verite:
+    menu text verite_v 70 206 !ore
+
+    namespace local %azuryt
+    menu text azuryt 5 228 Azuryt:
+    menu text azuryt_v 70 228 !ore
+
+    namespace local %mithril
+    menu text mithril 5 250 Mithril:
+    menu text mithril_v 70 250 !ore
+
+    namespace local %magnetyt
+    menu text magnetyt 5 272 Magnetyt:
+    menu text magnetyt_v 70 272 !ore
+
+    namespace local %krwawnik
+    menu text krwawnik 5 294 Krwawnik:
+    menu text krwawnik_v 70 294 !ore
+
+    namespace local %terathryt
+    menu text terathryt 5 316 Terathryt:
+    menu text terathryt_v 70 316 !ore
+
+    ; Style:
+    namespace local ns1
+    menu font BGColor blue
+    set %bx %w - 15
+    set %by %h - 15
+    menu button style1 %bx %by 10 10
+    namespace local ns2
+    menu font BGColor yellow
+    set %bx %bx - 15
+    menu button style2 %bx %by 10 10
+    namespace local ns3
+    menu font bgcolor black
+    set %bx %bx - 15
+    menu button style3 %bx %by 10 10
+    namespace local ns4
+    menu font bgcolor green
+    set %bx %bx - 15
+    menu button style4 %bx %by 10 10
+    namespace local ns5
+    menu font bgcolor red
+    set %bx %bx - 15
+    menu button style5 %bx %by 10 10
+    menu show
+return
+
+sub skin
+    if *miningInfoFirstrun = 0 || *miningInfoFirstrun = N/A
+    {
+     set *mainfc $FFB09F
+     set *bgc $711400
+     set *btnfc $711400
+     set *rys $FF0099
+     set *bbg $FFB09F
+     set *miningInfoFirstrun 1
+     goto konskin
+    }
+    str right #menubutton 1
+    namespace local ns , #strres
+    set *mainfc !bgcolor
+    set *bbg !bgcolor
+    set *bgc !color
+    set *btnfc !color
+    set *rys !rys
+    konskin:
+return
+
+sub count
+{
+    set %pack %1
+    if %open = #true && %pack <> #backpackid
+    {
+       set #lobjectid %pack
+       event macro 17
+       repeat
+       until #contid = %pack
+    }
+    repeat
+    {
+       finditem %containers C_ , %pack
+       if #findkind <> -1
+       {
+          ignoreitem #findid
+          gosub count #findid %pack
+          set %pack #result
+       }
+       finditem %containers C_ , %pack
+    }
+    until #findkind = -1
+
+    repeat
+    {
+          finditem %ore C_ , %pack
+          if #findkind <> -1
+          {
+             namespace local _ , #findcol
+             if !ore = N/A 1
+                set !ore 0
+             set !ore !ore + #findstack
+             ignoreitem #findid
+          }
+    }
+    until #findkind = -1
+    return %2
+}
+
+sub getInfo
+    while #true
+    {
+      ignoreitem reset
+      gosub zero_ns
+
+      gosub count #backpackid
+      if %another = #true 1
+         gosub count *minForeignCont
+
+      namespace local %zelazo
+      menu set zelazo_v !ore
+
+      namespace local %miedz
+      menu set miedz_v !ore
+
+      namespace local %malachit
+      menu set malachit_v !ore
+
+      namespace local %rdzawa_ruda
+      menu set rdzawa_ruda_v !ore
+
+      namespace local %srebro
+      menu set srebro_v !ore
+
+      namespace local %zloto
+      menu set zloto_v !ore
+
+      namespace local %syderyt
+      menu set syderyt_v !ore
+
+      namespace local %agapit
+      menu set agapit_v !ore
+
+      namespace local %valorite
+      menu set valorite_v !ore
+
+      namespace local %verite
+      menu set verite_v !ore
+
+      namespace local %azuryt
+      menu set azuryt_v !ore
+
+      namespace local %mithril
+      menu set mithril_v !ore
+
+      namespace local %magnetyt
+      menu set magnetyt_v !ore
+
+      namespace local %krwawnik
+      menu set krwawnik_v !ore
+
+      namespace local %terathryt
+      menu set terathryt_v !ore
+
+      if style in #menubutton
+      {
+       gosub skin
+       set #menubutton N/A
+       gosub main_menu
+      }
+      set %s %refresh * 20
+      wait %s
+    }
+return
+
+sub zero_ns
+{
+    namespace local %zelazo
+    set !ore 0
+
+    namespace local %miedz
+    set !ore 0
+
+    namespace local %malachit
+    set !ore 0
+
+    namespace local %rdzawa_ruda
+    set !ore 0
+
+    namespace local %srebro
+    set !ore 0
+
+    namespace local %zloto
+    set !ore 0
+
+    namespace local %syderyt
+    set !ore 0
+
+    namespace local %agapit
+    set !ore 0
+
+    namespace local %valorite
+    set !ore 0
+
+    namespace local %verite
+    set !ore 0
+
+    namespace local %azuryt
+    set !ore 0
+
+    namespace local %mithril
+    set !ore 0
+
+    namespace local %magnetyt
+    set !ore 0
+
+    namespace local %krwawnik
+    set !ore 0
+
+    namespace local %terathryt
+    set !ore 0
+    return
+}
+
+sub pointAnotherCont
+    set #targcurs 1
+    event sysmessage Wskaz pojemnik z ruda, ktory znajduje sie poza plecakiem.
+    repeat
+    until #targcurs = 0
+    set *minForeignCont #ltargetid
+    event sysmessage Dzieki.
+return
+

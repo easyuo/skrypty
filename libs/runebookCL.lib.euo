@@ -1,0 +1,13 @@
+; Biblioteka:   Runebook (obsluga runebookow CLkowych)
+; Autor:        Krowa
+; Data:         15.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+; call libs/runebookCL.lib.eu
+
+; gosub runebook %1 [runebookID] %2 [runebookNumber]
+sub runebook
+
+return
+

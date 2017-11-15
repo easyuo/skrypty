@@ -4,16 +4,11 @@
 ; Shard:        Clair's Lair
 ; ---------------------------
 
-; call
-
-; gosub przeniesPrzedmiot %1 [przedmiot] %2 [lokalizacja docelowa] %3 [ile]
-sub przeniesPrzedmiot
-  exevent drag %1 %3
-  wait %dragPause
-  exevent dropc %2
+sub przenies
+  exevent drag %2 %4
+  exevent dropc %3
   repeat
-   wait %dropPause
-   finditem %1 C
-  until #FINDBAGID = %2 || #FINDKIND = -1
-return
+   finditem %2 C
+  until #FINDBAGID = %3 || #FINDKIND = -1
+exit
 

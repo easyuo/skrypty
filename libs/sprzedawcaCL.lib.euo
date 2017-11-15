@@ -1,0 +1,20 @@
+; Biblioteka:   Sprzedawca CL
+; Opis:         Biblioteka obs³uguje sprzedawce na CLce (przyjmowanie przedmiotow do sprzedazy)
+; Autor:        Krowa
+; Data:         15.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+; call libs/sprzedawcaCL.lib.eu
+
+; gosub ustalCene %2 [cena]
+sub ustalCene
+ event sysmessage Ustalam cene na %2
+ if #CONTNAME = Stringquery_gump && #CONTKIND = EGFD && #CONTSIZEX = 393 && #CONTSIZEY = 270
+ {
+  wait 5
+  msg %2
+  key enter
+  wait 5
+ }
+exit

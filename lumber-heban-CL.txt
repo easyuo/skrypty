@@ -1,0 +1,788 @@
+; Shard:        Clair's Lair
+; Data:         15.11.2017
+; Lumber HEBAN
+
+set %hid 0
+; 1-ukrywa
+; 0-nie ukrywa
+
+set %stealth 0
+; 1-stealth
+; 0-bez ;]
+
+set %drop 0
+; 1-wyrzuca pod siebie
+; 0-wrzuca na lame
+
+set %topory FSF_BSF_ZRF_NSF_MPH
+; siekierki, ktorymi bedzie scinac
+set %zarcie QQD_
+; filety (bedzie jesc:))
+set %jablka QQD_
+; bedzie karmic lamke :)
+
+
+set %hebanx1 738
+set %hebany1 983
+set %hebanz1 0
+
+set %hebanx2 754
+set %hebany2 1005
+set %hebanz2 0
+
+set %hebanx3 781
+set %hebany3 1015
+set %hebanz3 0
+
+set %hebanx4 827
+set %hebany4 1003
+set %hebanz4 0
+
+set %hebanx5 779
+set %hebany5 944
+set %hebanz5 0
+
+set %hebanx6 733
+set %hebany6 938
+set %hebanz6 0
+
+set %hebanx7 705
+set %hebany7 967
+set %hebanz7 0
+
+
+; nie rusz!;>
+;-----------------------------------------------------
+set %HID_SCNT #SCNT
+set %SAY_SCNT #SCNT - 5
+set %LAMA_SCNT #SCNT
+set %ZARCIE_SCNT #SCNT
+set %ZARCIE_LAMA_DELEY 500
+set %ZARCIE_LAMA #SCNT + %ZARCIE_LAMA_DELEY
+; bedzie karmic lame 1 jablkiem co 500 sek.
+
+set %timeout 10
+
+set %log_all #true ; #false = log only one in each 8x8-ressource-field; #True = ignores 8x8-ressource-grids
+set %scan_radius 15
+set %action lumbering
+
+set %tree 1
+set %treec 1
+
+set %heban 1
+
+set %woodc 0
+
+set %startx #CharPosX
+set %starty #CharPosY
+set %startz #CharPosZ
+
+loop:
+if #ContName = generic_gump && #ContSize = 560_520
+   {
+   event sysmessage MAKROCZEK! Pierdole, nie robie...
+   wait 1s
+   goto loop
+   }
+
+event sysmessage Drzewo: %tree / %treec
+event sysmessage Drzewo hebanowe nr: %heban
+event sysmessage Scieto %woodc bali drewna.
+if %drop = 0 && %lama = N/A
+   {
+   FindItem NBO
+   if #FindKind = -1
+      {
+
+      set #TargCurs 1
+      event sysmessage Wskaz swoja lame... bo znalazlem pare O_o
+      repeat
+      until #TargCurs = 0
+      event sysmessage Ok. Wskazano #LTargetID , .
+      set %lama #LTargetID
+      }
+   else
+       {
+       set %lama #FindID
+       event sysmessage Opierdalam tylko dobre kabanki.  ( #FindID ).
+       }
+   set %tmp #ContID
+   set #LObjectID %lama
+   event macro 17 0
+   repeat
+   until %tmp <> #ContID
+   set %lamac #ContID
+   }
+if %drop = 1
+   {
+   FindItem ZLK C_ , #BackPackID
+   if #FindKind <> -1
+      {
+      set %woodc %woodc + #FindStack
+      exevent drag #FindID #FindStack
+      exevent dropg #CharPosX #CharPosY #CharPosZ
+      }
+   }
+else
+    {
+    FindItem ZLK C_ , #BackPackID
+    if #FindKind <> -1
+       {
+       FindItem %lama G
+       while #FindDist > 2
+             {
+             if %SAY_SCNT + 5 < #SCNT
+                {
+                event macro 1 0 Podazajcie za mna
+                set %SAY_SCNT #SCNT
+                }
+             FindItem %lama G
+             }
+       repeat
+       if #SCNT > %LAMA_SCNT + 1
+          {
+          set #LObjectID %lama
+          event macro 17 0
+          }
+       until #ContID = %lamac
+       ContPos 60 700
+       FindItem ZLK C_ , #BackPackID
+       set %woodc %woodc + #FindStack
+       exevent drag #FindID #FindStack
+       exevent dropc %lamac
+       if %ZARCIE_LAMA <= #SCNT
+          {
+          FindItem %jablka C_ , #BackPackID
+          if #FindKind = -1
+             FindItem %jablka C_ , %lamac
+          if #FindKind = -1
+             event sysmessage Nie ma jablek dla lamki:(
+          else
+              {
+              exevent drag #FindID 1
+              exevent dropc %lama
+              }
+          set %ZARCIE_LAMA #SCNT + %ZARCIE_LAMA_DELEY
+          }
+       }
+    }
+if %ZARCIE_SCNT <= #SCNT
+   {
+   gosub spr_glod
+   set %ZARCIE_SCNT #SCNT + 300
+   }
+if %hid = 1 && %HID_SCNT + 10 < #SCNT
+   {
+   gosub hiding
+   goto loop
+   }
+if %tree = %treec
+   {
+   set %heban %heban + 1
+   if %hebanx . %heban = N/A || %hebany . %heban = N/A || %hebanz . %heban = N/A
+      set %heban 1
+   repeat
+         {
+         ;if %hid = 1 && %HID_SCNT + 10 < #SCNT
+         ;   gosub hiding
+         gosub BMPathfind %hebanx . %heban %hebany . %heban 0 2
+         ;move %hebanx . %heban %hebany . %heban 0 1s
+         ;wait 20
+         }
+   until #Result = #TRUE
+   gosub 8x8_scanner %scan_radius %action #CharPosX #CharPosY tile_list
+   set %treec #Result
+   if %treec = 0
+      {
+      event sysmessage Nie znalazlem zadnych drzew...$Pauza.
+
+      goto loop
+      }
+   set %tree 1
+   }
+gosub BMPathfind %tile_list_X_ . %tree %tile_list_Y_ . %tree 1 10
+set %_JIndex #JIndex
+repeat
+      {
+      gosub findtopor
+      set #LObjectID %siekiera
+      event macro 17 0
+      target 1s
+      }
+until #TargCurs = 1
+set #LTargetX %tile_list_X_ . %tree
+set #LTargetY %tile_list_Y_ . %tree
+set #LTargetZ %tile_list_Z_ . %tree
+set #LTargetTile %tile_list_title_ . %tree
+set #LTargetKind 3
+event macro 22 0
+gosub ScanJournal %_JIndex To_jest_za_daleko Nie_ma_tutaj Wrzucasz Nie_potrafisz Nie_udalo Twoje_narzedzie_sie Nie_mozesz already
+;                 1        2                 3            4        5             6         7                   8          9
+if #Result = 2
+   {
+   event pathfind %tile_list_X_ . %tree %tile_list_Y_ . %tree %tile_list_Z_ . %tree
+  ; wait 30
+   ;gosub BMPathfind %tile_list_X_ . %tree %tile_list_Y_ . %tree 2 2
+   wait 20
+   goto loop
+   }
+if #Result = 4 || #Result = 9
+   {
+   wait 5
+   goto loop
+   }
+if #Result = 6 || #Result = 7
+   goto loop
+set %tree %tree + 1
+goto loop
+
+
+; jedzenie :)
+
+sub spr_glod
+glodloop:
+set %_JIndex #JIndex
+event macro 1 0 .glod
+gosub ScanJournal %_JIndex Twoja_postac_jest_tak_najedzona Twoja_postac_jest_najedzona_do_syta_i_nic_wiecej Twoja_postac_jest_najedzona_do_syta Twoja_postac_jest_najedzona Twoja_postac_nie_jest_glodna Twoja_postac_czuje_oznaki_glodu Twoja_postac_jest_nieco_glodna Twoja_postac_jest_glodna Twoja_postac_jest_bardzo_glodna Twoja_postac_przymiera_glodem Twoja_postac_jest_bliska_smierci_glodowej
+;                           2                               3                                                4                                   5                           6                            7                               8                              9                        10                              11                            12
+if #Result < 5
+   event macro 1 0 .glodniej
+if #Result = 5
+   return
+if #Result > 5
+   {
+   FindItem %zarcie C
+   if #FindKind = -1
+      {
+      event sysmessage Nie znalazle jedzenia:(
+      return
+      }
+   set #LObjectID #FindID
+   event macro 17 0
+   }
+goto glodloop
+return
+
+; hiding :)
+
+sub hiding
+event macro 13 21
+if %stealth = 1
+   {
+   gosub ScanJournal %_JIndex Ukryles Nie_potrafisz_sie already
+   if #Result = 2
+      {
+      repeat
+            {
+            for %w 1 12
+                {
+                  wait 1s
+                  if H notin #CharStatus
+                     break
+                }
+            event macro 13 47
+      until H notin #CharStatus
+      }
+   }
+set %HID_SCNT #SCNT
+return
+
+; ----------------------------------
+
+
+; szukanie siekierki ;]
+
+sub findtopor
+FindItem %topory C_ , #CharID
+if #FindKind = -1
+  {
+  FindItem %topory C
+  if #FindKind = -1
+     {
+     display ok Brak siekier.
+     halt
+     }
+
+  set %siekiera #FindID
+  exevent drag %siekiera
+  exevent droppd
+  wait 1s
+  return
+  }
+set %siekiera #FindID
+return
+
+; --------------------------------
+
+
+; Scanjournal
+
+sub ScanJournal
+set %__JIndex %1
+set %_timeout #SCNT
+ScanLoop:
+set %x %timeout + %_timeout
+if #SCNT > %_timeout + %timeout
+   return TIMEOUT
+if #JIndex > %__JIndex
+   {
+   set %__JIndex %__JIndex + 1
+   ScanJournal %__JIndex
+   for %__i 2 %0
+       {
+       if % . %__i in #journal
+          return %__i
+       }
+   }
+goto ScanLoop
+return
+
+;------------------------------
+
+; tree_scanner;]
+
+sub 8x8_scanner
+; save vars, create namespace... & make hurry!
+nameSpace Push
+nameSpace Local #sysTime , #random
+set !old_lpc #LPC
+Linespercycle 500
+
+tile init
+
+set !layer_mining 1
+; Note: After the 3rd line the values are from Cyberpopes Mine radar!
+set !mining _220_221_222_223_224_225_226_227_268_269_270_271_276
++_277_278_279_294_295_296_297_561_562_563_564_564_569_570_571_572
++_1861_1873_1981_1982_1983_1984_
++228_229_230_231_236_237_238_239_244_245_246_247_252_253_254_255_256_257_
++258_259_260_261_262_263_272_273_274_275_286_287_288_289_290_291_292_293_
++295_321_322_323_324_430_467_468_469_470_471_472_473_474_476_477_478_479_
++480_481_482_483_484_485_486_487_492_493_494_495_543_544_545_546_547_548_
++549_550_551_552_553_554_555_560_565_566_567_568_573_574_575_576_577_578_
++579_581_582_583_584_585_586_587_588_589_590_591_592_593_594_595_596_597_
++598_599_600_601_610_611_612_613_1010_1339_1340_1341_1342_1343_1344_1345_
++1346_1347_1348_1349_1350_1351_1352_1353_1354_1355_1356_1357_1358_1359_1741_
++1742_1743_1744_1745_1746_1747_1748_1749_1750_1751_1752_1753_1754_1755_1756_
++1757_1771_1772_1773_1774_1775_1776_1777_1778_1779_1780_1781_1782_1783_1784_
++1785_1786_1787_1788_1789_1790_1801_1802_1803_1804_1805_1806_1807_1808_1809_
++1811_1812_1813_1814_1815_1816_1817_1818_1819_1820_1821_1822_1823_1824_1831_
++1832_1833_1834_1835_1836_1837_1838_1839_1840_1841_1842_1843_1844_1845_1846_
++1847_1848_1849_1850_1851_1852_1853_1854_1862_1863_1864_1865_1866_1867_1868_
++1869_1870_1871_1872_1874_1875_1876_1877_1878_1879_1880_1881_1882_1883_1884_
++1985_1986_1987_1988_1989_1990_1991_1992_1993_1994_1995_1996_1997_1998_1999_
++2000_2001_2002_2003_2004_2029_2030_2031_2032_2033_2100_2101_2102_2103_2104_
++2105_430_556_557_558_559_2028_240_241_242_243_
+
+set !layer_lumbering 2
+set !lumbering _4790_4791_4792_4793_4794_4795_4796_4797_4798_4799_4801_4802_4803_
+
+set !layer_custom 1
+set !custom _NONE_YET_
+
+; --------------  SETUP ----------------------
+set !range %1
+
+set !debug #FALSE
+
+set !temp layer_ , %2
+set !layer ! . !temp
+
+; What type of tiley do you want to search?
+set !search_for ! . %2
+; ------------ END SETUP --------------------
+
+set !centerX %3
+set !centerY %4
+
+; declare the return-value-name
+if %0 < 5
+   set %return found_location
+Else
+   set %return %5
+
+; Clear the positions and vars:
+set !Q_count 0
+set !merged $
+set !output_count 0
+set !search_for_in
+
+; calculate the quare
+set !direction2 !range
+set !direction1 !direction2 * -1
+
+; Scan the square (able to reach)
+for !cnt_x !direction1 !direction2
+   {
+   for  !cnt_y !direction1 !direction2
+      {
+      set !X_tile_to_get !centerX + !cnt_x
+      set !Y_tile_to_get !centerY + !cnt_y
+      tile cnt !X_tile_to_get !Y_tile_to_get
+      for %ii 0 #TileCnt
+      {
+      ;tile get !X_tile_to_get !Y_tile_to_get !layer
+      tile get !X_tile_to_get !Y_tile_to_get %ii
+      set !check_type _ , #TileType , _
+        if !check_type in !search_for
+            {
+            if %log_all = #FALSE
+                {
+                gosub quanticer !centerX !centerY
+                if ( #Result <> 0 ) && ( #Result notin !search_for_in )
+                    {
+                    set !search_for_in !search_for_in , #Result , _
+                    set !merged !merged , !X_tile_to_get , _ , !Y_tile_to_get , $
+                    set !output_count !output_count + 1
+                    set % . %return , _X_ . !output_count !X_tile_to_get
+                    set % . %return , _Y_ . !output_count !Y_tile_to_get
+                    set % . %return , _Z_ . !output_count #TileZ
+                    set % . %return , _title_ . !output_count #TILETYPE
+                    }
+             }
+          if %log_all = #TRUE && #Result <> 0
+                {
+                set !merged !merged , !X_tile_to_get , _ , !Y_tile_to_get , $
+                set !output_count !output_count + 1
+                set % . %return , _X_ . !output_count !X_tile_to_get
+                set % . %return , _Y_ . !output_count !Y_tile_to_get
+                set % . %return , _Z_ . !output_count #TileZ
+                set % . %return , _title_ . !output_count #TILETYPE
+                }
+         }
+      }
+      }
+   }
+
+if !debug
+{
+display yes found tiles in reach in grids: !search_for_in $$ Remember the grids:$
++(Tilted by 45 degrees to represent the UO-world)$
++________1$
++$
++____4______2$
++$
++7______5_______3$
++$
++___8_______6$
++$
++_______9$$
++Coordinates of the spots: !merged
+}
+set %found_locations !output_count
+; restore old LPC and namespace
+set #LPC !old_lpc
+nameSpace Clear
+nameSpace Pop
+return %found_locations
+; ------------------------------------
+
+; ------------------------------------
+sub quanticer
+;* @param   %1  startX    req  centerposition X to start scan (normally #CharPosX)
+;* @param   %2  startY    req  centerposition Y to start scan (normally #CharPosY)
+
+; Get the borders of actual 8x8-grid
+
+set !actual_grid_Y_0 %2 - ( %2 % 8 )
+set !actual_grid_Y_8 %2 - ( %2 % 8 ) + 7
+set !actual_grid_X_0 %1 - ( %1 % 8 )
+set !actual_grid_X_8 %1 - ( %1 % 8 ) + 7
+
+if  ( !X_tile_to_get >= !actual_grid_X_0 ) && ( !X_tile_to_get <= !actual_grid_X_8 )
+   {
+   ; actual 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 )
+      return 5
+   ; N 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 - 8 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 - 8 )
+      return 2
+   ; S 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 + 8 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 + 8 )
+      return 8
+   }
+
+if ( !Y_tile_to_get >= !actual_grid_Y_0 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 )
+   {
+   ; W 8x8
+   if  ( !X_tile_to_get >= !actual_grid_X_0 - 8 ) && ( !X_tile_to_get <= !actual_grid_X_8 - 8 )
+      return 4
+   ; E 8x8
+   if  ( !X_tile_to_get >= !actual_grid_X_0 + 8 ) && ( !X_tile_to_get <= !actual_grid_X_8 + 8 )
+      return 6
+   }
+
+if  ( !X_tile_to_get >= !actual_grid_X_0 - 8 ) && ( !X_tile_to_get <= !actual_grid_X_8 - 8 )
+   {
+   ; NW 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 - 8 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 - 8 )
+      return 1
+   ; SW 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 + 8 + 8 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 + 8 + 8 )
+      return 7
+   }
+
+if  ( !X_tile_to_get >= !actual_grid_X_0 + 8 ) && ( !X_tile_to_get <= !actual_grid_X_8 + 8 )
+   {
+   ; NE 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 - 8 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 - 8 )
+      return 3
+   ; SE 8x8
+   if  ( !Y_tile_to_get >= !actual_grid_Y_0 + 8 ) && ( !Y_tile_to_get <= !actual_grid_Y_8 + 8 )
+      return 9
+   }
+return 0
+; ------------------------------------
+
+
+SUB BMPathfind
+   IF %1 = #CHARPOSX && %2 = #CHARPOSY
+      RETURN #TRUE
+   IF %0 < 3 || %3 = N/A
+      SET %3 0
+   IF %0 < 4 || %4 = N/A
+      SET %4 0
+   NAMESPACE PUSH
+   NAMESPACE LOCAL BMPathFind , #RANDOM , #RANDOM
+   SET !bmp_x %1
+   SET !bmp_y %2
+   SET !bmp_tolerance %3
+   IF %4 = 0
+   {
+   GOSUB Distance #CHARPOSX #CHARPOSY !bmp_x !bmp_y
+   SET %4 10
+   IF #RESULT > 10
+     SET %4 #RESULT / 2
+  }
+   SET !bmp_segmenttimeout %4
+   SET !bmp_timeout #SCNT + %4
+   SET !bmp_initsegment #FALSE
+   SET !bmp_oldlpc #LPC
+   IF #LPC < 100
+      SET #LPC 100
+   IF !bmp_tileinit = N/A
+   {
+      TILE INIT
+      SET !bmp_tileinit #TRUE
+   }
+   ;Set the destination to the actual target minus the tolerance radius if greater than 0 (works, with a few % error)
+   IF !bmp_tolerance > 0
+   {
+      GOSUB ScaledLine !bmp_x !bmp_y #CHARPOSX #CHARPOSY !bmp_tolerance
+      GOSUB XYReadout #RESULT bmp_x bmp_y
+   }
+bmp_initsegment:
+   SET !bmp_currx !bmp_x
+   SET !bmp_curry !bmp_y
+   IF #CHARPOSX = !bmp_x && #CHARPOSY = !bmp_y
+   {
+      SET !bmp_return #TRUE
+      GOTO bmp_end
+   }
+   IF #SCNT > !bmp_timeout
+   {
+      SET !bmp_return #FALSE
+      GOTO bmp_end
+   }
+   GOSUB Distance #CHARPOSX #CHARPOSY !bmp_x !bmp_y
+   IF #RESULT <= 11
+      SET !bmp_final #TRUE
+   ELSE
+   {
+      IF ! !bmp_initsegment
+      {
+         SET !bmp_segmenttimeout !bmp_segmenttimeout / ( #RESULT / 11 )
+         IF !bmp_segmenttimeout < 2
+            SET !bmp_segmenttimeout 2
+         SET !bmp_initsegment #TRUE
+      }
+      GOSUB ScaledLine #CHARPOSX #CHARPOSY !bmp_x !bmp_y 11
+      GOSUB XYReadout #RESULT bmp_currx bmp_curry
+      SET !bmp_final #FALSE
+   }
+   SET !bmp_xmajor #FALSE
+   IF ( ABS ( #CHARPOSX - !bmp_currx ) ) > ( ABS ( #CHARPOSY - !bmp_curry ) )
+      SET !bmp_xmajor #TRUE
+   SET !bmp_delta 11
+   SET !bmp_jitter 1
+   SET !bmp_jittercnt 1
+   SET !time #SCNT + !bmp_segmenttimeout
+bmp_checktile:
+   TILE CNT !bmp_currx !bmp_curry
+   SET !bmp_imp #FALSE
+   SET !bmp_impz 9999
+   FOR !ti 1 #TILECNT
+   {
+      IF #SCNT > !time
+         GOTO bmp_initsegment
+      TILE GET !bmp_currx !bmp_curry !ti
+      IF !ti = 1 || #TILEZ = #CHARPOSZ
+         SET !bmp_currz #TILEZ
+      IF Impassable IN #TILEFLAGS
+      {
+         SET !bmp_imp #TRUE
+         SET !bmp_impz #TILEZ
+      }
+      IF Surface IN #TILEFLAGS && !bmp_imp = #TRUE && #TILEZ > !bmp_impz
+      {
+         SET !bmp_imp #FALSE
+         SET !bmp_currz #TILEZ
+         SET !ti #TILECNT
+      }
+   }
+   IF !bmp_imp
+   {
+      IF !bmp_jittercnt > 25
+         SET !bmp_jitter !bmp_jitter + 1
+      SET !rnd_x ( #RANDOM % ( !bmp_jitter * 2 + 1 ) ) - !bmp_jitter
+      SET !rnd_y ( #RANDOM % ( !bmp_jitter * 2 + 1 ) ) - !bmp_jitter
+      SET !bmp_currx !bmp_currx + !rnd_x
+      SET !bmp_curry !bmp_curry + !rnd_y
+      ;If this is the final segment of the path, change the target coordinates to match the jittered ones.
+      IF !bmp_final
+      {
+         SET !bmp_x !bmp_currx
+         SET !bmp_y !bmp_curry
+      }
+      SET !bmp_jittercnt !bmp_jittercnt + 1
+      GOTO bmp_checktile
+   }
+   SET !bmp_jstart #JINDEX + 1
+   EVENT PATHFIND !bmp_currx !bmp_curry !bmp_currz
+   SET !time #SCNT + !bmp_segmenttimeout
+   SET !bmp_jend #JINDEX + 1
+   SET !bmp_disttimeout #SCNT2 + 25
+   SET !bmp_charpos #CHARPOSX , _ , #CHARPOSY
+bmp_distancewait:
+   FOR !i !bmp_jstart !bmp_jend
+   {
+      SCANJOURNAL !i
+      IF Can't_get_there IN #JOURNAL
+      {
+         SET !bmp_delta !bmp_delta - 1
+         IF !bmp_delta > 1
+         {
+            GOSUB ScaledLine #CHARPOSX #CHARPOSY !bmp_currx !bmp_curry !bmp_delta
+            GOSUB XYReadout #RESULT bmp_currx bmp_curry
+            GOTO bmp_checktile
+         }
+         GOTO bmp_avoidobstacle
+      }
+   }
+   SET !bmp_jend #JINDEX + 1
+   IF #SCNT2 > !bmp_disttimeout
+   {
+     IF !bmp_charpos = #CHARPOSX , _ , #CHARPOSY
+       GOTO bmp_initsegment
+     SET !bmp_disttimeout #SCNT2 + 25
+     SET !bmp_charpos #CHARPOSX , _ , #CHARPOSY
+  }
+   IF ( #CHARPOSX <> !bmp_currx || #CHARPOSY <> !bmp_curry ) && #SCNT < !time
+      GOTO bmp_distancewait
+   GOTO bmp_initsegment
+bmp_avoidobstacle:
+   SET !bmp_delta 11
+   SET !random #RANDOM % 3
+   SET !avoid 8 + ( #RANDOM % 8 )
+   IF #CHARPOSX <> !bmp_lavoidx
+   {
+      SET !bmp_lavoidmaxy #CHARPOSY
+      SET !bmp_lavoidminy #CHARPOSY
+   }
+   IF #CHARPOSY <> !bmp_lavoidy
+   {
+      SET !bmp_lavoidmaxx #CHARPOSX
+      SET !bmp_lavoidminx #CHARPOSX
+   }
+   IF !bmp_xmajor
+   {
+      SET !bmp_lavoidx #CHARPOSX
+      SET !bmp_currx #CHARPOSX
+      IF ( #CHARPOSY > !bmp_y && !random > 0 ) || ( #CHARPOSY <= !bmp_y && !random = 0 )
+      {
+         SET !bmp_lavoidminy !bmp_lavoidminy - !avoid
+         SET !bmp_curry !bmp_lavoidminy
+      }
+    ELSE
+      {
+         SET !bmp_lavoidmaxy !bmp_lavoidmaxy + !avoid
+         SET !bmp_curry !bmp_lavoidmaxy
+      }
+   }
+   IF ! !bmp_xmajor
+   {
+      SET !bmp_lavoidy #CHARPOSY
+      SET !bmp_curry #CHARPOSY
+      IF ( #CHARPOSX > !bmp_x && !random > 0 ) || ( #CHARPOSX <= !bmp_x && !random = 0 )
+      {
+         SET !bmp_lavoidminx !bmp_lavoidminx - !avoid
+         SET !bmp_currx !bmp_lavoidminx
+      }
+      ELSE
+      {
+         SET !bmp_lavoidmaxx !bmp_lavoidmaxx + !avoid
+         SET !bmp_currx !bmp_lavoidmaxx
+      }
+   }
+   GOSUB BMPathfind !bmp_currx !bmp_curry 0
+   GOTO bmp_initsegment
+bmp_end:
+   SET #LPC !bmp_oldlpc
+   SET #RESULT !bmp_return
+   NAMESPACE CLEAR
+   NAMESPACE POP
+   RETURN #RESULT
+RETURN #FALSE
+;%1 = X1
+;%2 = Y1
+;%3 = X2
+; %4 = Y2
+; %5 = Distance along the line from X1,Y1 to X2,Y2 to calculate the new point
+; Returns the new pont formatted as X_Y (ex:123_456)
+SUB ScaledLine
+   SET !sl_startx %1
+   SET !sl_starty %2
+   SET !sl_goalx %3
+   SET !sl_goaly %4
+   SET !sl_dx ( !sl_goalx - !sl_startx ) * 256
+   SET !sl_dy ( !sl_goaly - !sl_starty ) * 256
+   SET !sl_sd %5
+   SET
+   GOSUB Distance !sl_startx !sl_starty !sl_goalx !sl_goaly
+   SET #RESULT #RESULT * 256
+   SET !sl_ts #RESULT / !sl_sd
+   IF #RESULT <= !sl_sd
+   {
+      SET #RESULT !sl_goalx , _ , !sl_goaly
+      RETURN #RESULT
+   }
+   SET !sl_resultx !sl_startx + ( !sl_dx / !sl_ts )
+   SET !sl_resulty !sl_starty + ( !sl_dy / !sl_ts )
+   SET #RESULT !sl_resultx , _ , !sl_resulty
+RETURN #RESULT
+; %1 is X1
+; %2 is Y1
+; %3 is X2
+; %4 is Y2
+; Returns the approximate UO tile distance
+SUB Distance
+   SET !dist_x ABS ( %3 - %1 )
+   SET !dist_y ABS ( %4 - %2 )
+   SET #RESULT !dist_x
+   IF !dist_y > !dist_x
+      SET #RESULT !dist_y
+RETURN #RESULT
+;%1 = the X_Y formatted value to parse
+;%2 = the % variable name to otput the X component to, WITHOUT %
+;%3 = the % variable name to otput the Y component to, WITHOUT %
+SUB XYReadout
+   SET !local1 %1
+   STR POS !local1 _
+   STR DEL !local1 #STRRES 999
+   SET ! . %2 #STRRES
+   SET !local1 %1
+   STR POS !local1 _
+   STR DEL !local1 1 #STRRES
+   SET ! . %3 #STRRES
+RETURN
