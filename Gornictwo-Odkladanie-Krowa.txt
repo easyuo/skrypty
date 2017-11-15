@@ -68,7 +68,9 @@ if *gornictwo_odkladanie = #true
   goto pokaz_menu
  }
 
- set %pojemnik #findid
+ set %pojemnik #FINDID
+ set %sklad #FINDID
+ event sysmessage Sklad i Pojemnik ustawiony: #FINDID
 
 }
 
@@ -670,4 +672,15 @@ sub CzarujCorpPor
  {
   gosub CzarujCorpPor
  }
+return
+
+; ==========================
+;  otworzPojemnik %pojemnikID
+; ==========================
+sub otworzPojemnik
+ set #lobjectid %1
+ event macro 17 0
+ repeat
+  wait 1
+ until #CONTID = #LOBJECTID
 return

@@ -10,6 +10,17 @@ loop:
 finditem %sprzedawcaID G_2
 if #findCNT = 1
 {
+; ZLOTO
+
+ repeat
+  finditem %zloto C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid %sprzedawcaID #findstack
+     finditem %zloto C_ , #BACKPACKID
+  }
+ until #findid = x
+
  repeat
   finditem %przedmiotySprzedawca C_ , #BACKPACKID
   if #findid <> x
