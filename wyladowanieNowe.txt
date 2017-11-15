@@ -1,0 +1,168 @@
+set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
+set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_
+set %przedmioty_do_sprzedawcy ENK_RVH_
+set %sklad KVHLAOE
+set %piec JBG_
+; DWJ - Ruda
+; ENK - Sztaby
+; RVH - Mapy
+
+set %zloto POF_
+set %sprzedawcaID XHCJQD
+
+loop:
+onhotkey F2
+ gosub corobic
+goto loop
+
+sub corobic
+ finditem %sprzedawcaID G_2
+ if #findCNT = 1
+ {
+  set !znalazlem 1
+  gosub sprzedawca
+ }
+
+ finditem %sklad G_2
+ if #findCNT = 1
+ {
+  set !znalazlem 1
+  gosub dzialajSklad
+ }
+ 
+ if !znalazlem <> 1
+ {
+  event sysmessage Nie wiem co robic. Sprobuj jeszcze raz
+ }
+ 
+ set !znalazlem
+ 
+return
+
+sub dzialajSklad
+ finditem %piec G_2
+ if #FINDCNT > 0
+  gosub przetapiaj %sklad
+ gosub przeniesZPojemnika %sklad
+return
+
+; gosub przetapiaj %pojemnikID
+sub przetapiaj
+  event sysmessage Szuakmy rudy do przetopienia w plecaku i w skladzie
+  if %1 <> N/A
+   gosub otworzPojemnik %1
+
+  repeat
+   finditem DWJ C
+   if #FINDCNT > 0
+   {
+    set #lObjectID #FindID
+    event Macro 17
+   }
+  until #FINDCNT = 0
+
+return
+
+
+; ------------
+;  Sprzedawca
+; ------------
+
+sub sprzedawca
+ event sysmessage Jestesmy przy sprzedawcy. Dzialamy.
+ finditem %sprzedawcaID G_2
+ if #findCNT = 1
+ {
+ ; ZLOTO
+ repeat
+  finditem %zloto C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid %sprzedawcaID #findstack
+     finditem %zloto C_ , #BACKPACKID
+  }
+ until #findid = x
+ repeat
+  finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid %sprzedawcaID #findstack
+   repeat
+     wait 1
+   until #CONTKIND = EGFD
+   
+   if #CONTNAME = Stringquery_gump && #CONTKIND = EGFD && #CONTSIZEX = 393 && #CONTSIZEY = 270
+   {
+    call libs\sprzedawcaCL.lib.euo ustalCene 444
+   }
+   finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
+  }
+ until #findid = x
+}
+return
+
+
+; ==========================
+;  Przenies z Pojemnika
+; ==========================
+; gosub przeniesZPojemnika %pojemnikID
+sub przeniesZPojemnika
+ set !dokadPrzenosimy %1
+ if !dokadPrzenosimy = N/A
+ {
+  event sysmessage Nie podano parametru: pojemnikID
+  return
+ }
+ 
+ 
+ event sysmessage Przenosze ze skladu do glownego plecaka
+ gosub otworzPojemnik !dokadPrzenosimy
+ 
+ repeat
+  finditem %przedmioty_ze_skladu C_ , !dokadPrzenosimy
+  if #FINDCNT > 0
+  {
+   event sysmessage Przenosze #FINDID #FINDTYPE #FINDSTACK - znalalzem #FINDCNT
+   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID #findstack
+   event sysmessage Znalazlem
+   finditem %przedmioty_ze_skladu C_ , !dokadPrzenosimy
+  }
+ until #FINDCNT = 0
+ 
+return
+
+
+; ==========================
+;  przeniesDoPoijemnika
+; ==========================
+;gosub przeniesDoPojemnika %pojemnikID
+sub przeniesDoPojemnika
+ if %1 = N/A
+ {
+  event sysmessage Nie podano parametru: pojemnikID
+  return
+ }
+ 
+ gosub otworzPojemnik %1
+
+ repeat
+  finditem %przedmioty_do_skladu C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid %1 #findstack
+   finditem %przedmioty_do_skladu C_ , #BACKPACKID
+  }
+ until #findid = x
+return
+
+
+; ==========================
+;  otworzPojemnik %pojemnikID
+; ==========================
+sub otworzPojemnik
+ set #lobjectid %1
+ event macro 17 0
+ repeat
+  wait 1
+ until #CONTID = #LOBJECTID
+return

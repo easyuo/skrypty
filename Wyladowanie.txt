@@ -8,20 +8,16 @@
 ; Revision Date: 5/13/2015
 ; Public Release: 5/13/2015
 
-set %skrzynia_id DBZMZDE
-set %skrzynia_dest_id DXYMZDE
-; set %skrzynia_id LLHKNCE  ; Destard Dom
+set %skrzynie_id DBZMZDE
 set %sprzedawca_id EKMJLD
 
 ; VLK - piora
 set %przedmioty_do_skrzyni PUD_NPF_TMK_OUF_ZLF_AMF_UWS_QOF_UTO_VLF_XUF_VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
 set %przedmioty_do_skrzyni_dest PUD_NPF_TMK_OUF_AMF_UWS_QOF_UTO_VLF_XUF_VLK_PUD_VRD_EEG_ZUF_YLI_RWF_LNK_HQD_ROF_WUF_RVH_YUF_
-
-
 ; POF - zloto
 set %przedmioty_do_sprzedawcy POF_
 
-set %hotkey INSERT
+set %hotkey F3
 set %wait 10
 
 repeat
