@@ -33,7 +33,6 @@ if #findCNT = 1
    
    if #CONTNAME = Stringquery_gump && #CONTKIND = EGFD && #CONTSIZEX = 393 && #CONTSIZEY = 270
    {
-    event sysmessage Mamy okno z cena
     call libs\sprzedawcaCL.lib.euo ustalCene 444
    }
    finditem %sztaby C_ , #BACKPACKID

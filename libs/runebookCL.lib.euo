@@ -6,8 +6,198 @@
 
 ; call libs/runebookCL.lib.eu
 
-; gosub runebook %1 [runebookID] %2 [runebookNumber]
+; gosub runebook %2 [runebookID] %3 [runebookNumber]
+; Makro do obslugi Ksiegi Run - UO CLr
+; Autor: Krowa
+; Data: 25 kwietnia 2015
+
+; Ksiega run otwiera sie zawsze w tej samej pozycji.
+; Konkretne pozycje w ksiedze znajduja sie na pozycjach:
+; x  y
+; 73 28 - Zmien nazwe ksiegi
+
+; X  Y
+; 64 66  - 1   9  - 222 66
+; 64 82  - 2   10 - 222 82
+; 64 96  - 3   11 - 222 96
+; 64 110 - 4   12 - 222 110
+; 64 126 - 5   13 - 222 126
+; 64 140 - 6   14 - 222 140
+; 64 156 - 7   15 - 222 156
+; 64 170 - 8   16 - 222 170
+
+; Ksiega run
+; Typ: MPF
+; Kolor: 108
+
+; Moongate
+  ; Typ: OTF
+  ; Kolor: 88 - diament
+  ; Kolor: 6  - gwiezdy szafir
+
+; Pudelko na kamienie
+  ; Typ: LKF
+  ; Color: 1195
+
+; Kamienie
+  ; Typ   Kolor
+  ; FVF_ - 0 - szafir - popularniejszy
+  ; IVF_ - 0 - szafir - drugi typ
+  ; EVF_ - 0 - ametyst - rozpada sie
+  ; MWF_ - 0 - diament
+  ; VUF_ - 0 - gwiezdy szafir
+
 sub runebook
 
-return
+if #mana < 70
+   {
+    chooseskill medi
+    event macro 13 46 ; meditation
+    wait 10s
+   }
 
+; Kamienie
+set %kamienie FVF_IVF_MWF_VUF_EWF_DWF_TVF_
+set %kamieniePojemnik #BACKPACKID
+
+; Pierwsza strona
+set %runaX1 64
+set %runaY1 66
+set %runaX2 64
+set %runaY2 82
+set %runaX3 64
+set %runaY3 96
+set %runaX4 64
+set %runaY4 110
+set %runaX5 64
+set %runaY5 126
+set %runaX6 64
+set %runaY6 140
+set %runaX7 64
+set %runaY7 156
+set %runaX8 64
+set %runaY8 170
+
+; Druga strona
+set %runaX9 222
+set %runaY9 66
+set %runaX10 222
+set %runaY10 82
+set %runaX11 222
+set %runaY11 96
+set %runaX12 222
+set %runaY12 110
+set %runaX13 222
+set %runaY13 126
+set %runaX14 222
+set %runaY14 140
+set %runaX15 222
+set %runaY15 156
+set %runaX16 222
+set %runaY16 170
+
+  set %KsiegaRunID %1
+  set %NumerRuny %2
+
+  event sysmessage %KsiegaRunID %NumerRuny
+
+  finditem %KsiegaRunID
+
+  if ( #FINDKIND = -1 )
+  {
+      event sysmessage Nie znalazlem runebooka!
+      exit
+  }
+
+  ; Sprawdzanie pojemnika na kamienie i kamieni.
+
+  finditem LKF C_ , #BACKPACKID
+
+  if #FINDCNT > 0
+  {
+   set %kamieniePojemnik #FINDID
+  }
+
+  gosub OtworzPojemnik %kamieniePojemnik
+
+  finditem %kamienie C_ , %kamieniePojemnik ; Pojemnik na kamienie
+
+  if #FINDCNT > 0
+  {
+   set %kamienDoBramy #FINDID
+   event sysmessage Kamien: #FINDID - #FINDTYPE
+  }
+  else
+  {
+   event sysmessage Nie znalazlem kamieni. Nie ma jak postawic bramy.
+   exit
+  }
+
+  set #LOBJECTID %KsiegaRunID
+  event macro 17
+  wait 10
+
+  ; Jezeli ksiega jest otwarta wybieramy czar
+  ; TODO: Sprawdzanie czy ksiega jest otwarta (#CONTSIZE + #CONTPOS)
+  ; #CONTPOSX: 0
+  ; #CONTPOSY: 0
+  ; #CONTSIZEX: 382
+  ; #CONTSIZEY: 231
+  ; #CONTKIND: GJZ
+
+   ;   if #contSize = 382_231
+    ;   {
+        event sysmessage Ksiega jest widoczna, czaruje.
+
+        set %x %runaX . %NumerRuny
+        set %y %runaY . %NumerRuny
+
+        event sysmessage %runaY . %NumerRuny
+
+        event sysmessage Czaruje rune %NumerRuny w pozycji X: %x Y: %y
+        click %x %y
+
+        set #LTARGETID %kamienDoBramy
+        set #lTargetKind 1
+        target 10s
+        event macro 22 0 ; last target
+       ;  }
+
+                    ; Klejnot_rozpadl_sie_na
+
+      finditem OTF ; Moongate
+
+      while #FINDKIND = -1
+      {
+       finditem OTF
+      }
+
+      set %staraPozycjaX #CHARPOSX
+      set %staraPozycjaY #CHARPOSY
+
+      event macro 15 21 ; Teleport
+      target 3s
+      event macro 23 0 ; Target Self
+      wait 1s
+
+      ; Odwolanie bramy
+      if %staraPozycjaX <> #CHARPOSX || %staraPozycjaY <> #CHARPOSY
+      {
+       event macro 15 33 ; Dispel Field
+       target 5s
+       event macro 23 0 ; Target Self
+      }
+      else
+      {
+       event sysmessage Postac nie przeniosla sie, lub brama postawiona jest w to samo miejsce.
+       event macro 15 21 ; Teleport
+       target 3s
+       event macro 23 0 ; Target Self
+
+       event sysmessage Odwoluje brame mimo wszystko.
+       event macro 15 33 ; Dispel Field
+       target 5s
+       event macro 23 0 ; Target Self
+      }
+
+exit
