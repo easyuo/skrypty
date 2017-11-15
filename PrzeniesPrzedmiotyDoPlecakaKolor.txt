@@ -9,12 +9,13 @@ loop:
 
 onhotkey F3
  gosub rzeczy
-
 goto loop
 
 ; Szukam plecaka w glownym plecaku
 
 sub rzeczy
+
+ignoreItem reset
 
 finditem %plecakType C_ , #BACKPACKID
  if #findid <> x
