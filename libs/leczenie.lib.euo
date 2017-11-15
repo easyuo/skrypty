@@ -1,0 +1,23 @@
+; Biblioteka:   Leczenie
+; Autor:        Krowa
+; Data:         14.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+sub LeczenieOdtruj
+ if #mana < 11
+  event macro 1 0 .wypij duza mana
+ event macro 15 10
+ target 3s
+ event macro 23 0
+ wait 10
+return
+
+sub LeczenieIVM
+ if #mana < 11
+  event macro 1 0 .wypij duza mana
+ event macro 15 28
+ target 3s
+ event macro 23 0
+ wait 10
+return

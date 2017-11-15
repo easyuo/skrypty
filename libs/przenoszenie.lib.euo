@@ -1,0 +1,19 @@
+; Biblioteka:   Przenosnie
+; Autor:        Krowa
+; Data:         14.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+; call
+
+; gosub przeniesPrzedmiot %1 [przedmiot] %2 [lokalizacja docelowa] %3 [ile]
+sub przeniesPrzedmiot
+  exevent drag %1 %3
+  wait %dragPause
+  exevent dropc %2
+  repeat
+   wait %dropPause
+   finditem %1 C
+  until #FINDBAGID = %2 || #FINDKIND = -1
+return
+
