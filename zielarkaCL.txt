@@ -620,3 +620,4 @@ sub przeniesPrzedmiot
    finditem %1 C
   until #FINDBAGID = %2 || #FINDKIND = -1
 return
+

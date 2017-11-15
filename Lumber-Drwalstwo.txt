@@ -20,6 +20,7 @@ set %zarcie HND_END_
 ; filety (bedzie jesc:))
 set %jablka QQD_
 ; bedzie karmic lamke :
+set %pudelko_podroznika_typ LKF
 
 ; nie rusz!;>
 ;-----------------------------------------------------

@@ -1,15 +1,14 @@
 ; Drag przedmioty do plecaka
 
-set %dragPauza 10
-set %dropPauza 10
+set %dragPause 1
+set %dropPause 1
 set %plecakType ZJF
-
 ignoreItem reset
 
 loop:
 
-onhotkey F2
-  gosub rzeczy
+onhotkey F3
+ gosub rzeczy
 
 goto loop
 
@@ -30,22 +29,30 @@ finditem %plecakType C_ , #BACKPACKID
  }
 
 
-repeat
- finditem * C_ , #BACKPACKID
-  if #findid <> x
-  {
+ repeat
+  finditem * C_ , #BACKPACKID
+   if #FINDID <> x
+   {
   ; if #FINDCOL = 38 || #FINDCOL = 104
   ; {
-    exevent drag #findid #findstack
-    wait %dragPauza
-    exevent dropc %sklad
-    wait %dropPauza
+    event sysmessage Przenosze #FINDID do %sklad
+    gosub przeniesPrzedmiot #findid %sklad #findstack
+    finditem * C_ , #BACKPACKID
   ; }
-
    ignoreItem #FINDID
-
-  }
- wait 2
-until #findid = x
+   }
+  wait 1
+ until #FINDID = x
 
 return
+
+sub przeniesPrzedmiot
+  exevent drag %1 %3
+  wait %dragPause
+  exevent dropc %2
+  repeat
+   wait %dropPause
+   finditem %1 C
+  until #FINDBAGID = %2 || #FINDKIND = -1
+return
+
