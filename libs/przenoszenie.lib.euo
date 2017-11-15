@@ -1,0 +1,14 @@
+; Biblioteka:   Przenosnie
+; Autor:        Krowa
+; Data:         14.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+sub przenies
+  exevent drag %2 %4
+  exevent dropc %3
+  repeat
+   finditem %2 C
+  until #FINDBAGID = %3 || #FINDKIND = -1
+exit
+

@@ -1,0 +1,54 @@
+set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
+set %sklad KVHLAOE
+
+set %przedmiotySprzedawca ENK_RVH_
+set %zloto POF_
+set %sprzedawcaID XHCJQD
+
+loop:
+
+finditem %sprzedawcaID G_2
+if #findCNT = 1
+{
+ repeat
+  finditem %przedmiotySprzedawca C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid %sprzedawcaID #findstack
+   repeat
+     event sysmessage Czekam na okno z cena
+     wait 1
+   until #CONTKIND = EGFD
+   
+   if #CONTNAME = Stringquery_gump && #CONTKIND = EGFD && #CONTSIZEX = 393 && #CONTSIZEY = 270
+   {
+    event sysmessage Mamy okno z cena
+    call libs\sprzedawcaCL.lib.euo ustalCene 444
+   }
+   finditem %sztaby C_ , #BACKPACKID
+  }
+ until #findid = x
+}
+
+goto loop
+
+
+repeat
+  finditem %przedmioty_do_skladu C_ , %sklad
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID #findstack
+   finditem %przedmioty_do_skladu C_ , %sklad
+  }
+until #findid = x
+
+repeat
+  finditem %przedmioty_do_skladu C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenoszenie.lib.euo przenies #findid %sklad #findstack
+   finditem %przedmioty_do_skladu C_ , #BACKPACKID
+  }
+until #findid = x
+
+halt

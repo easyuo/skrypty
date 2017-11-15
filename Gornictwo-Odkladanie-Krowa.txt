@@ -396,24 +396,21 @@ sub odkladanie
  }
 
  repeat
-  finditem %przedmioty_do_skladu C
-  if #findid <> x
+  if %afterCall <> 1
+   finditem %przedmioty_do_skladu C_ , #BACKPACKID
+
+  if #FINDCNT > 0
   {
-   exevent drag #findid #findstack
-   wait %dragPauza
-   exevent dropc %sklad
-   wait %dragPauza
+   call libs\przenoszenie.lib.euo przenies #findid %sklad #findstack
+   set !afterCall 1
+   finditem %przedmioty_do_skladu C_ , #BACKPACKID
   }
- wait 2
- until #findid = x
+ until #FINDCNT = 0
   
  event sysmessage Otwieranie pojemnika przed uzupelnianiem
- set #lobjectid %pojemnik
- set #ltargetkind 1
- event macro 17 0
- wait 1s
+ gosub otworzPojemnik %pojemnik
+ event sysmessage Uzupelnianie stuffu (bandaze, ziola)
 
-  event sysmessage Uzupelnianie stuffu (bandaze, ziola)
   ; Bandaze
  finditem ZLF C_ , #BACKPACKID
  if #findstack < %ileBandazy
@@ -423,10 +420,8 @@ sub odkladanie
    event macro 17 0
    wait 1s
    finditem ZLF C_ , %pojemnik
-   exevent drag #findid 5
-   wait %dragPauza
-   exevent dropc #backpackid
-   wait %dragPauza
+   if #FINDCNT > 0
+    call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID 5
  }
   
 ; Ziola
@@ -436,12 +431,9 @@ sub odkladanie
   set %ilePrzeniesc %ileZiol - #FINDSTACK
   event sysmessage Uzupe³niam belladone: %ilePrzeniesc
   gosub otworzPojemnik %sklad
-
   finditem WZF C_ , %pojemnik
-  exevent drag #findid %ilePrzeniesc
-  wait %dragPauza
-  exevent dropc #backpackid
-  wait %dropPauza
+  if #FINDCNT > 0
+   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID %ilePrzeniesc
  }
 
  finditem KUF C_ , #BACKPACKID
@@ -450,12 +442,9 @@ sub odkladanie
   set %ilePrzeniesc %ileZiol - #FINDSTACK
   event sysmessage Uzupe³niam perly: %ilePrzeniesc
   gosub otworzPojemnik %sklad
-
   finditem KUF C_ , %pojemnik
-  exevent drag #findid %ilePrzeniesc
-  wait %dragPauza
-  exevent dropc #backpackid
-  wait %dropPauza
+  if #FINDCNT > 0
+   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID %ilePrzeniesc
  }
 
 return
@@ -496,10 +485,8 @@ sub ustaw_narzedzie
      wait 1s
 
      finditem NPF C
-     exevent drag #FINDID 1
-     wait %dragPauza
-     exevent dropc #backpackid 90 20
-     wait %dragPauza
+     if #FINDCNT > 0
+      call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID 1
 
      gosub zmiana_miejsca
 
