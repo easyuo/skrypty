@@ -1,23 +1,12 @@
 ; Drag przedmioty do plecaka
-
-set %dragPause 1
-set %dropPause 1
-set %plecakType ZJF
-ignoreItem reset
-
 loop:
-
 onhotkey F3
  gosub rzeczy
 goto loop
 
-; Szukam plecaka w glownym plecaku
-
 sub rzeczy
-
-ignoreItem reset
-
-finditem %plecakType C_ , #BACKPACKID
+ ignoreItem reset
+ finditem ZJF C_ , #BACKPACKID
  if #findid <> x
  {
   set %sklad #FINDID
@@ -26,34 +15,19 @@ finditem %plecakType C_ , #BACKPACKID
  else
  {
   event sysmessage Nie znaleziono plecaka.
-  halt
+  return
  }
 
-
  repeat
-  finditem * C_ , #BACKPACKID
-   if #FINDID <> x
+  finditem FSF C_ , #BACKPACKID
+  if #FINDCNT > 0
+  {
+   if #FINDCOL = 38 || #FINDCOL = 104
    {
-  ; if #FINDCOL = 38 || #FINDCOL = 104
-  ; {
-    event sysmessage Przenosze #FINDID do %sklad
-    gosub przeniesPrzedmiot #findid %sklad #findstack
-    finditem * C_ , #BACKPACKID
-  ; }
-   ignoreItem #FINDID
+    call libs\przenoszenie.lib.euo przenies #findid %sklad #findstack
+    finditem FSF C_ , #BACKPACKID
    }
-  wait 1
- until #FINDID = x
+  }
+ until #FINDCNT = 0
 
 return
-
-sub przeniesPrzedmiot
-  exevent drag %1 %3
-  wait %dragPause
-  exevent dropc %2
-  repeat
-   wait %dropPause
-   finditem %1 C
-  until #FINDBAGID = %2 || #FINDKIND = -1
-return
-
