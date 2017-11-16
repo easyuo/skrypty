@@ -1,0 +1,289 @@
+    ;==================================
+    ; Script Name: Dynamite's Color ID
+    ; Author:  Dyn420
+    ; Version: 1.01
+    ; Client Tested with: 5.0.1c (Patch 22)
+    ; EUO version tested with: 1.5
+    ; Shard OSI / FS: OSI
+    ; Revised:
+    ; Public Release: October 21st 2005
+    ; Purpose: To Check Clothing/Armor Coloring and Code
+    ;==================================
+     Menu clear
+     Menu hideEUO
+     Menu window size 340 200
+     Menu show
+     Menu window color black
+     Menu font bgcolor Blue
+     Menu Font Style B
+     Menu font size 13
+     Menu Window Title I Got MOO, YAY!!
+     Menu Text text_1 5 90 Thank You For Using Dynamite's Color ID!
+    Wait 5s
+    Menu Hide
+
+    initevents
+    hotkeyloop:
+    ;Set the hot key to your liking
+    onhotkey f12
+    gosub Color Coding
+    goto hotkeyloop
+
+    sub Color Coding
+
+    set #TargCurs 1
+    target
+    set #LTargetID NULL
+    event sysmessage Target the item you wish to know the color of.
+    wait_4_targ:
+    wait 1
+    if #LTargetID = NULL
+     goto wait_4_targ
+    set %item #LTargetID
+    findItem %item c ;
+    {
+      event sysmessage Exact Hue Color is: #findcol
+      if #findcol = 1109
+         {
+            event sysmessage [This item is True Evil Mage.]
+         }
+
+      if #findcol = 11
+         {
+            event sysmessage [This item is True Sigil Purple.]
+         }
+
+      if #findcol = 1153
+         {
+            event sysmessage [This item is Pure/Hyper White.]
+         }
+
+      if #findcol = 1150
+         {
+            event sysmessage [This item is Ice/Luna White.]
+            event sysmessage [This item is Reward Cloth LvL 5.]
+         }
+
+      if #findcol = 1175
+         {
+            event sysmessage [This item is Charcoal.]
+            event sysmessage [This item is Reward Cloth LvL 4 .]
+         }
+
+      if #findcol = 1266
+         {
+            event sysmessage [This item is AOS Blue.]
+         }
+
+      if #findcol = 1
+         {
+            event sysmessage [This item is Jet Black.]
+         }
+
+      if #findcol = 1161
+         {
+            event sysmessage [This item is Blazed.]
+            event sysmessage [This item is Reward Cloth LvL 5.]
+         }
+
+      if #findcol = 1154
+         {
+            event sysmessage [This item is Ice Blue.]
+            event sysmessage [This item is Reward Cloth LvL 5.]
+         }
+
+      if #findcol = 1151
+         {
+            event sysmessage [This item is Ice Green.]
+            event sysmessage [This item is Reward Cloth LvL 5.]
+         }
+
+      if #findcol = 1167
+         {
+            event sysmessage [This item is Dryad Green.]
+            event sysmessage [This item is Reward Cloth LvL 4.]
+         }
+
+      if #findcol = 1172
+         {
+            event sysmessage [This item is Blood Red.]
+            event sysmessage [This item is Reward Cloth LvL 4.]
+         }
+
+      if #findcol = 1156
+         {
+            event sysmessage [This item is Navy Blue.]
+            event sysmessage [This item is Reward Cloth LvL 4.]
+         }
+
+      if #findcol = 1168
+         {
+            event sysmessage [This item is Fuscia.]
+            event sysmessage [This item is Reward Cloth LvL 3.]
+         }
+
+      if #findcol = 1165
+         {
+            event sysmessage [This item is Light Blue.]
+            event sysmessage [This item is Reward Cloth LvL 3.]
+         }
+      if #findcol = 1169
+         {
+            event sysmessage [This item is Light Yellow.]
+            event sysmessage [This item is Reward Cloth LvL 3.]
+         }
+
+      if #findcol = 1166
+         {
+            event sysmessage [This item is Neon Pink.]
+            event sysmessage [This item is Reward Cloth LvL 3.]
+         }
+
+      if #findcol = 1158
+         {
+            event sysmessage [This item is Violet Purple.]
+            event sysmessage [This item is Reward Cloth LvL 2.]
+         }
+
+      if #findcol = 1173
+         {
+            event sysmessage [This item is Blue Green.]
+            event sysmessage [This item is Reward Cloth LvL 2.]
+         }
+
+      if #findcol = 1163
+         {
+            event sysmessage [This item is Light Purple.]
+            event sysmessage [This item is Reward Cloth LvL 2.]
+         }
+
+      if #findcol = 1157
+         {
+            event sysmessage [This item is Maroon.]
+            event sysmessage [This item is Reward Cloth LvL 2.]
+         }
+
+      if #findcol = 1164
+         {
+            event sysmessage [This item is Navy Green.]
+            event sysmessage [This item is Reward Cloth LvL 1.]
+         }
+
+      if #findcol = 1162
+         {
+            event sysmessage [This item is Dull Green.]
+            event sysmessage [This item is Reward Cloth LvL 1.]
+         }
+
+      if #findcol = 1160
+         {
+            event sysmessage [This item is Serpent Green.]
+            event sysmessage [This item is Reward Cloth LvL 1.]
+         }
+
+      if #findcol = 1155
+         {
+            event sysmessage [This item is Green.]
+            event sysmessage [This item is Reward Cloth LvL 1.]
+         }
+
+      if #findcol = 33
+         {
+            event sysmessage [This item is Berserkers Red.]
+         }
+
+      if #findcol = 1281
+         {
+            event sysmessage [This item is Paragon Gold.]
+         }
+
+      if #findcol = 1420
+         {
+            event sysmessage [This item is Nox Green.]
+         }
+
+      if #findcol = 1359
+         {
+            event sysmessage [This item is Fire Orange.]
+         }
+
+      if #findcol = 1644
+         {
+            event sysmessage [This item is Rum Red.]
+         }
+
+      if #findcol = 0
+         {
+            event sysmessage [This item is Defualt/Iron/Leather.]
+         }
+
+      if #findcol = 2425
+         {
+            event sysmessage [This item is Agapite.]
+         }
+
+      if #findcol = 2413
+         {
+            event sysmessage [This item is Copper.]
+         }
+
+      if #findcol = 2216
+         {
+            event sysmessage [This item is Gold.]
+         }
+
+      if #findcol = 2418
+         {
+            event sysmessage [This item is Bronze.]
+         }
+
+      if #findcol = 2419
+         {
+            event sysmessage [This item is Dull Copper.]
+         }
+
+      if #findcol = 2406
+         {
+            event sysmessage [This item is Shadow.]
+         }
+
+      if #findcol = 2207
+         {
+            event sysmessage [This item is Verite.]
+         }
+
+      if #findcol = 2219
+         {
+            event sysmessage [This item is Valorite.]
+         }
+
+      if #findcol = 2117
+         {
+            event sysmessage [This item is Horned Red.]
+         }
+
+      if #findcol = 2129
+         {
+            event sysmessage [This item is Barbed Green.]
+         }
+
+      if #findcol = 232
+         {
+            event sysmessage [This item is Crimson Red.]
+         }
+
+      if #findcol = 1278
+         {
+            event sysmessage [This item is Guantlet Purple.]
+         }
+
+      if #findcol = 1270
+         {
+            event sysmessage [This item is Ornate Green.]
+         }
+
+      if #findcol = 1152
+         {
+            event sysmessage [This item is Glacial Blue.]
+         }
+    return hotkeyloop
