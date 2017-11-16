@@ -153,7 +153,6 @@ set %runaY16 170
         set %y %runaY . %NumerRuny
 
         event sysmessage %runaY . %NumerRuny
-
         event sysmessage Czaruje rune %NumerRuny w pozycji X: %x Y: %y
         click %x %y
 
@@ -162,15 +161,11 @@ set %runaY16 170
         target 10s
         event macro 22 0 ; last target
        ;  }
-
-                    ; Klejnot_rozpadl_sie_na
+       ; Klejnot_rozpadl_sie_na
 
       finditem OTF ; Moongate
-
       while #FINDKIND = -1
-      {
        finditem OTF
-      }
 
       set %staraPozycjaX #CHARPOSX
       set %staraPozycjaY #CHARPOSY

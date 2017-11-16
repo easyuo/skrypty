@@ -1,0 +1,27 @@
+    ;==================================
+    ; Script Name: RKpixelChecker.txt
+    ; Author: Roadkill
+    ; Version: 1.0
+    ; Client Tested with: 4.0.3A
+    ; EUO version tested with: build 0088
+    ; Shard OSI / FS: OSI
+    ; Revision Date: 17Jun04
+    ; Public Release: 22Jun04
+    ; Global Variables Used:
+    ; Purpose: sysmessage the pixel colors underneath cursor, tool for scripting
+    ;==================================
+    initevents
+    loop:
+    set %cursx #cursorx
+    set %cursy #cursory
+    looppix:
+    wait 5
+    if #cursorx = %cursx && #cursory = %cursy
+        goto looppix
+    savepix #cursorx #cursory 1
+    event sysmessage #pixcol at X: #CURSORX Y: #CURSORY
+    goto loop
+    halt
+
+
+
