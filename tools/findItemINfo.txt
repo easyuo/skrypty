@@ -1,0 +1,43 @@
+initevents
+menu clear
+menu button findbut 10 10 130 25 &Find Item Info
+menu text creator 85 130 By Mosep
+menu window size 150 150
+menu window title ID/Type
+menu font align center
+menu font size 10
+menu font style b
+menu window color black
+menu font bgcolor black
+menu font color $0033AA
+menu show
+set %target #LTARGETID
+set #MENUBUTTON N/A
+start:
+        onhotkey f alt
+                goto target
+        if #MENUBUTTON = CLOSED
+                halt
+        if #MENUBUTTON = FINDBUT
+        {
+                target:
+                event sysmessage Target the creature or item to identify.
+                set #TARGCURS 1
+                set #MENUBUTTON N/A
+        }
+        if %target <> #LTARGETID
+        {
+                set %target #LTARGETID
+                finditem #LTARGETID
+                menu delete ID
+                menu delete type
+                menu delete color
+                menu delete quantity
+                menu delete position
+                menu text ID 5 40 ID: #FINDID
+                menu text type 5 55 Type: #FINDTYPE
+                menu text color 5 70 Color: #FINDCOL
+                menu text quantity 5 85 Quantity: #FINDCNT
+                menu text position 5 100 Position: #FINDX #FINDY
+        }
+goto start
