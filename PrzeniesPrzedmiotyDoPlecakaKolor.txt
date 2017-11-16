@@ -19,13 +19,13 @@ sub rzeczy
  }
 
  repeat
-  finditem FSF C_ , #BACKPACKID
-  if #FINDCNT > 0
+  finditem * C_ , #BACKPACKID
+  for #FINDINDEX 1 #FINDCNT
   {
    if #FINDCOL = 38 || #FINDCOL = 104
    {
     call libs\przenoszenie.lib.euo przenies #findid %sklad #findstack
-    finditem FSF C_ , #BACKPACKID
+    finditem * C_ , #BACKPACKID
    }
   }
  until #FINDCNT = 0
