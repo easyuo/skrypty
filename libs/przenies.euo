@@ -13,3 +13,11 @@ sub przenies
   until #FINDBAGID = %3 || #FINDKIND = -1
 exit
 
+sub przedmiot
+  exevent drag %2 %4
+  exevent dropc %3
+  repeat
+   finditem %2 C
+  until #FINDBAGID = %3 || #FINDKIND = -1
+exit
+

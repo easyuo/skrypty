@@ -369,7 +369,7 @@ sub SzukajPrzedmiotyZiemia
   {
     event sysmessage Znalazlem #findcnt przedmiotow na ziemii
     for #findindex 1 #findcnt
-     gosub przeniesPrzedmiot #findid %pojemnikNaZiola #findstack
+     call libs\przenies.euo przedmiot #findid %pojemnikNaZiola #findstack
     event SysMessage Koniec!
   }
 
@@ -378,7 +378,7 @@ sub SzukajPrzedmiotyZiemia
   {
     event sysmessage Znalazlem #findcnt przedmiotow na ziemii
     for #findindex 1 #findcnt
-     gosub przeniesPrzedmiot #findid %pojemnikDocelowy #findstack
+     call libs\przenies.euo przedmiot #findid %pojemnikDocelowy #findstack
     event SysMessage Koniec!
     event macro 1 0 .grab ziola kamienie ustawione
   }

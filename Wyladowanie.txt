@@ -69,7 +69,7 @@ sub przeniesPrzedmioty
     
     for #findindex 1 #findcnt
     {
-     gosub przeniesPrzedmiot #findid %pojemnikDocelowy #findstack
+     call libs\przenies.euo przedmiot #findid %pojemnikDocelowy #findstack
     }
 
     event SysMessage Koniec!
