@@ -1,0 +1,223 @@
+set %expy 1 ;ile plyt wykuc.
+set %item 0 ; 0 - helm 1 - karczek 2 rekawice 3 zarekawia 4 - nogi 5 - klata 6 - tarcza
+set %tarcza 0 ; 0 - bez tarczy, 1- pawez, 2- turniejowka
+set %mlotki #backpackid
+set %szczypce #backpackid
+set %magazyn #backpackid
+;==========================================================
+;      N I E    R U S Z A C   T E G O   N I Z E J
+;                                      by Veis.
+;==========================================================
+set %zestaw 1
+ 
+set %proba 0
+ 
+event sysmessage Wskaz gdzie wkladac expy:
+set #targcurs 1
+repeat
+until #targcurs = 0
+set %poj_e #ltargetid
+ 
+event sysmessage Wskaz gdzie wkladac zwyklaki:
+set #targcurs 1
+repeat
+until #targcurs = 0
+set %poj_z #ltargetid
+ 
+event sysmessage Wskaz Rude na zyczenie:
+set #targcurs 1
+repeat
+until #targcurs = 0
+set %rudka #ltargetid
+wait 1s
+ 
+start:
+set %go 1
+finditem TLH C_ , #charid
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+set #ltargetid %rudka
+event macro 22 0
+wait 1s
+if %item = 0
+{
+click 40 125
+}
+if %item = 1 || %item = 2 || %item = 3 || %item = 4 || %item = 5
+{
+click 40 200
+}
+if %item = 6
+{
+click 40 225
+}
+wait 1s
+kucie:
+if %item = 0
+{
+set %x 360
+set %y 125
+set %item_type OSH
+set %msg helm
+}
+if %item = 1
+{
+set %x 210
+set %y 125
+set %item_type nsh
+set %msg karczek
+}
+if %item = 2
+{
+set %x 210
+set %y 215
+set %item_type ish
+set %msg rekawice
+}
+if %item = 3
+{
+set %x 210
+set %y 305
+set %item_type msh
+set %msg zarekawia
+}
+if %item = 4
+{
+set %x 210
+set %y 395
+set %item_type lsh
+set %msg nogawice
+}
+if %item = 5
+{
+set %x 355
+set %y 125
+set %item_type hsh
+set %msg napiersnik
+}
+if %item = 6
+{
+if %tarcza = 1
+{
+set %x 355
+set %y 125
+set %item_type CIK
+set %msg pawez
+}
+if %tarcza = 2
+{
+set %x 210
+set %y 395
+set %item_type AIK
+set %msg turniejowka
+}
+}
+if %go = 1
+{
+click %x %y
+set %go 0
+}
+ 
+finditem TLH C_ , #charid
+if #findkind = -1
+{
+finditem %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem %mlotki C_ , %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem TLH C_ , %mlotki
+set #lobjectid #findid
+exevent drag #findid 1
+exevent droppd
+goto start
+}
+if #contname = generic_gump && #contsize = 660_520
+{
+if #sysmsg = Wykonales_przedmiot. || #sysmsg = Wykonales_przedmiot_slabej_jakosci.
+{
+finditem %item_type c_ , #backpackid
+exevent drag #findid #findstack
+exevent dropc %poj_z
+set %proba %proba + 1
+}
+ 
+if #sysmsg = Wykonales_rzecz_o_wyjatkowej_jakosci!
+{
+finditem %item_type c_ , #backpackid
+exevent drag #findid #findstack
+exevent dropc %poj_e
+set %item %item + 1
+set %proba 0
+wait 1s
+click 40 500 d
+wait 1s
+finditem tbg c_ , #backpackid
+if #findkind = -1
+{
+finditem %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem %szczypce C_ , %magazyn
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+finditem TBG C
+exevent drag #findid 1
+exevent dropc , #backpackid
+}
+set #lobjectid #findid
+event macro 17 0
+wait 1s
+set #ltargetkind
+set #ltargetid %poj_z
+event macro 22 0
+repeat
+finditem * C_ , %poj_z
+event sysmessage Przetapiam - zostalo #findcnt przedmiotow
+wait 3s
+until #findcnt = 0
+wait 1s
+if %item = 6
+{
+if %tarcza = 0
+{
+set %zestaw %zestaw + 1
+set %item 0
+if %zestaw > %expy
+{
+display Skonczylem kuc plyty!
+halt
+}
+goto start
+}
+goto start
+}
+if %tarcza <> 0 && %item = 6
+{
+goto start
+}
+if %tarcza <> 0 && %item > 6
+{
+set %zestaw %zestaw + 1
+set %item 0
+if %zestaw > %expy
+{
+display Skonczylem kuc plyty!     ;gotowe
+halt
+}
+}
+goto start
+}
+wait 10
+click %x %y
+Event sysmessage Kuje %zestaw zestaw - %msg
+event sysmessage Przedmiot %item Proba: %proba
+}
+ 
+goto kucie
