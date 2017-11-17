@@ -1,18 +1,25 @@
-set %przedmioty_do_skladu POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
+set %przedmioty_do_skladu ENK_OKF_POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF_
 set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_
+set %kamienieNaBramy FVF_IVF_MWF_VUF_EWF_DWF_TVF_NVF_VVF_
 set %przedmioty_do_sprzedawcy ENK_RVH_
-set %sklad KVHLAOE
+
 set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby
 ; RVH - Mapy
 
-set %zloto POF_
+set %zloto        POF_
+set %sklad        KVHLAOE
 set %sprzedawcaID XHCJQD
+set %gornikID     FUCHAD
 
 loop:
 onhotkey F2
+ gosub jedziemy
+
+onhotkey F2 ALT
  gosub corobic
+ 
 goto loop
 
 sub corobic
@@ -20,13 +27,23 @@ sub corobic
  if #findCNT = 1
  {
   set !znalazlem 1
+  event sysmessage Znalazlem sprzedawce.
   gosub sprzedawca
+ }
+ 
+ finditem %gornikID G_2
+ if #findCNT = 1
+ {
+  set !znalazlem 1
+  event sysmessage Znalazlem gornika.
+  gosub gornik
  }
 
  finditem %sklad G_2
  if #findCNT = 1
  {
   set !znalazlem 1
+  event sysmessage Znalazlem sklad. Dzialamy ze skladem.
   gosub dzialajSklad
  }
  
@@ -34,16 +51,44 @@ sub corobic
  {
   event sysmessage Nie wiem co robic. Sprobuj jeszcze raz
  }
- 
  set !znalazlem
- 
+return
+
+sub jedziemy
+;  gosub corobic
+ ; KKITKPE 14  ; Gornik
+ ; ALEEIPE 3   ; Sklep
+ ; ALEEIPE 16  ; Kopalnia
+
+ event sysmessage Czyszcze rece.
+ gosub oczyscRece
+
+ gosub corobic
+
+ event sysmessage Jedziemy do gornika
+ call libs\runebookCL.lib.euo runebook KKITKPE 14
+ gosub corobic
+
+ event sysmessage Jedziemy do sklepu
+ call libs\runebookCL.lib.euo runebook ALEEIPE 3
+ gosub corobic
+
+ event sysmessage Jedziemy do kopalni
+ call libs\runebookCL.lib.euo runebook ALEEIPE 16
+
+return
+
+sub gornik
+ event macro 1 0 I znowu mam cos do sprzedania.
 return
 
 sub dzialajSklad
- finditem %piec G_2
+ finditem %piec G_3
  if #FINDCNT > 0
   gosub przetapiaj %sklad
- gosub przeniesZPojemnika %sklad
+  
+ gosub przeniesZeSkladu %sklad
+ 
 return
 
 ; gosub przetapiaj %pojemnikID
@@ -82,6 +127,7 @@ sub sprzedawca
      finditem %zloto C_ , #BACKPACKID
   }
  until #findid = x
+ 
  repeat
   finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
   if #findid <> x
@@ -105,27 +151,19 @@ return
 ; ==========================
 ;  Przenies z Pojemnika
 ; ==========================
-; gosub przeniesZPojemnika %pojemnikID
-sub przeniesZPojemnika
- set !dokadPrzenosimy %1
- if !dokadPrzenosimy = N/A
- {
-  event sysmessage Nie podano parametru: pojemnikID
-  return
- }
- 
- 
- event sysmessage Przenosze ze skladu do glownego plecaka
- gosub otworzPojemnik !dokadPrzenosimy
+; gosub przeniesZeSkladu %pojemnikID
+sub przeniesZeSkladu
+
+ event sysmessage Przenosze przedmioty ze skladu do glownego plecaka.
+ gosub otworzPojemnik %sklad
  
  repeat
-  finditem %przedmioty_ze_skladu C_ , !dokadPrzenosimy
+  finditem %przedmioty_ze_skladu , %kamienieNaBramy C_ , %sklad
   if #FINDCNT > 0
   {
    event sysmessage Przenosze #FINDID #FINDTYPE #FINDSTACK - znalalzem #FINDCNT
    call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID #findstack
-   event sysmessage Znalazlem
-   finditem %przedmioty_ze_skladu C_ , !dokadPrzenosimy
+   finditem %przedmioty_ze_skladu C_ , %sklad
   }
  until #FINDCNT = 0
  
@@ -135,8 +173,8 @@ return
 ; ==========================
 ;  przeniesDoPoijemnika
 ; ==========================
-;gosub przeniesDoPojemnika %pojemnikID
-sub przeniesDoPojemnika
+;gosub przeniesDoSkladu %pojemnikID
+sub przeniesDoSkladu
  if %1 = N/A
  {
   event sysmessage Nie podano parametru: pojemnikID
@@ -165,4 +203,13 @@ sub otworzPojemnik
  repeat
   wait 1
  until #CONTID = #LOBJECTID
+return
+
+
+sub oczyscRece
+ finditem NPF
+ exevent drag #FINDID
+ wait 10
+ exevent dropc #BACKPACKID
+ wait 10
 return

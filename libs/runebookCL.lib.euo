@@ -4,7 +4,7 @@
 ; Shard:        Clair's Lair
 ; ---------------------------
 
-; call libs/runebookCL.lib.eu
+; call libs/runebookCL.lib.euo runebook ID numerRuny
 
 ; gosub runebook %2 [runebookID] %3 [runebookNumber]
 ; Makro do obslugi Ksiegi Run - UO CLr
@@ -57,7 +57,7 @@ if #mana < 70
    }
 
 ; Kamienie
-set %kamienie FVF_IVF_MWF_VUF_EWF_DWF_TVF_
+set %kamienie FVF_IVF_MWF_VUF_EWF_DWF_TVF_NVF_VVF_
 set %kamieniePojemnik #BACKPACKID
 
 ; Pierwsza strona
@@ -96,23 +96,19 @@ set %runaY15 156
 set %runaX16 222
 set %runaY16 170
 
-  set %KsiegaRunID %1
-  set %NumerRuny %2
+  set %KsiegaRunID %2
+  set %NumerRuny %3
 
   event sysmessage %KsiegaRunID %NumerRuny
-
   finditem %KsiegaRunID
-
-  if ( #FINDKIND = -1 )
+  if #FINDKIND = -1
   {
       event sysmessage Nie znalazlem runebooka!
       exit
   }
 
   ; Sprawdzanie pojemnika na kamienie i kamieni.
-
   finditem LKF C_ , #BACKPACKID
-
   if #FINDCNT > 0
   {
    set %kamieniePojemnik #FINDID
@@ -120,8 +116,8 @@ set %runaY16 170
 
   gosub OtworzPojemnik %kamieniePojemnik
 
-  finditem %kamienie C_ , %kamieniePojemnik ; Pojemnik na kamienie
-
+;  finditem %kamienie C_ , %kamieniePojemnik ; Pojemnik na kamienie
+  finditem %kamienie C ; Szukamy kamieni we wszystkich otwartych pojemnikach.
   if #FINDCNT > 0
   {
    set %kamienDoBramy #FINDID
@@ -133,9 +129,10 @@ set %runaY16 170
    exit
   }
 
-  set #LOBJECTID %KsiegaRunID
-  event macro 17
-  wait 10
+  repeat
+   set #LOBJECTID %KsiegaRunID
+   event macro 17
+  until #CONTKIND = GJZ && #CONTSIZEX = 382 && #CONTSIZEY = 231
 
   ; Jezeli ksiega jest otwarta wybieramy czar
   ; TODO: Sprawdzanie czy ksiega jest otwarta (#CONTSIZE + #CONTPOS)
@@ -144,55 +141,50 @@ set %runaY16 170
   ; #CONTSIZEX: 382
   ; #CONTSIZEY: 231
   ; #CONTKIND: GJZ
+  event sysmessage Ksiega jest widoczna, czaruje.
+  set %x #CONTPOSX + %runaX . %NumerRuny
+  set %y #CONTPOSY + %runaY . %NumerRuny
+  event sysmessage %runaY . %NumerRuny
+  event sysmessage Czaruje rune %NumerRuny w pozycji X: %x Y: %y
+  click %x %y
+  set #LTARGETID %kamienDoBramy
+  set #lTargetKind 1
+  target 10s
+  event macro 22 0 ; last target
+ }
 
-   ;   if #contSize = 382_231
-    ;   {
-        event sysmessage Ksiega jest widoczna, czaruje.
+ ; Klejnot_rozpadl_sie_na - tutaj sprawdzanie
 
-        set %x %runaX . %NumerRuny
-        set %y %runaY . %NumerRuny
+ finditem OTF ; Moongate
+ while #FINDKIND = -1
+  finditem OTF
 
-        event sysmessage %runaY . %NumerRuny
-        event sysmessage Czaruje rune %NumerRuny w pozycji X: %x Y: %y
-        click %x %y
+ set %staraPozycjaX #CHARPOSX
+ set %staraPozycjaY #CHARPOSY
 
-        set #LTARGETID %kamienDoBramy
-        set #lTargetKind 1
-        target 10s
-        event macro 22 0 ; last target
-       ;  }
-       ; Klejnot_rozpadl_sie_na
+ event macro 15 21 ; Teleport
+ target 3s
+ event macro 23 0 ; Target Self
+ wait 1s
 
-      finditem OTF ; Moongate
-      while #FINDKIND = -1
-       finditem OTF
+ ; Odwolanie bramy
+ if %staraPozycjaX <> #CHARPOSX || %staraPozycjaY <> #CHARPOSY
+ {
+  event macro 15 33 ; Dispel Field
+  target 5s
+  event macro 23 0 ; Target Self
+ }
+ else
+ {
+  event sysmessage Postac nie przeniosla sie, lub brama postawiona jest w to samo miejsce.
+  event macro 15 21 ; Teleport
+  target 3s
+  event macro 23 0 ; Target Self
 
-      set %staraPozycjaX #CHARPOSX
-      set %staraPozycjaY #CHARPOSY
-
-      event macro 15 21 ; Teleport
-      target 3s
-      event macro 23 0 ; Target Self
-      wait 1s
-
-      ; Odwolanie bramy
-      if %staraPozycjaX <> #CHARPOSX || %staraPozycjaY <> #CHARPOSY
-      {
-       event macro 15 33 ; Dispel Field
-       target 5s
-       event macro 23 0 ; Target Self
-      }
-      else
-      {
-       event sysmessage Postac nie przeniosla sie, lub brama postawiona jest w to samo miejsce.
-       event macro 15 21 ; Teleport
-       target 3s
-       event macro 23 0 ; Target Self
-
-       event sysmessage Odwoluje brame mimo wszystko.
-       event macro 15 33 ; Dispel Field
-       target 5s
-       event macro 23 0 ; Target Self
-      }
+  event sysmessage Odwoluje brame mimo wszystko.
+  event macro 15 33 ; Dispel Field
+  target 5s
+  event macro 23 0 ; Target Self
+ }
 
 exit
