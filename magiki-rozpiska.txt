@@ -1,0 +1,7 @@
+Magiki Rozpiska dla shardu Clair's Lair
+by Krowa
+I           II              III           IV                 V            VI
+ran     --> sily        --> uderzenia --> niewrazliwosci --> smierci
+ciepla  --> iskry       --> plomienia --> ognia          --> slonca
+zimna   --> mrozu       --> lodu      --> zamrozenia     --> zamieci  --> zimy
+blysku  --> blyskawicy  --> wstrzasu  --> gromu          --> burzy
