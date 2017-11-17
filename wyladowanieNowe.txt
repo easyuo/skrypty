@@ -95,7 +95,7 @@ return
 sub przetapiaj
   event sysmessage Szuakmy rudy do przetopienia w plecaku i w skladzie
   if %1 <> N/A
-   gosub otworzPojemnik %1
+   call libs\pojemnik.euo otworz %1
 
   repeat
    finditem DWJ C
@@ -123,7 +123,7 @@ sub sprzedawca
   finditem %zloto C_ , #BACKPACKID
   if #findid <> x
   {
-   call libs\przenoszenie.lib.euo przenies #findid %sprzedawcaID #findstack
+   call libs\przenies.euo przedmiot #findid %sprzedawcaID #findstack
      finditem %zloto C_ , #BACKPACKID
   }
  until #findid = x
@@ -132,7 +132,7 @@ sub sprzedawca
   finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
   if #findid <> x
   {
-   call libs\przenoszenie.lib.euo przenies #findid %sprzedawcaID #findstack
+   call libs\przenies.euo przedmiot #findid %sprzedawcaID #findstack
    repeat
      wait 1
    until #CONTKIND = EGFD
@@ -155,14 +155,14 @@ return
 sub przeniesZeSkladu
 
  event sysmessage Przenosze przedmioty ze skladu do glownego plecaka.
- gosub otworzPojemnik %sklad
+ call libs\pojemnik.euo otworz %sklad
  
  repeat
   finditem %przedmioty_ze_skladu , %kamienieNaBramy C_ , %sklad
   if #FINDCNT > 0
   {
    event sysmessage Przenosze #FINDID #FINDTYPE #FINDSTACK - znalalzem #FINDCNT
-   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID #findstack
+   call libs\przenies.euo przedmiot #findid #BACKPACKID #findstack
    finditem %przedmioty_ze_skladu C_ , %sklad
   }
  until #FINDCNT = 0
@@ -181,13 +181,13 @@ sub przeniesDoSkladu
   return
  }
  
- gosub otworzPojemnik %1
+ call libs\pojemnik.euo otworz %1
 
  repeat
   finditem %przedmioty_do_skladu C_ , #BACKPACKID
   if #findid <> x
   {
-   call libs\przenoszenie.lib.euo przenies #findid %1 #findstack
+   call libs\przenies.euo przedmiot #findid %1 #findstack
    finditem %przedmioty_do_skladu C_ , #BACKPACKID
   }
  until #findid = x

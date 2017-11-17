@@ -24,7 +24,7 @@ sub rzeczy
   {
    if #FINDCOL = 38 || #FINDCOL = 104
    {
-    call libs\przenoszenie.lib.euo przenies #findid %sklad #findstack
+    call libs\przenies.euo przedmiot #findid %sklad #findstack
     finditem * C_ , #BACKPACKID
    }
   }

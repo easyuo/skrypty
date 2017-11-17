@@ -403,14 +403,14 @@ sub odkladanie
 
   if #FINDCNT > 0
   {
-   call libs\przenoszenie.lib.euo przenies #findid %sklad #findstack
+   call libs\przenies.euo przedmiot #findid %sklad #findstack
    set !afterCall 1
    finditem %przedmioty_do_skladu C_ , #BACKPACKID
   }
  until #FINDCNT = 0
   
  event sysmessage Otwieranie pojemnika przed uzupelnianiem
- gosub otworzPojemnik %pojemnik
+ call libs\pojemnik.euo otworz %pojemnik
  event sysmessage Uzupelnianie stuffu (bandaze, ziola)
 
   ; Bandaze
@@ -423,7 +423,7 @@ sub odkladanie
    wait 1s
    finditem ZLF C_ , %pojemnik
    if #FINDCNT > 0
-    call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID 5
+    call libs\przenies.euo przedmiot #findid #BACKPACKID 5
  }
   
 ; Ziola
@@ -432,10 +432,10 @@ sub odkladanie
  {
   set %ilePrzeniesc %ileZiol - #FINDSTACK
   event sysmessage Uzupe³niam belladone: %ilePrzeniesc
-  gosub otworzPojemnik %sklad
+  call libs\pojemnik.euo otworz %sklad
   finditem WZF C_ , %pojemnik
   if #FINDCNT > 0
-   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID %ilePrzeniesc
+   call libs\przenies.euo przedmiot #findid #BACKPACKID %ilePrzeniesc
  }
 
  finditem KUF C_ , #BACKPACKID
@@ -443,10 +443,10 @@ sub odkladanie
  {
   set %ilePrzeniesc %ileZiol - #FINDSTACK
   event sysmessage Uzupe³niam perly: %ilePrzeniesc
-  gosub otworzPojemnik %sklad
+  call libs\pojemnik.euo otworz %sklad
   finditem KUF C_ , %pojemnik
   if #FINDCNT > 0
-   call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID %ilePrzeniesc
+   call libs\przenies.euo przedmiot #findid #BACKPACKID %ilePrzeniesc
  }
 
 return
@@ -488,7 +488,7 @@ sub ustaw_narzedzie
 
      finditem NPF C
      if #FINDCNT > 0
-      call libs\przenoszenie.lib.euo przenies #findid #BACKPACKID 1
+      call libs\przenies.euo przedmiot #findid #BACKPACKID 1
 
      gosub zmiana_miejsca
 

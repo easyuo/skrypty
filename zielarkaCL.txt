@@ -6,7 +6,7 @@
 ;  2017.11
 ;  * Modyfikacje dla kobiecej postaci (CLka) - Znalazlas
 ;  * Dobieranie pojedynczego nozyka ze skladu
-;  * Dobieranie tylko odpowiedniej ilosci ziol do Corpa
+;  * Leczenie, odtruwanie
 
 ; Krzewy
 ; OIJ - Krzew Mandragory
@@ -65,8 +65,8 @@ start:
 
  event macro 34 0
  event macro 31 0
- gosub otworzPojemnik #BACKPACKID
- gosub otworzPojemnik #CHARID
+ call libs\pojemnik.euo otworz #BACKPACKID
+ call libs\pojemnik.euo otworz #CHARID
 
  menu get tryb_select
  set *zielarka_tryb #menures
@@ -304,7 +304,7 @@ sub odkladanie
   {
    set %ilePrzeniesc %ileZiol - #FINDSTACK
    event sysmessage Uzupelniam %zioloNazwa . %i : %ilePrzeniesc
-   gosub otworzPojemnik %sklad
+   call libs\pojemnik.euo otworz %sklad
    finditem %zioloTyp . %i C_ , %sklad
    gosub przeniesPrzedmiot #findid #BACKPACKID %ilePrzeniesc
   }
@@ -328,6 +328,8 @@ sub ustaw_narzedzie
   set %narzedzieNazwa Lopatka zielarza
  }
 
+ event sysmessage Szukam: %narzedzieNazwa : %narzedzieTyp
+
  ; Sprawdzanie narzedzia w rece
  finditem %narzedzieTyp C_ , #CHARID
   if #findkind = -1
@@ -338,8 +340,8 @@ sub ustaw_narzedzie
    {
     event sysmessage Nie znalazlem narzedzia w rece ani w plecaku postaci.
     gosub idzPozycjaStartowa
-    gosub otworzPojemnik %sklad
-    gosub otworzPojemnik %skladNarzedzia
+    call libs\pojemnik.euo otworz %sklad
+    call libs\pojemnik.euo otworz %skladNarzedzia
     
     finditem %narzedzieTyp C_ , %skladNarzedzia
     if #findkind = -1
@@ -486,17 +488,6 @@ if #charposx <> %pozycja_startowa_x || #charposy <> %pozycja_startowa_y
   wait 1s
  until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
 }
-return
-
-; ==========================
-;  otworzPojemnik %pojemnikID
-; ==========================
-sub otworzPojemnik
- set #lobjectid %1
- event macro 17 0
- repeat
-  wait 1
- until #CONTID = #LOBJECTID
 return
 
 ; ====================

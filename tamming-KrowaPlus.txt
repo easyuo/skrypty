@@ -1194,7 +1194,7 @@ set %runaY16 170
    set %kamieniePojemnik #FINDID
   }
 
-  gosub OtworzPojemnik %kamieniePojemnik
+  call libs\pojemnik.euo otworz %kamieniePojemnik
 
   finditem %kamienie C_ , %kamieniePojemnik ; Pojemnik na kamienie
 

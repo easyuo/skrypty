@@ -1,0 +1,13 @@
+; Biblioteka:   Otwieranie pojemnika
+; Autor:        Krowa
+; Data:         17.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+; call libs\pojemnik.euo otworz %ID_POJEMNIKA
+sub otworz
+ set #LOBJECTID %2
+ repeat
+  event macro 17 0
+ until #CONTID = #LOBJECTID
+exit

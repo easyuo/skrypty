@@ -4,6 +4,7 @@
 ; Shard:        Clair's Lair
 ; ---------------------------
 
+; call libs\przenies.euo przedmiot %CO %GDZIE %ILE
 sub przenies
   exevent drag %2 %4
   exevent dropc %3

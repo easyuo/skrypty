@@ -187,7 +187,7 @@ return
 
 sub ZnajdzNarzedzia
  event sysmessage Szukam narzedzi
- gosub OtworzPojemnik %pojemnik_z_narzedziami
+ call libs\pojemnik.euo otworz %pojemnik_z_narzedziami
  FindItem %narzedzia_majstra C_ , %pojemnik_z_narzedziami
  if #FindKind = -1
    {
@@ -210,7 +210,7 @@ return
 
 sub ZnajdzMaterial
  event sysmessage Szukam materialu
- gosub OtworzPojemnik %pojemnik_ze_sztabami
+ call libs\pojemnik.euo otworz %pojemnik_ze_sztabami
  FindItem ENK C_ , %pojemnik_ze_sztabami
  if #FindKind = -1
    {
