@@ -2,7 +2,7 @@ InitEvents
 IgnoreItem Reset
 ; === Edytujemy tutaj ===
 
-set %TnijCiala 0
+set %TnijCiala 1
 set %AutoGrabCiala 0
 set %AutoGrabZiemia 0
 set %UzywajAnatomii 1
@@ -57,8 +57,14 @@ if findkind <> -1
 
 set %czas_anatomia 11
 set %czas_bandarz 10
+set %czas_enemyID_msg 6
+set %timer_enemyID_msg #SCNT
+
 set %timer_bandarz #SCNT
 set %timer_anatomia #SCNT
+
+   {
+    set %timer_anatomia #SCNT + %czas_anatomia
 
 Event SysMessage [AA] Auto Anatomia + autobandaz.....ver 1.0.5 (modyfikacje: Krowa)
 petla:
@@ -114,7 +120,13 @@ petla:
 
  if #enemyid <> N/A
  {
-  event exmsg #enemyID 3 30 ATAKUJE!
+  ; Wyswietla komunikat nad ENEMYID ktory nas atakuje
+  if %timer_enemyID_msg <= #SCNT
+  {
+   set %timer_enemyID_msg #SCNT + %czas_enemyID_msg
+   event exmsg #enemyID 3 30 ATAKUJE!
+  }
+  
   if %UzywajAnatomii = 1
   {
    if %timer_anatomia <= #SCNT
