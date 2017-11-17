@@ -63,8 +63,6 @@ goto #menubutton
 
 start:
 
- event macro 34 0
- event macro 31 0
  call libs\pojemnik.euo otworz #BACKPACKID
  call libs\pojemnik.euo otworz #CHARID
 

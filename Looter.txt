@@ -9,6 +9,7 @@
 ; The order the script loots stuff in can be seen in the main subroutine below.
 ; If there are multiple corpses in range, the nearest one is looted first
 ; and then ignored in subsequent looting attempts.
+
 set %hk_main F2
 
 ; Hotkey for looting a whole corpse slowly
@@ -45,6 +46,7 @@ repeat
 until #false
 
 sub main
+  event sysmessage GRABIMY!
   set %count 0
 
   gosub findCorpse
@@ -141,7 +143,7 @@ sub findCorpse
 
   for %i 0 2
   {
-    finditem YFM_KNF G_ , %i
+    finditem YFM_KNF_ G_ , %i
 
     if #findcnt > 0
     {
@@ -161,7 +163,7 @@ sub openCorpse
   {
     set #lobjectid %corpseID
     event macro 17
-    sleep 800
+
   }
 return
 
@@ -189,7 +191,6 @@ sub lootItem
     goto hotkeyloop
   }
 
-  exevent Drag %1 %2
   if *lootBag <> #backpackid
   {
     finditem *lootBag C_ , #backpackid
@@ -200,7 +201,9 @@ sub lootItem
       set *lootBag #backpackid
     }
   }
-  exevent Dropc *lootBag
+
+  call libs\przenies.euo przedmiot %1 *lootBag %2
+
 return
 
 sub setLootBag
@@ -233,4 +236,5 @@ sub setLootBag
     set *lootBag #backpackid
   }
 return
+
 
