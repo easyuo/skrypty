@@ -9,7 +9,7 @@ set %dragPauza 4                              ; Pauza przy drag/drop
 set %dropPauza 8                              ; Pauza przy drag/drop
 set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
-set %ileRudyZelazaOdkladanie 19000            ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
+set %ileRudyZelazaOdkladanie 20000            ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
 set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby
@@ -533,7 +533,8 @@ sub odkladanie
   {
    event sysmessage Znalazlem rudy zelaza w skladzie: #FINDSTACK SPRZEDAJE!
    gosub jedziemy
-   goto loop
+   event sysmessage Koniec jazdy. Wracamy do pracy.
+   goto start
   }
  }
 
@@ -827,8 +828,11 @@ sub jedziemy
  event sysmessage Jedziemy do kopalni
  call libs\runebookCL.lib.euo runebook ALEEIPE 16
 
+ event sysmessage Jestesmy w kopalni ponownie. Odkladam rzeczy do pojemnika
  gosub przeniesDoSkladu
- goto loop
+ event sysmeesage Rzeczy odlozone. Wracam do pracy
+
+ goto start
 
 return
 
@@ -925,19 +929,12 @@ return
 ; ==========================
 ;gosub przeniesDoSkladu %pojemnikID
 sub przeniesDoSkladu
- if %1 = N/A
- {
-  event sysmessage Nie podano parametru: pojemnikID
-  return
- }
-
- call libs\pojemnik.euo otworz %1
-
+ call libs\pojemnik.euo otworz %sklad
  repeat
   finditem %przedmioty_do_skladu C_ , #BACKPACKID
   if #findid <> x
   {
-   call libs\przenies.euo przedmiot #findid %1 #findstack
+   call libs\przenies.euo przedmiot #findid %sklad #findstack
    finditem %przedmioty_do_skladu C_ , #BACKPACKID
   }
  until #findid = x
