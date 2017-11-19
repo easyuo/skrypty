@@ -1,5 +1,5 @@
 set %przedmioty_do_skladu ENK_OKF_POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF_
-set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_
+set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_OKF ; OKF - pojemnik na ziola
 set %kamienieNaBramy FVF_IVF_MWF_VUF_EWF_DWF_TVF_NVF_VVF_
 set %przedmioty_do_sprzedawcy ENK_RVH_
 
@@ -76,6 +76,8 @@ sub jedziemy
  event sysmessage Jedziemy do kopalni
  call libs\runebookCL.lib.euo runebook ALEEIPE 16
 
+ gosub przedmiotyDoSkladu
+
 return
 
 sub gornik
@@ -108,11 +110,9 @@ sub przetapiaj
 
 return
 
-
 ; ------------
 ;  Sprzedawca
 ; ------------
-
 sub sprzedawca
  event sysmessage Jestesmy przy sprzedawcy. Dzialamy.
  finditem %sprzedawcaID G_2
@@ -147,7 +147,6 @@ sub sprzedawca
 }
 return
 
-
 ; ==========================
 ;  Przenies z Pojemnika
 ; ==========================
@@ -156,22 +155,21 @@ sub przeniesZeSkladu
 
  event sysmessage Przenosze przedmioty ze skladu do glownego plecaka.
  call libs\pojemnik.euo otworz %sklad
- 
+
+ finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
  repeat
-  finditem %przedmioty_ze_skladu , %kamienieNaBramy C_ , %sklad
   if #FINDCNT > 0
   {
    event sysmessage Przenosze #FINDID #FINDTYPE #FINDSTACK - znalalzem #FINDCNT
    call libs\przenies.euo przedmiot #findid #BACKPACKID #findstack
-   finditem %przedmioty_ze_skladu C_ , %sklad
   }
+  finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
  until #FINDCNT = 0
  
 return
 
-
 ; ==========================
-;  przeniesDoPoijemnika
+;  przeniesDoPojemnika
 ; ==========================
 ;gosub przeniesDoSkladu %pojemnikID
 sub przeniesDoSkladu
@@ -192,19 +190,6 @@ sub przeniesDoSkladu
   }
  until #findid = x
 return
-
-
-; ==========================
-;  otworzPojemnik %pojemnikID
-; ==========================
-sub otworzPojemnik
- set #lobjectid %1
- event macro 17 0
- repeat
-  wait 1
- until #CONTID = #LOBJECTID
-return
-
 
 sub oczyscRece
  finditem NPF
