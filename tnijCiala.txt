@@ -1,46 +1,99 @@
 ; Krowa 06-10-2017
 ; Tnie ciala gdy nie ma wroga.
+; Wycina ziola z ciala lopatka.
 
- ; Szukanie sztyletu w plecaku
- finditem TSF C_ , #BACKPACKID
+set %tnijCiala 1
+set %kopLopatka 1
+
+set %sztylet TSF
+set %lopatka WSF
+set %zwloki  YFM
+
+gosub znajdzSztylet
+
+loop:
+ if #CHARGHOST = YES
+ {
+  event sysmessage Cholera, nie zyje.
+  wait 5s
+  goto loop
+ }
+
+ if #ENEMYID = N/A
+ {
+  finditem %zwloki G_2
+  if #FINDCNT > 0
+  {
+   if H in #charstatus
+   {
+  ; Jestesmy ukryci. Nie tniemy
+    event sysmessage Jestesmy ukryci. Nie TNIEMY!
+    wait 1s
+   }
+   else
+   {
+    ; -----------
+    ; Kop lopatka
+    ; -----------
+    if %kopLopatka = 1
+    {
+     gosub znajdzLopatke
+     if %lopatkaID <> N/A
+     {
+      event sysmessage Mam kopac lopatk¹ ale nie znalazlem zadnej w plecaku.
+      wait 1s
+     }
+     else
+     {
+      set #lobjectid %lopatkaID ; sztylet w plecaku
+      for #findindex 1 #findcnt
+      {
+       event sysmessage Tne cialo # #findindex
+       event Macro 17 ; Last Object
+       target 5s
+       set #ltargetid #findID
+       set #LTargetKind 1
+       event Macro 22  ; Last Target
+      }
+     }
+    }
+    
+    ; ----------
+    ; Tnij Ciala
+    ; ----------
+    if %tnijCiala = 1
+    {
+     set #lobjectid %SztyletID ; sztylet w plecaku
+     event sysmessage Tne #findCNT cial
+     for #findindex 1 #findcnt
+     {
+      event sysmessage Tne cialo # #findindex
+      event Macro 17 ; Last Object
+      target 5s
+      set #ltargetid #findID
+      set #LTargetKind 1
+      event Macro 22  ; Last Target
+     }
+     event SysMessage Pociete
+    }
+   }
+  }
+ }
+goto loop
+
+sub znajdzSztylet
+ finditem %sztylet C_ , #BACKPACKID
  if findkind <> -1
  {
   set %sztyletID #FINDID
-   event sysmessage Sztylet: %sztyletID
+  event sysmessage Sztylet: %sztyletID
  }
+return
 
-loop:
-
-if #CHARGHOST = YES
-  goto loop
-
-if #ENEMYID = N/A
-{
- FINDITEM YFM G_2
- if #FINDCNT > 0
- {
-  if H in #charstatus
-  {
-  ; Jestesmy ukryci. Nie tniemy
-   event sysmessage Jestesmy ukryci. Nie TNIEMY!
-   wait 1s
-  }
-  else
-  {
-   set #lobjectid %SztyletID ; sztylet w plecaku
-   event sysmessage Tne #findCNT cial
-   for #findindex 1 #findcnt
-   {
-    event sysmessage Tne cialo # #findindex
-    event Macro 17 ; Last Object
-    target
-    set #ltargetid #findID
-    set #LTargetKind 1
-    event Macro 22  ; Last Target
-   }
-   event SysMessage Pociete
-  }
- }
-}
-
-goto loop
+sub znajdzLopatke
+ finditem %lopatka C_ , #BACKPACKID
+ if findkind <> -1
+  set %lopatkaID #FINDID
+ else
+  set %lopatkaID
+return

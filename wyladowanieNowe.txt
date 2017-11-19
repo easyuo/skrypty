@@ -2,7 +2,6 @@ set %przedmioty_do_skladu ENK_OKF_POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WV
 set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_OKF ; OKF - pojemnik na ziola
 set %kamienieNaBramy FVF_IVF_MWF_VUF_EWF_DWF_TVF_NVF_VVF_
 set %przedmioty_do_sprzedawcy ENK_RVH_
-
 set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby

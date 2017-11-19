@@ -1,12 +1,9 @@
 ;co ile sekund ma odswiezac okno (nie polecam odswiezac czesciej niz co 5 sek - moze zjadac procka
 set %refresh 5
-
 ;czy ma otwierac wszystkie pojemniki, czy sami otworzymy wlasciwe pojemniki przed rozpoczeciem zliczania
 set %open #true
-
 ;czy ma zliczac rude/sztaby rowniez w jakims pojemniku (i jego podpojemnikach) poza plecakiem?
 set %another #true
-
 
 set %containers KUD_ZJF_CKF_AUD_CUD_HKF_SPF_GRL_FRL_BUD_IIF_HIF_KIF_JIF_IKF_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP
 set %ore DWJ_ENK
@@ -26,7 +23,6 @@ set %mithril _1320
 set %magnetyt _1309
 set %krwawnik _1209
 set %terathryt _2007
-
 
 if %another = #true 1
    gosub pointAnotherCont

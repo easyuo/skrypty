@@ -1,3 +1,10 @@
+; Autor: Krowa
+; Data:  19.11.2017
+; Opis:
+; Makro autoamtycznie wybiera jak leczyc (bandaze/magia) na podstawie skila Magery.
+; Pije zolte butle, tnie ciala, pije pomaranczowe butle oraz czerwone.
+; Automatycznie podnosi przedmioty z ziemii, grabi z cial.
+
 InitEvents
 IgnoreItem Reset
 ; === Edytujemy tutaj ===
@@ -155,10 +162,11 @@ sub Odtruj
   if #mana < 11
    event macro 1 0 .wypij duza mana
 
-  event macro 15 24
+  event macro 15 24 ; Vas An Nox
   target 3s
   event macro 23 0
  }
+ wait 10
 return
 
 sub Leczenie
