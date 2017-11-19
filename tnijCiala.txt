@@ -10,6 +10,7 @@ set %lopatka WSF
 set %zwloki  YFM
 
 gosub znajdzSztylet
+gosub znajdzLopatke
 
 loop:
  if #CHARGHOST = YES
@@ -32,9 +33,6 @@ loop:
    }
    else
    {
-    gosub znajdzLopatke
-    finditem %zwloki G_2
-
     ; -----------
     ; Kop lopatka
     ; -----------
@@ -51,7 +49,7 @@ loop:
       for #findindex 1 #findcnt
       {
        event Macro 17 ; Last Object
-       target 5s
+       target
        set #ltargetid #findID
        set #LTargetKind 1
        event Macro 22  ; Last Target
