@@ -2,7 +2,7 @@ InitEvents
 IgnoreItem Reset
 ; === Edytujemy tutaj ===
 
-set %TnijCiala 1
+set %TnijCiala 0
 set %AutoGrabCiala 0
 set %AutoGrabZiemia 0
 set %UzywajAnatomii 1
