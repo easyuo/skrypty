@@ -10,6 +10,7 @@ set %lopatka WSF
 set %zwloki  YFM
 
 gosub znajdzSztylet
+gosub znajdzLopatke
 
 loop:
  if #CHARGHOST = YES
@@ -37,20 +38,17 @@ loop:
     ; -----------
     if %kopLopatka = 1
     {
-     gosub znajdzLopatke
-     if %lopatkaID <> N/A
+     if %lopatkaID <> X
      {
-      event sysmessage Mam kopac lopatk¹ ale nie znalazlem zadnej w plecaku.
-      wait 1s
+      event sysmessage Mam kopac lopatka ale nie znalazlem zadnej w plecaku.
      }
      else
      {
       set #lobjectid %lopatkaID ; sztylet w plecaku
       for #findindex 1 #findcnt
       {
-       event sysmessage Tne cialo # #findindex
        event Macro 17 ; Last Object
-       target 5s
+       target
        set #ltargetid #findID
        set #LTargetKind 1
        event Macro 22  ; Last Target
@@ -69,7 +67,7 @@ loop:
      {
       event sysmessage Tne cialo # #findindex
       event Macro 17 ; Last Object
-      target 5s
+      target
       set #ltargetid #findID
       set #LTargetKind 1
       event Macro 22  ; Last Target
