@@ -38,7 +38,6 @@ loop:
     ; -----------
     if %kopLopatka = 1
     {
-     event sysmessage %lopatkaID
      if %lopatkaID <> X
      {
       event sysmessage Mam kopac lopatka ale nie znalazlem zadnej w plecaku.
