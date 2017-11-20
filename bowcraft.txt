@@ -2,6 +2,7 @@
 ; Autor:       Nieznany
 ; Modyfikacje: Krowa
 ; Data:        20.11.2017
+
 initevents
 set %lobj #ltargetid
 set %produkcja 1 ;wpisz, co ma robic skrypt (0 - strzaly, 1 - belty)
@@ -14,7 +15,6 @@ finditem VLK C_ , %plecak ;znajduje piora w w plecaku
 Exevent Drag #findid
 wait 1
 Exevent Dropc %worek ;wrzuca jedno piorko do plecaka
-
 wait 1s
 piora
 if #FINDSTACK > 1
