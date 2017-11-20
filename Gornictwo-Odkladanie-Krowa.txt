@@ -9,10 +9,83 @@ set %dragPauza 4                              ; Pauza przy drag/drop
 set %dropPauza 8                              ; Pauza przy drag/drop
 set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
+set %ileRudyZelazaOdkladanie 20000            ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
+set %piec JBG_
+; DWJ - Ruda
+; ENK - Sztaby
+; RVH - Mapy
+
+set %sprzedawcaID XHCJQD
+set %gornikID     FUCHAD
+
+
+set %zelazo       0
+set %miedz        1548
+set %malachit     2130
+set %rdzawa_ruda  1541
+set %srebro       1301
+set %zloto        1121
+set %syderyt      1109
+set %agapit       1024
+set %valorite     2001
+set %verite       1424
+set %azuryt       1247
+set %mithril      1320
+set %magnetyt     1309
+set %krwawnik     1209
+set %terathryt    2007
+
+set %ruda_cena . %zelazo 2
+set %ruda_nazwa . %zelazo Zelazo
+
+set %ruda_cena . %miedz 3
+set %ruda_nazwa . %miedz Miedz
+
+set %ruda_cena . %malachit 4
+set %ruda_nazwa . %malachit Malachit
+
+set %ruda_cena . %rdzawa_ruda 4
+set %ruda_nazwa . %rdzawa_ruda Rdzawa
+
+set %ruda_cena . %srebro 5
+set %ruda_nazwa . %srebro Srebro
+
+set %ruda_cena . %zloto 5
+set %ruda_nazwa . %zloto Zloto
+
+set %ruda_cena . %syderyt 8
+set %ruda_nazwa . %syderyt Syderyt
+
+set %ruda_cena . %agapit 10
+set %ruda_nazwa . %agapit Agapit
+
+set %ruda_cena . %valorite 12
+set %ruda_nazwa . %valorite Valorite
+
+set %ruda_cena . %verite 12
+set %ruda_nazwa . %verite Verite
+
+set %ruda_cena . %azuryt 40
+set %ruda_nazwa . %azuryt Azuryt
+
+set %ruda_cena . %mithryl 100
+set %ruda_nazwa . %mithryl Mithryl
+
+set %ruda_cena . %magnetyt 150
+set %ruda_nazwa . %magnetyt Magnetyt
+
+set %ruda_cena . %krwawnik 200
+set %ruda_nazwa . %krwawnik Krwawnik
+
+set %ruda_cena . %terathryt 400
+set %ruda_nazwa . %terathryt Terathryt
 
 ; ==== Koniec EDYCJI ====
-
-set %przedmioty_do_skladu OKF_ENK_POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF
+set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_OKF ; OKF - pojemnik na ziola
+set %przedmioty_do_skladu OKF_ENK_POF_JZF_HUF_MZF_AMF_SZF_DWJ_EQD_VUF_RVH_QVF_WVF_EVF_RVF_TVF_YVF_UVF_IVF_OVF_PVF_AVF_SVF_DVF_FVF_GVF_HVF_JVF_KVF_LVF_ZVF_XVF_CVF_VVF_BVF_NVF_MVF_QWF_WWF_EWF_RWF_TWF_YWF_UWF_IWF_OWF_PWF_AWF_SWF_DWF_FWF_GWF_HWF_JWF_KWF_LWF_ZWF_XWF_CWF_VWF_BWF_NWF_MWF_
+set %kamienieNaBramy FVF_IVF_MWF_VUF_EWF_DWF_TVF_NVF_VVF_
+set %przedmioty_do_sprzedawcy ENK_RVH_
+set %zloto        POF_
 set %piece_do_przetapiania JBG
 
 ; Zmienne dla ArmsLore
@@ -448,6 +521,22 @@ sub odkladanie
   if #FINDCNT > 0
    call libs\przenies.euo przedmiot #findid #BACKPACKID %ilePrzeniesc
  }
+ 
+ ; XXXXX
+; DWJ - Ruda
+; ENK - Sztaby
+ finditem DWJ C_ , %sklad
+ for #FINDINDEX 1 #FINDCNT
+ {
+  event sysmessage %ruda_nazwa . #FINDCOL Ilosc: #FINDSTACK
+  if #FINDCOL = 0 && #FINDSTACK > %ileRudyZelazaOdkladanie
+  {
+   event sysmessage Znalazlem rudy zelaza w skladzie: #FINDSTACK SPRZEDAJE!
+   gosub jedziemy
+   event sysmessage Koniec jazdy. Wracamy do pracy.
+   goto start
+  }
+ }
 
 return
 
@@ -683,4 +772,178 @@ sub otworzPojemnik
  repeat
   wait 1
  until #CONTID = #LOBJECTID
+return
+
+sub corobic
+ finditem %sprzedawcaID G_2
+ if #findCNT = 1
+ {
+  set !znalazlem 1
+  event sysmessage Znalazlem sprzedawce.
+  gosub sprzedawca
+ }
+
+ finditem %gornikID G_2
+ if #findCNT = 1
+ {
+  set !znalazlem 1
+  event sysmessage Znalazlem gornika.
+  gosub gornik
+ }
+
+ finditem %sklad G_2
+ if #findCNT = 1
+ {
+  set !znalazlem 1
+  event sysmessage Znalazlem sklad. Dzialamy ze skladem.
+  gosub dzialajSklad
+ }
+
+ if !znalazlem <> 1
+ {
+  event sysmessage Nie wiem co robic. Sprobuj jeszcze raz
+ }
+ set !znalazlem
+return
+
+sub jedziemy
+;  gosub corobic
+ ; KKITKPE 14  ; Gornik
+ ; ALEEIPE 3   ; Sklep
+ ; ALEEIPE 16  ; Kopalnia
+
+ event sysmessage Czyszcze rece.
+ gosub oczyscRece
+
+ gosub corobic
+
+ event sysmessage Jedziemy do gornika
+ call libs\runebookCL.lib.euo runebook KKITKPE 14
+ gosub corobic
+
+ event sysmessage Jedziemy do sklepu
+ call libs\runebookCL.lib.euo runebook ALEEIPE 3
+ gosub corobic
+
+ event sysmessage Jedziemy do kopalni
+ call libs\runebookCL.lib.euo runebook ALEEIPE 16
+
+ event sysmessage Jestesmy w kopalni ponownie. Odkladam rzeczy do pojemnika
+ gosub przeniesDoSkladu
+ event sysmeesage Rzeczy odlozone. Wracam do pracy
+
+ goto start
+
+return
+
+sub gornik
+ event macro 1 0 I znowu mam cos do sprzedania.
+return
+
+sub dzialajSklad
+ finditem %piec G_3
+ if #FINDCNT > 0
+  gosub przetapiaj %sklad
+
+ gosub przeniesZeSkladu %sklad
+
+return
+
+; gosub przetapiaj %pojemnikID
+sub przetapiaj
+  event sysmessage Szuakmy rudy do przetopienia w plecaku i w skladzie
+  if %1 <> N/A
+   call libs\pojemnik.euo otworz %1
+
+  repeat
+   finditem DWJ C
+   if #FINDCNT > 0
+   {
+    set #lObjectID #FindID
+    event Macro 17
+   }
+  until #FINDCNT = 0
+
+return
+
+; ------------
+;  Sprzedawca
+; ------------
+sub sprzedawca
+ event sysmessage Jestesmy przy sprzedawcy. Dzialamy.
+ finditem %sprzedawcaID G_2
+ if #findCNT = 1
+ {
+ ; ZLOTO
+ repeat
+  finditem %zloto C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenies.euo przedmiot #findid %sprzedawcaID #findstack
+     finditem %zloto C_ , #BACKPACKID
+  }
+ until #findid = x
+
+ repeat
+  finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenies.euo przedmiot #findid %sprzedawcaID #findstack
+   repeat
+     wait 1
+   until #CONTKIND = EGFD
+
+   if #CONTNAME = Stringquery_gump && #CONTKIND = EGFD && #CONTSIZEX = 393 && #CONTSIZEY = 270
+   {
+    call libs\sprzedawcaCL.lib.euo ustalCene 444
+   }
+   finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
+  }
+ until #findid = x
+}
+return
+
+; ==========================
+;  Przenies z Pojemnika
+; ==========================
+; gosub przeniesZeSkladu %pojemnikID
+sub przeniesZeSkladu
+
+ event sysmessage Przenosze przedmioty ze skladu do glownego plecaka.
+ call libs\pojemnik.euo otworz %sklad
+
+ finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
+ repeat
+  if #FINDCNT > 0
+  {
+   event sysmessage Przenosze #FINDID #FINDTYPE #FINDSTACK - znalalzem #FINDCNT
+   call libs\przenies.euo przedmiot #findid #BACKPACKID #findstack
+  }
+  finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
+ until #FINDCNT = 0
+
+return
+
+; ==========================
+;  przeniesDoPojemnika
+; ==========================
+;gosub przeniesDoSkladu %pojemnikID
+sub przeniesDoSkladu
+ call libs\pojemnik.euo otworz %sklad
+ repeat
+  finditem %przedmioty_do_skladu C_ , #BACKPACKID
+  if #findid <> x
+  {
+   call libs\przenies.euo przedmiot #findid %sklad #findstack
+   finditem %przedmioty_do_skladu C_ , #BACKPACKID
+  }
+ until #findid = x
+return
+
+sub oczyscRece
+ finditem NPF
+ exevent drag #FINDID
+ wait 10
+ exevent dropc #BACKPACKID
+ wait 10
 return

@@ -1,5 +1,5 @@
 set %upuscID 0
-set %coUpuszczac NPF_ENK_WLH_KMH
+set %coUpuszczac NPF_ENK_WLH_KMH_ZLK
 ignoreItem reset *
 
 loop:
@@ -25,6 +25,7 @@ return
 ; ENK - sztabki
 ; DWJ - ruda
 ; RVH - mapy
+; ZLK - klody
 
 ; 1lvl    995   mapa wygladajaca na niedawno naszkicowana
 ; 2lvl    444   pozolka mapa
