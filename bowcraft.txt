@@ -1,0 +1,63 @@
+; Bowcraft - Wytwarzanie lukow
+; Autor:       Nieznany
+; Modyfikacje: Krowa
+; Data:        20.11.2017
+initevents
+set %lobj #ltargetid
+set %produkcja 1 ;wpisz, co ma robic skrypt (0 - strzaly, 1 - belty)
+set %plecak #BACKPACKID
+finditem CKF_ZJF C_ , %plecak ;woreczek lub plecak
+set %worek #FINDID
+
+start:
+finditem VLK C_ , %plecak ;znajduje piora w w plecaku
+Exevent Drag #findid
+wait 1
+Exevent Dropc %worek ;wrzuca jedno piorko do plecaka
+
+wait 1s
+piora
+if #FINDSTACK > 1
+{
+   ignoreitem #FINDID
+   goto piora
+}
+if #FINDID = x
+{
+   event sysmessage Nie masz pior! Zatrzymuje!
+   halt
+}
+set #LOBJECTID #FINDID
+finditem SLK C_
+if #FINDSTACK > 1 , %plecak
+{
+   ignoreitem #FINDID
+   goto piora
+}
+if #FINDID = x
+{
+   event sysmessage Nie masz drzewcow! Zatrzymuje
+   halt
+}
+set #LTARGETID #FINDID
+
+
+if %produkcja = 0
+{
+event macro 17
+target
+event macro 22
+wait 10
+click 60 60 mc d
+wait 10
+}
+if %produkcja = 1
+{
+event macro 17
+target
+event macro 22
+wait 10
+click 105 60 mc d
+wait 10
+}
+goto start
