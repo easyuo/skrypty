@@ -2,7 +2,6 @@
 ; Gornictwo z odkladaniem rudy do domku. Edytujesz wiersze ponizej:
 
 ; ==== EDYCJA ====
-
 set %sklad KVHLAOE ; Veis GIILMPE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
 set %kilofy KVHLAOE ; Veis GIILMPE            ; Pojemnik z kilofami
 set %dragPauza 4                              ; Pauza przy drag/drop
@@ -14,10 +13,12 @@ set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby
 ; RVH - Mapy
-
 set %sprzedawcaID XHCJQD
 set %gornikID     FUCHAD
 
+ignoreitem reset *
+ignoreitem #CHARID
+set %graczType IS_HS_ZE_
 
 set %zelazo       0
 set %miedz        1548
@@ -142,6 +143,16 @@ loop:
 
  if #targcurs = 1
   key esc
+  
+ finditem %graczType G_
+ if #FINDCNT > 0
+ {
+  event macro 1 0 Podrozniku strudzony odpocznij sobie jak i ja
+  event macro 2 0 odklada wszystkie przedmioty do skrzyni
+  gosub odkladanie
+  wait 10s
+  goto loop
+ }
  
  if *trenujArmsLore = #true
   gosub ArmsLore
@@ -330,7 +341,6 @@ loop:
  event macro 22 0
                                 2                   3                4              5               6          7              8                           9                 10           11                12         13
  gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_ Nie_mozesz_tutaj Wybrane_miejsce Nie_ma_tu_wiecej Wykopales Anulowano Twoje_narzedzie_do_niczego Nie_mozesz_tutaj Wybrane_miejsce You_see:_ameba You_see:_zywiolak You_see:
- event sysmessage Journal: #RESULT
 
  if #result = 11 || #result = 12
  {
@@ -339,6 +349,7 @@ loop:
 
  if #result = 13
  {
+  event macro 1 0 Podrozniku strudzony tylko nie probuj zabijac. Wszystko w skrzyni juz dawno.
   if #scnt > %czas
   {
    set %czas #scnt + 10
@@ -862,7 +873,6 @@ sub przeniesZeSkladu
  repeat
   if #FINDCNT > 0
   {
-   event sysmessage Przenosze #FINDID #FINDTYPE #FINDSTACK - znalalzem #FINDCNT
    call libs\przenies.euo przedmiot #findid #BACKPACKID #findstack
   }
   finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
