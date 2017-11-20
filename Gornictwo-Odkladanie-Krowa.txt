@@ -9,7 +9,7 @@ set %dragPauza 4                              ; Pauza przy drag/drop
 set %dropPauza 8                              ; Pauza przy drag/drop
 set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
-set %ileRudyZelazaOdkladanie 20           ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
+set %ileRudyZelazaOdkladanie 20000           ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
 set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby
