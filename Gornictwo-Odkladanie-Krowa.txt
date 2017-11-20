@@ -9,7 +9,7 @@ set %dragPauza 4                              ; Pauza przy drag/drop
 set %dropPauza 8                              ; Pauza przy drag/drop
 set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
 set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
-set %ileRudyZelazaOdkladanie 20000            ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
+set %ileRudyZelazaOdkladanie 20           ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
 set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby
@@ -34,51 +34,37 @@ set %mithril      1320
 set %magnetyt     1309
 set %krwawnik     1209
 set %terathryt    2007
-
-set %ruda_cena . %zelazo 2
-set %ruda_nazwa . %zelazo Zelazo
-
-set %ruda_cena . %miedz 3
-set %ruda_nazwa . %miedz Miedz
-
-set %ruda_cena . %malachit 4
-set %ruda_nazwa . %malachit Malachit
-
-set %ruda_cena . %rdzawa_ruda 4
+set %ruda_nazwa . %zelazo      Zelazo
+set %ruda_nazwa . %miedz       Miedz
+set %ruda_nazwa . %malachit    Malachit
 set %ruda_nazwa . %rdzawa_ruda Rdzawa
+set %ruda_nazwa . %srebro      Srebro
+set %ruda_nazwa . %zloto       Zloto
+set %ruda_nazwa . %syderyt     Syderyt
+set %ruda_nazwa . %agapit      Agapit
+set %ruda_nazwa . %valorite    Valorite
+set %ruda_nazwa . %verite      Verite
+set %ruda_nazwa . %azuryt      Azuryt
+set %ruda_nazwa . %mithryl     Mithryl
+set %ruda_nazwa . %magnetyt    Magnetyt
+set %ruda_nazwa . %krwawnik    Krwawnik
+set %ruda_nazwa . %terathryt   Terathryt
 
-set %ruda_cena . %srebro 5
-set %ruda_nazwa . %srebro Srebro
-
-set %ruda_cena . %zloto 5
-set %ruda_nazwa . %zloto Zloto
-
-set %ruda_cena . %syderyt 8
-set %ruda_nazwa . %syderyt Syderyt
-
-set %ruda_cena . %agapit 10
-set %ruda_nazwa . %agapit Agapit
-
-set %ruda_cena . %valorite 12
-set %ruda_nazwa . %valorite Valorite
-
-set %ruda_cena . %verite 12
-set %ruda_nazwa . %verite Verite
-
-set %ruda_cena . %azuryt 40
-set %ruda_nazwa . %azuryt Azuryt
-
-set %ruda_cena . %mithryl 100
-set %ruda_nazwa . %mithryl Mithryl
-
-set %ruda_cena . %magnetyt 150
-set %ruda_nazwa . %magnetyt Magnetyt
-
-set %ruda_cena . %krwawnik 200
-set %ruda_nazwa . %krwawnik Krwawnik
-
-set %ruda_cena . %terathryt 400
-set %ruda_nazwa . %terathryt Terathryt
+set %ruda_cena . %zelazo      2
+set %ruda_cena . %miedz       3
+set %ruda_cena . %malachit    4
+set %ruda_cena . %rdzawa_ruda 4
+set %ruda_cena . %srebro      5
+set %ruda_cena . %zloto       5
+set %ruda_cena . %syderyt     8
+set %ruda_cena . %agapit      10
+set %ruda_cena . %valorite    12
+set %ruda_cena . %verite      12
+set %ruda_cena . %azuryt      40
+set %ruda_cena . %mithryl     100
+set %ruda_cena . %magnetyt    150
+set %ruda_cena . %krwawnik    200
+set %ruda_cena . %terathryt   400
 
 ; ==== Koniec EDYCJI ====
 set %przedmioty_ze_skladu POF_DWJ_ENK_RVH_OKF ; OKF - pojemnik na ziola
@@ -93,7 +79,7 @@ set %armslore_badaj HSH_LSH_MSH_YSF_CIK_
 set %ostatnieUzycieAL 0
 
 set %czas 0
-set %timeout 20
+set %timeout 10
 set #sysmsgcol 154
 
 chooseskill medi
@@ -124,294 +110,266 @@ goto #menubutton
 
 start:
 
-menu get tryb_select
-set *gornictwo_tryb #menures
-menu get armslore_check
-set *trenujArmsLore #menures
-menu get odkladanie_check
-set *gornictwo_odkladanie #menures
+ menu get tryb_select
+ set *gornictwo_tryb #menures
+ menu get armslore_check
+ set *trenujArmsLore #menures
+ menu get odkladanie_check
+ set *gornictwo_odkladanie #menures
 
-if *gornictwo_odkladanie = #true
-{
- finditem BUD_ZTD_HKF_UYD_GZD_CZD_OZD_IIF_HIF_KIF_JIF_IKF_RLL_CML_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP_CUD_KUD_ZJF_KKF G_2
-
- if #findid = x || #finddist > 2
+ if *gornictwo_odkladanie = #true
  {
-  event sysmessage Musisz miec pojemnik w zasiegu przy starcie skryptu!
-  goto pokaz_menu
- }
-
+  finditem BUD_ZTD_HKF_UYD_GZD_CZD_OZD_IIF_HIF_KIF_JIF_IKF_RLL_CML_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP_CUD_KUD_ZJF_KKF G_2
+  if #findid = x || #finddist > 2
+  {
+   event sysmessage Musisz miec pojemnik w zasiegu przy starcie skryptu!
+   goto pokaz_menu
+  }
  set %pojemnik #FINDID
  set %sklad #FINDID
  event sysmessage Sklad i Pojemnik ustawiony: #FINDID
-
 }
 
-set %pozycja_startowa_x #charposx
-set %pozycja_startowa_y #charposy
+ set %pozycja_startowa_x #charposx
+ set %pozycja_startowa_y #charposy
 
-menu hide
-gosub ustaw_narzedzie
-gosub zmiana_miejsca
+ menu hide
+ gosub ustaw_narzedzie
+ gosub zmiana_miejsca
 goto loop
 
 loop:
 
-if #targcurs = 1
- key esc
+ if #targcurs = 1
+  key esc
  
-if *trenujArmsLore = #true
-{
- gosub ArmsLore
-}
+ if *trenujArmsLore = #true
+  gosub ArmsLore
 
-if *gornictwo_tryb = 1
-{
-finditem %narzedzie C_ , #CharID
-if #findkind = -1
- gosub ustaw_narzedzie
-}
-
-if *gornictwo_tryb = 3
-{
-finditem %narzedzie C
-if #findkind = -1
- gosub ustaw_narzedzie
-}
-
-if #enemyid <> N/A
-{
- goto zabij
-}
-
-if #weight >= %wagajes
-{
- event sysmessage Za duzo waze. Odkladam rzeczy
- run:
- gosub odkladanie
- gosub zmiana_miejsca
-}
-
-if %kop = 0 || %kop = n/a
-{
-set #ltargetx #charposx
-set #ltargety #charposy
-}
-
-if %kop = 1
-{
-set #ltargetx #charposx
-set #ltargety #charposy + 1
-}
-
-if %kop = 2
-{
-set #ltargetx #charposx - 1
-set #ltargety #charposy
-}
-
-if %kop = 3
-{
-set #ltargetx #charposx
-set #ltargety #charposy - 1
-}
-
-if %kop = 4
-{
-set #ltargetx #charposx + 1
-set #ltargety #charposy
-}
-
-if %kop = 5
-{
-set #ltargetx #charposx + 1
-set #ltargety #charposy + 1
-}
-
-if %kop = 6
-{
-set #ltargetx #charposx
-set #ltargety #charposy + 2
-}
-
-if %kop = 7
-{
-set #ltargetx #charposx - 1
-set #ltargety #charposy + 1
-}
-
-if %kop = 8
-{
-set #ltargetx #charposx - 2
-set #ltargety #charposy
-}
-
-if %kop = 9
-{
-set #ltargetx #charposx - 1
-set #ltargety #charposy - 1
-}
-
-if %kop = 10
-{
-set #ltargetx #charposx
-set #ltargety #charposy - 2
-}
-
-if %kop = 11
-{
-set #ltargetx #charposx + 1
-set #ltargety #charposy - 1
-}
-
-if %kop = 12
-{
-set #ltargetx #charposx + 2
-set #ltargety #charposy
-}
-
-if %kop = 13
-{
-set #ltargetx #charposx + 2
-set #ltargety #charposy + 1
-}
-
-if %kop = 14
-{
-set #ltargetx #charposx + 2
-set #ltargety #charposy + 2
-}
-
-if %kop = 15
-{
-set #ltargetx #charposx + 1
-set #ltargety #charposy + 2
-}
-
-if %kop = 16
-{
-set #ltargetx #charposx - 1
-set #ltargety #charposy + 2
-}
-
-if %kop = 17
-{
-set #ltargetx #charposx - 2
-set #ltargety #charposy + 2
-}
-
-if %kop = 18
-{
-set #ltargetx #charposx - 2
-set #ltargety #charposy + 1
-}
-
-if %kop = 19
-{
-set #ltargetx #charposx - 2
-set #ltargety #charposy - 1
-}
-
-if %kop = 20
-{
-set #ltargetx #charposx - 2
-set #ltargety #charposy - 2
-}
-
-if %kop = 21
-{
-set #ltargetx #charposx - 1
-set #ltargety #charposy - 2
-}
-
-if %kop = 22
-{
-set #ltargetx #charposx + 1
-set #ltargety #charposy - 2
-}
-
-if %kop = 23
-{
-set #ltargetx #charposx + 2
-set #ltargety #charposy - 2
-}
-
-if %kop = 24
-{
-set #ltargetx #charposx + 2
-set #ltargety #charposy - 1
-}
-
-set %_JIndex #JIndex
-set #lobjectid %narzedzie
-event macro 17 0
-target 2s
-set #ltargetkind 2
-event macro 22 0
-                                1                   2                3              4               5         6              7                           8                 9           10                11         12
-gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_ Nie_mozesz_tutaj Wybrane_miejsce Nie_ma_tu_wiecej Wykopales Anulowano Twoje_narzedzie_do_niczego Nie_mozesz_tutaj Wybrane_miejsce You_see:_ameba You_see:_zywiolak You_see:
-; event sysmessage Po skanowaniu Journala
-
-if #result = 11 || #result = 12
-{
-zabij:
- if %leczMagia = 1
+ if *gornictwo_tryb = 1
  {
-  repeat
-  finditem NPF
-  exevent drag #FindID
-  wait 10
-  exevent dropc #BackPackID
-  wait 10
-  if #enemyid <> N/A
+  finditem %narzedzie C_ , #CharID
+  if #findkind = -1
+   gosub ustaw_narzedzie
+ }
+
+ if *gornictwo_tryb = 3
+ {
+  finditem %narzedzie C
+  if #findkind = -1
+   gosub ustaw_narzedzie
+ }
+
+ if #enemyid <> N/A
+  gosub zabij
+
+ if #weight >= %wagajes
+ {
+  event sysmessage Za duzo waze. Odkladam rzeczy
+  run:
+   gosub odkladanie
+   gosub zmiana_miejsca
+ }
+
+
+ if %kop = 0 || %kop = n/a
+ {
+  set #ltargetx #charposx
+  set #ltargety #charposy
+ }
+
+ if %kop = 1
+ {
+  set #ltargetx #charposx
+  set #ltargety #charposy + 1
+ }
+
+ if %kop = 2
+ {
+  set #ltargetx #charposx - 1
+  set #ltargety #charposy
+ }
+
+ if %kop = 3
+ {
+  set #ltargetx #charposx
+  set #ltargety #charposy - 1
+ }
+
+ if %kop = 4
+ {
+  set #ltargetx #charposx + 1
+  set #ltargety #charposy
+ }
+
+ if %kop = 5
+ {
+  set #ltargetx #charposx + 1
+  set #ltargety #charposy + 1
+ }
+
+ if %kop = 6
+ {
+  set #ltargetx #charposx
+  set #ltargety #charposy + 2
+ }
+
+ if %kop = 7
+ {
+  set #ltargetx #charposx - 1
+  set #ltargety #charposy + 1
+ }
+
+ if %kop = 8
+ {
+  set #ltargetx #charposx - 2
+  set #ltargety #charposy
+ }
+
+ if %kop = 9
+ {
+  set #ltargetx #charposx - 1
+  set #ltargety #charposy - 1
+ }
+
+ if %kop = 10
+ {
+  set #ltargetx #charposx
+  set #ltargety #charposy - 2
+ }
+
+ if %kop = 11
+ {
+  set #ltargetx #charposx + 1
+  set #ltargety #charposy - 1
+ }
+
+ if %kop = 12
+ {
+  set #ltargetx #charposx + 2
+  set #ltargety #charposy
+ }
+
+ if %kop = 13
+ {
+  set #ltargetx #charposx + 2
+  set #ltargety #charposy + 1
+ }
+
+ if %kop = 14
+ {
+  set #ltargetx #charposx + 2
+  set #ltargety #charposy + 2
+ }
+
+ if %kop = 15
+ {
+  set #ltargetx #charposx + 1
+  set #ltargety #charposy + 2
+ }
+
+ if %kop = 16
+ {
+  set #ltargetx #charposx - 1
+  set #ltargety #charposy + 2
+ }
+
+ if %kop = 17
+ {
+  set #ltargetx #charposx - 2
+  set #ltargety #charposy + 2
+ }
+
+ if %kop = 18
+ {
+  set #ltargetx #charposx - 2
+  set #ltargety #charposy + 1
+ }
+
+ if %kop = 19
+ {
+  set #ltargetx #charposx - 2
+  set #ltargety #charposy - 1
+ }
+
+ if %kop = 20
+ {
+  set #ltargetx #charposx - 2
+  set #ltargety #charposy - 2
+ }
+
+ if %kop = 21
+ {
+  set #ltargetx #charposx - 1
+  set #ltargety #charposy - 2
+ }
+
+ if %kop = 22
+ {
+  set #ltargetx #charposx + 1
+  set #ltargety #charposy - 2
+ }
+
+ if %kop = 23
+ {
+  set #ltargetx #charposx + 2
+  set #ltargety #charposy - 2
+ }
+
+ if %kop = 24
+ {
+  set #ltargetx #charposx + 2
+  set #ltargety #charposy - 1
+ }
+
+ set %_JIndex #JIndex
+ set #lobjectid %narzedzie
+ event macro 17 0
+ target 2s
+ set #ltargetkind 2
+ event macro 22 0
+                                2                   3                4              5               6          7              8                           9                 10           11                12         13
+ gosub ScanJournal %_JIndex Nie_udalo_Ci_sie_nic_ Nie_mozesz_tutaj Wybrane_miejsce Nie_ma_tu_wiecej Wykopales Anulowano Twoje_narzedzie_do_niczego Nie_mozesz_tutaj Wybrane_miejsce You_see:_ameba You_see:_zywiolak You_see:
+ event sysmessage Journal: #RESULT
+
+ if #result = 11 || #result = 12
+ {
+  gosub zabij
+ }
+
+ if #result = 13
+ {
+  if #scnt > %czas
   {
-   gosub CzarujCorpPor
+   set %czas #scnt + 10
+   goto run
   }
- return
  }
 
- if %leczBandazami = 1
- {
-  event macro 1 0 .lecz
-  wait 2s
- }
-return
-}
+ if #result = 2 || #result = 6 || #result = 7 || #result = 8
+  wait 1
 
-if #result = 13
-{
- if #scnt > %czas
+ if #result = 5 || #result = 3 || #result = 4 || #result = 9 || #result = 10
  {
-  set %czas #scnt + 10
-  goto run
- }
-}
-
-if #result = 2 || #result = 6 || #result = 7 || #result = 8
- wait 1
-
-if #result = 5 || #result = 3 || #result = 4 || #result = 9 || #result = 10
-{
- if %kop <> 24
- {
-  set %kop %kop + 1
- }
- else
- {
- set %miejsce %miejsce + 1
- if %miejsce > *gornictwo_miejsca
+  if %kop <> 24
+  {
+   set %kop %kop + 1
+  }
+  else
+  {
+  set %miejsce %miejsce + 1
+  if %miejsce > *gornictwo_miejsca
   {
    if *gornictwo_przetapianie = #true
     gosub przetapianie
    if *gornictwo_odkladanie = #true
     gosub odkladanie
   }
-  
- event sysmessage Zmiana miejsca.
- gosub zmiana_miejsca
- set %kop 0
+  event sysmessage Zmiana miejsca.
+  gosub zmiana_miejsca
+  set %kop 0
+  }
  }
-}
 
 goto loop
 
@@ -708,7 +666,8 @@ sub ScanJournal
    ScanJournal %JIndex
    for %i 2 %0
    {
-    if % . %i in #journal
+;    event sysmessage Szukam: %i : % . %i
+    if % . %i in #JOURNAL
      return %i
    }
   }
@@ -744,23 +703,6 @@ if #FindKind = -1
   ignoreItem reset
  }
 }
-return
-
-; Czaruje Energy Bolta
-sub CzarujCorpPor
- ; Cast Spell Energy Bolt
- event macro 15 41
- if #targcurs <> 1
- {
-  gosub CzarujCorpPor
- }
- set #ltargetid #enemyid
- set #ltargetkind 1
- event macro 22 0
- if #enemyid <> N/A
- {
-  gosub CzarujCorpPor
- }
 return
 
 ; ==========================
@@ -895,7 +837,11 @@ sub sprzedawca
 
    if #CONTNAME = Stringquery_gump && #CONTKIND = EGFD && #CONTSIZEX = 393 && #CONTSIZEY = 270
    {
-    call libs\sprzedawcaCL.lib.euo ustalCene 444
+    if %ruda_cena . #FINDCOL <> N/A
+     set %cena %ruda_cena . #FINDCOL
+    else
+     set %cena 4000
+    call libs\sprzedawcaCL.lib.euo ustalCene %cena
    }
    finditem %przedmioty_do_sprzedawcy C_ , #BACKPACKID
   }
@@ -947,3 +893,33 @@ sub oczyscRece
  exevent dropc #BACKPACKID
  wait 10
 return
+
+sub zabij
+ event exmsg #ENEMYID 3 30 ATAKUJE!
+ if %leczMagia = 1
+ {
+  gosub oczyscRece
+  if #ENEMYID <> N/A
+  {
+   repeat
+   ; Cast Spell Energy Bolt
+    event macro 15 41
+    target 1s
+    set #LTARGETID #ENEMYID
+    set #LTARGETKIND 1
+    event macro 22 0
+   until #ENEMYID = N/A
+   event sysmessage Wrog zabity.
+  }
+ }
+ if %leczBandazami = 1
+ {
+  event macro 1 0 .lecz
+  wait 1s
+ }
+return
+
+sub zabijEnemy
+
+return
+

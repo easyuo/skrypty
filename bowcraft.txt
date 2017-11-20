@@ -4,19 +4,52 @@
 ; Data:        20.11.2017
 
 initevents
-set %lobj #ltargetid
-set %produkcja 1 ;wpisz, co ma robic skrypt (0 - strzaly, 1 - belty)
-set %plecak #BACKPACKID
-finditem CKF_ZJF C_ , %plecak ;woreczek lub plecak
-set %worek #FINDID
+ set %lobj #ltargetid
+; === Produkcja ===
+ set %piora VLK
+ set %drewno ZLK
+ set %drzewce SLK
+ set %narzedzia UFG
+
+; Co produkujemy
+;  0 - drzewce
+;  1 - belty
+;  2 - strzaly
+
+ set %produkcja 1
+; =================
+ 
+ ; Szukamy pojemnikow w glownym plecaku (woreczki, plecaki)
+ finditem CKF_ZJF C_ , #BACKPACKID
+ set %plecak #FINDID
+ event sysmessage Znalazlem plecak do pracy: %plecak
+ call libs\pojemnik.euo otworz %plecak
 
 start:
-finditem VLK C_ , %plecak ;znajduje piora w w plecaku
-Exevent Drag #findid
-wait 1
-Exevent Dropc %worek ;wrzuca jedno piorko do plecaka
-wait 1s
-piora
+
+if %produkcja = 0
+ goto drzewce
+
+if %produkcja = 1 || %produkcja = 2
+ goto piora
+
+piora:
+
+
+ finditem %piora C_ , %plecak ; Szukamy pior w plecaku roboczym
+ if #FINDCNT = 0
+ {
+  finditem %piora C_ , #BACKPACKID ; Szukamy pior w glownym plecaku
+  if #FINDCNT > 0
+   call libs\przenies.euo przedmiot #FINDID %plecak 1
+  else
+  {
+   event sysmessage Nie masz pior! Zatrzymuje!
+   halt
+  }
+ }
+
+finditem %piora C_ , %plecak ; Szukamy pior w plecaku roboczym
 if #FINDSTACK > 1
 {
    ignoreitem #FINDID
@@ -24,14 +57,14 @@ if #FINDSTACK > 1
 }
 if #FINDID = x
 {
-   event sysmessage Nie masz pior! Zatrzymuje!
-   halt
+
 }
+
 set #LOBJECTID #FINDID
-finditem SLK C_
-if #FINDSTACK > 1 , %plecak
+finditem %drzewce C_
+if #FINDSTACK > 1 , #BACKPACKID
 {
-   ignoreitem #FINDID
+ ignoreitem #FINDID
    goto piora
 }
 if #FINDID = x
@@ -41,23 +74,26 @@ if #FINDID = x
 }
 set #LTARGETID #FINDID
 
-
-if %produkcja = 0
-{
-event macro 17
-target
-event macro 22
-wait 10
-click 60 60 mc d
-wait 10
-}
 if %produkcja = 1
 {
-event macro 17
-target
-event macro 22
-wait 10
-click 105 60 mc d
-wait 10
+ event sysmessage Produkujemy belty
+ event macro 17
+ target
+ event macro 22
+ wait 10
+ click 60 60 mc d
+ wait 10
 }
+
+if %produkcja = 2
+{
+ event sysmessage Produkujemy strzaly
+ event macro 17
+ target 5s
+ event macro 22
+ wait 10
+ click 105 60 mc d
+ wait 10
+}
+
 goto start
