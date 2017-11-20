@@ -9,12 +9,12 @@ InitEvents
 IgnoreItem Reset
 ; === Edytujemy tutaj ===
 
-set %TnijCiala 0
+set %TnijCiala 1
 set %AutoGrabCiala 0
 set %AutoGrabZiemia 0
-set %UzywajAnatomii 1
+set %UzywajAnatomii 0
 set %PijZolte 1
-set %PijZoltePonizej 60
+set %PijZoltePonizej 50
 
 ; OKF - koszyk na ziola
 finditem OKF C_, #BackPackID
@@ -68,10 +68,7 @@ set %czas_enemyID_msg 6
 set %timer_enemyID_msg #SCNT
 
 set %timer_bandarz #SCNT
-set %timer_anatomia #SCNT
-
-   {
-    set %timer_anatomia #SCNT + %czas_anatomia
+set %timer_anatomia #SCNT + %czas_anatomia
 
 Event SysMessage [AA] Auto Anatomia + autobandaz.....ver 1.0.5 (modyfikacje: Krowa)
 petla:
