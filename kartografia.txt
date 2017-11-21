@@ -6,15 +6,7 @@
 
 set #LSKILL 12
 
-event sysmessage "Wskaz pojemnik na zapisane mapy"
-
-set #TARGCURS 1
- repeat
- until #TARGCURS = 0
-
-set %pojemnik #LTARGETID
-
-finditem XVH ; Czysta mapa
+finditem XVH C_ , #BACKPACKID ; Czysta mapa
 if #FINDCNT = 0
 {
  event sysmessage "Nie masz czystych map!"
@@ -23,12 +15,13 @@ if #FINDCNT = 0
 else
 {
  set %czysteMapyID #FINDID
+ event sysmessage Czyste mapy: #FINDID w ilosci #FINDSTACK
 }
 
 loop:
  event macro 14
  target
- set #LTARGETID #FINDID
+ set #LTARGETID %czysteMapyID
  set #LTARGETKIND 1
  event macro 22
  
@@ -61,6 +54,7 @@ loop:
    set #LTARGETID #FINDID
    set #LTARGETKIND 1
    event macro 22
+   wait 10
   }
  }
  
