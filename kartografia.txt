@@ -6,9 +6,9 @@ set #LSKILL 12
 
 event sysmessage "Wskaz pojemnik na zapisane mapy"
 
-;set #TARGCURS 1
-; repeat
-; until #TARGCURS = 0
+set #TARGCURS 1
+ repeat
+ until #TARGCURS = 0
 
 set %pojemnik #LTARGETID
 
@@ -42,6 +42,11 @@ szukaj:
  else
   click 150 65 dmc
 
-wait 10s
+ wait 10s
+ event macro 1 0 .upusc
+ target
+ set #LTARGETID #FINDID
+ set #LTARGETKIND 1
+ event macro 22
 
 goto szukaj
