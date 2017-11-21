@@ -2,6 +2,8 @@
 ; Autor: Krowa (i ktos wczesniej cos dziwnego napisal, Veis? :D )
 ; Data: 21.11.2017
 
+; Odpalajac makro musisz miec tylko czyste mapy w plecaku! (stacka)
+
 set #LSKILL 12
 
 event sysmessage "Wskaz pojemnik na zapisane mapy"
@@ -12,13 +14,18 @@ set #TARGCURS 1
 
 set %pojemnik #LTARGETID
 
-szukaj:
- finditem XVH ; Czysta mapa
- if #FINDCNT = 0
- {
-  event sysmessage "Nie masz czystych map!"
-  halt
- }
+finditem XVH ; Czysta mapa
+if #FINDCNT = 0
+{
+ event sysmessage "Nie masz czystych map!"
+ halt
+}
+else
+{
+ set %czysteMapyID #FINDID
+}
+
+loop:
  event macro 14
  target
  set #LTARGETID #FINDID
@@ -43,10 +50,18 @@ szukaj:
   click 150 65 dmc
 
  wait 10s
- event macro 1 0 .upusc
- target
- set #LTARGETID #FINDID
- set #LTARGETKIND 1
- event macro 22
-
-goto szukaj
+ 
+ finditem XVH ; Czysta mapa
+ for #FINDINDEX 1 #FINDCNT
+ {
+  if #FINDID <> %czysteMapyID
+  {
+   event macro 1 0 .upusc
+   target
+   set #LTARGETID #FINDID
+   set #LTARGETKIND 1
+   event macro 22
+  }
+ }
+ 
+goto loop
