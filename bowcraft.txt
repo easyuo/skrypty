@@ -68,25 +68,25 @@ sub drzewce
   set %pracowac 1
 
   repeat
-
-  finditem %drewno C_ , %plecak ; Szukamy drewna w roboczym plecaku
-  if #FINDSTACK > 0
-  {
-   set %drewnoRoboczeID #FINDID
-   click 280 125 dmc     ; drzewce
-   target 5s
-   set #LTARGETID %drewnoRoboczeID
-   set #LTARGETKIND 1
-   event macro 22
+   finditem %drewno C_ , %plecak ; Szukamy drewna w roboczym plecaku
+   if #FINDSTACK > 0
+   {
+    set %drewnoRoboczeID #FINDID
+    click 280 125 dmc     ; drzewce
+    target 5s
+    set #LTARGETID %drewnoRoboczeID
+    set #LTARGETKIND 1
+    event macro 22
    
-   gosub przeniesDrewno
-   gosub przeniesDrzewce
+    gosub przeniesDrewno
+    gosub przeniesDrzewce
 
-   repeat
-    wait 1
-   until #CONTKIND = GJZ && #CONTSIZEX = 510
-  }
-
+    repeat
+     finditem %narzedzieID C_ , #BACKPACKID
+     if #FINDCNT = 0
+      goto loop
+    until #CONTKIND = GJZ && #CONTSIZEX = 510
+   }
   until %pracowac = 1
   
  }
@@ -176,7 +176,9 @@ return
 
 sub przeniesDrzewce
  finditem %drzewce C_ , #BACKPACKID  ; Szukamy drewna w plecaku roboczym
- for #FINDINDEX 1 #FINDCNT
+ repeat
   call libs\przenies.euo przedmiot #FINDID %plecak #FINDSTACK
+  finditem %drzewce C_ , #BACKPACKID  ; Szukamy drewna w plecaku roboczym
+ until #FINDCNT = 0
 return
 
