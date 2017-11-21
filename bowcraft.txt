@@ -80,8 +80,8 @@ sub drzewce
    event macro 22
    
    gosub przeniesDrewno
-   wait 10
-   
+   gosub przeniesDrzewce
+
    repeat
     wait 1
    until #CONTKIND = GJZ && #CONTSIZEX = 510
@@ -173,3 +173,10 @@ sub przeniesDrewno
   }
  }
 return
+
+sub przeniesDrzewce
+ finditem %drzewce C_ , #BACKPACKID  ; Szukamy drewna w plecaku roboczym
+ for #FINDINDEX 1 #FINDCNT
+  call libs\przenies.euo przedmiot #FINDID %plecak #FINDSTACK
+return
+
