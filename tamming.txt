@@ -641,7 +641,7 @@ if #jindex >= %tamejournal
 	return ignore
 	if Nie_mozesz_oswoic_tego in #journal
 	return ignore
-	if no_chance in #journal
+	if Nie_masz_szans_na in #journal
 	return skill
 }
 if #followers > %tamefollow
