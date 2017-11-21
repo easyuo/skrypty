@@ -365,21 +365,24 @@ set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN
 if %tameskill >= 520 && %tameskill < 580
 set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE
 if %tameskill >= 580 && %tameskill < 640
-set %tameable TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
+set %tameable TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
 if %tameskill >= 640 && %tameskill < 700
-set %tameable CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
+set %tameable PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
 if %tameskill >= 700 && %tameskill < 736
-set %tameable CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
+set %tameable YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
 if %tameskill >= 736 && %tameskill < 760
-set %tameable CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+set %tameable YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 760 && %tameskill < 796
 set %tameable CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
 set %tameable CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
+; TF_ - Prosiaki
+; PF_ - Owce
 ; JD_ - Ogromny waz
 ; QF_ - Jaszczor gorski
 ; AF_ - Wyverna
+; NG_ - Krowa
 ; HD_ - Pajak szablonogi
 ; IH_ - Lesny pelzacz
 ; BK_ - Dziobak
@@ -387,7 +390,8 @@ set %tameable CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG
 ; UF_ - Plomienny jaszczur
 ; TC_ - Orze³
 ; CB_ - Ogromna ropucha
-; HH - Pustynny Gryf
+; HH  - Pustynny Gryf
+; XX  - Byk
 
 if %tameskill >= 820
 set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
@@ -527,29 +531,23 @@ if #jindex >= %tamejournal
 
 	if Udalo_ci_sie_oswoic in #journal
 	{
-		sound %sound
-		
-		wait 2s
-		
-		event sysmessage #journal
-		
-		if Twoje_zwierze_zachowuje_sie_niespokojnie in #journal
+   if Twoje_zwierze_zachowuje_sie_niespokojnie in #journal
+	 {
+		event sysmessage Zwierze zachowuje sie niespokojnie
+		menu get odstawdostajni
+		if #menures = #true
 		{
-			event sysmessage Zwierze zachowuje sie niespokojnie
-			menu get odstawdostajni
-			if #menures = #true
-			{
-				gosub OdstawDoStajni
-			}
-			else
-			{
-				menu get releasekill
-				if #menures = #true
-				gosub TamingKill
-			}
+	   gosub OdstawDoStajni
 		}
-		return success
-	}
+		else
+		{
+			menu get releasekill
+			if #menures = #true
+		 	gosub TamingKill
+		}
+	 }
+	return success
+ }
 
 	if Zdenerwowales_zwierze in #journal
 	return retry
@@ -1408,12 +1406,12 @@ sub Lustro
 	
 sub BlessStr
 	event macro 15 15
-	wait 3s
+	target 3s
 	event macro 23 0
 return
 
 sub BlessInt
 	event macro 15 9
-	wait 3s
+	target 3s
 	event macro 23 0
 return

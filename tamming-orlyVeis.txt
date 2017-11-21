@@ -1,0 +1,657 @@
+;==================================
+; Auto-Taming v. 0.1 ( BETA )
+; Orly - Yew
+; Start Skryptu - x: 971 y: 942
+; Autor: Veis
+; Wszelkie bledy zglaszac na irc
+;==================================
+; ---------------edytujemy x/y ( ustawione na YEW (czesc off) ) --------------
+set %px . 0 971
+set %py . 0 942
+set %px . 1 971
+;set %py . 1 957
+;set %px . 2 979
+;set %py . 2 965
+;set %px . 3 994
+;set %py . 3 965
+;set %px . 4 1009
+;set %py . 4 965
+;set %px . 5 1009
+;set %py . 5 975
+;set %px . 6 1015
+;set %py . 6 981
+;set %px . 7 1010
+;set %py . 7 995
+;set %px . 8 989
+;set %py . 8 995
+;set %px . 9 989
+;set %py . 9 980
+;set %px . 10 969
+;set %py . 10 980
+;set %px . 11 967
+;set %py . 11 1005
+;set %px . 12 967
+;set %py . 12 1015
+;set %px . 13 975
+;set %py . 13 1023
+;set %px . 14 994
+;set %py . 14 1024
+;set %px . 15 994
+;set %py . 15 1041
+;set %px . 16 985
+;set %py . 16 1046
+set %px . 17 969
+set %py . 17 1046
+set %px . 18 945
+set %py . 18 1028
+set %px . 19 945
+set %py . 19 1041
+set %px . 20 945
+set %py . 20 1056
+set %px . 21 945
+set %py . 21 1066
+set %px . 22 945
+set %py . 22 1079
+set %px . 23 945
+set %py . 23 1094
+set %px . 24 945
+set %py . 24 1113
+set %px . 25 945
+set %py . 25 1133
+set %px . 26 945
+set %py . 26 1151
+set %px . 27 922
+set %py . 27 1151
+set %px . 28 922
+set %py . 28 1137
+set %px . 29 922
+set %py . 29 1121
+set %px . 30 922
+set %py . 30 1104
+set %px . 31 922
+set %py . 31 1085
+set %px . 32 922
+set %py . 32 1066
+set %px . 33 922
+set %py . 33 1047
+set %px . 34 922
+set %py . 34 1029
+set %px . 35 922
+set %py . 35 1018
+set %px . 36 922
+set %py . 36 999
+set %px . 37 922
+set %py . 37 983
+set %px . 38 922
+set %py . 38 966
+set %px . 39 922
+set %py . 39 952
+set %px . 40 922
+set %py . 40 938
+set %px . 41 922
+set %py . 41 924
+set %px . 42 922
+set %py . 42 911
+set %px . 43 922
+set %py . 43 897
+set %px . 44 922
+set %py . 44 877
+set %px . 45 922
+set %py . 45 860
+set %px . 46 922
+set %py . 46 844
+set %px . 47 922
+set %py . 47 830
+set %px . 48 919
+set %py . 48 818
+set %px . 49 919
+set %py . 49 808
+set %px . 50 919
+set %py . 50 794
+set %px . 51 890
+set %py . 51 794
+set %px . 52 890
+set %py . 52 808
+set %px . 53 890
+set %py . 53 825
+set %px . 54 890
+set %py . 54 838
+set %px . 55 890
+set %py . 55 854
+set %px . 56 890
+set %py . 56 870
+set %px . 57 890
+set %py . 57 880
+set %px . 58 890
+set %py . 58 893
+set %px . 59 890
+set %py . 59 912
+set %px . 60 890
+set %py . 60 928
+set %px . 61 890
+set %py . 61 941
+set %px . 62 890
+set %py . 62 954
+set %px . 63 890
+set %py . 63 964
+set %px . 64 890
+set %py . 64 977
+set %px . 65 890
+set %py . 65 990
+set %px . 66 890
+set %py . 66 1004
+set %px . 67 890
+set %py . 67 1020
+set %px . 68 890
+set %py . 68 1033
+set %px . 69 890
+set %py . 69 1051
+set %px . 70 890
+set %py . 70 1065
+set %px . 71 890
+set %py . 71 1080
+set %px . 72 890
+set %py . 72 1096
+set %px . 73 890
+set %py . 73 1110
+set %px . 74 890
+set %py . 74 1126
+set %px . 75 890
+set %py . 75 1142
+set %px . 76 890
+set %py . 76 1158
+set %px . 77 890
+set %py . 77 1174
+set %px . 78 890
+set %py . 78 1188
+set %px . 79 857
+set %py . 79 1188
+set %px . 80 857
+set %py . 80 1175
+set %px . 81 857
+set %py . 81 1154
+set %px . 82 857
+set %py . 82 1136
+set %px . 83 857
+set %py . 83 1125
+set %px . 84 857
+set %py . 84 1105
+set %px . 85 857
+set %py . 85 1087
+set %px . 86 857
+set %py . 86 1072
+set %px . 87 857
+set %py . 87 1055
+set %px . 88 857
+set %py . 88 1040
+set %px . 89 857
+set %py . 89 1025
+set %px . 90 857
+set %py . 90 1004
+set %px . 91 857
+set %py . 91 986
+set %px . 92 857
+set %py . 92 966
+;set %px . 93 857
+;set %py . 93 950
+;set %px . 94 857
+;set %py . 94 926
+;set %px . 95 857
+;set %py . 95 909
+;set %px . 96 857
+;set %py . 96 888
+;set %px . 97 857
+;set %py . 97 872
+;set %px . 98 857
+;set %py . 98 855
+;set %px . 99 857
+;set %py . 99 846
+;set %px . 100 857
+;set %py . 100 823
+;set %px . 101 857
+;set %py . 101 807
+;set %px . 102 857
+;set %py . 102 789
+;set %px . 103 841
+;set %py . 103 789
+;set %px . 104 841
+;set %py . 104 804
+;set %px . 105 841
+;set %py . 105 821
+;set %px . 106 831
+;set %py . 106 831
+;set %px . 107 819
+;set %py . 107 831
+;set %px . 108 819
+;set %py . 108 847
+;set %px . 109 819
+;set %py . 109 862
+;set %px . 110 819
+;set %py . 110 876
+;set %px . 111 819
+;set %py . 111 892
+;set %px . 112 819
+;set %py . 112 911
+;set %px . 113 799
+;set %py . 113 918
+;set %px . 114 793
+;set %py . 114 924
+;set %px . 115 793
+;set %py . 115 937
+;set %px . 116 804
+;set %py . 116 948
+;set %px . 117 814
+;set %py . 117 958
+;set %px . 118 818
+;set %py . 118 962
+set %px . 119 818
+set %py . 119 978
+set %px . 120 818
+set %py . 120 999
+set %px . 121 786
+set %py . 121 1021
+set %px . 122 786
+set %py . 122 1038
+set %px . 123 786
+set %py . 123 1039
+set %px . 124 786
+set %py . 124 1051
+set %px . 125 786
+set %py . 125 1066
+set %px . 126 786
+set %py . 126 1082
+set %px . 127 786
+set %py . 127 1094
+set %px . 128 819
+set %py . 128 1104
+set %px . 129 819
+set %py . 129 1120
+set %px . 130 819
+set %py . 130 1133
+set %px . 131 821
+set %py . 131 1133
+set %px . 132 821
+set %py . 132 1140
+set %px . 133 821
+set %py . 133 1153
+set %px . 134 818
+set %py . 134 1156
+set %px . 135 795
+set %py . 135 1156
+set %px . 136 789
+set %py . 136 1156
+set %px . 137 789
+set %py . 137 1143
+set %px . 138 789
+set %py . 138 1132
+set %px . 139 789
+set %py . 139 1117
+set %px . 140 789
+set %py . 140 1101
+set %px . 141 789
+set %py . 141 1085
+set %px . 142 789
+set %py . 142 1069
+set %px . 143 789
+set %py . 143 1054
+set %px . 144 789
+set %py . 144 1037
+set %px . 145 789
+set %py . 145 1021
+set %px . 146 789
+set %py . 146 1005
+set %px . 147 789
+set %py . 147 985
+set %px . 148 789
+set %py . 148 973
+set %px . 149 789
+set %py . 149 958
+;set %px . 150 789
+;set %py . 150 944
+;set %px . 151 789
+;set %py . 151 924
+;set %px . 152 789
+;set %py . 152 907
+;set %px . 153 789
+;set %py . 153 892
+;set %px . 154 789
+;set %py . 154 872
+;set %px . 155 789
+;set %py . 155 855
+;set %px . 156 789
+;set %py . 156 840
+;set %px . 157 789
+;set %py . 157 821
+;set %px . 158 789
+;set %py . 158 791
+;set %px . 159 789
+;set %py . 159 783
+;set %px . 160 776
+;set %py . 160 783
+;set %px . 161 767
+;set %py . 161 774
+;set %px . 162 758
+;set %py . 162 779
+;set %px . 163 748
+;set %py . 163 779
+;set %px . 164 745
+;set %py . 164 787
+;set %px . 165 745
+;set %py . 165 800
+;set %px . 166 745
+;set %py . 166 816
+;set %px . 167 745
+;set %py . 167 831
+;set %px . 168 745
+;set %py . 168 848
+;set %px . 169 745
+;set %py . 169 866
+;set %px . 170 745
+;set %py . 170 887
+;set %px . 171 745
+;set %py . 171 900
+;set %px . 172 745
+;set %py . 172 917
+;set %px . 173 745
+;set %py . 173 935
+;set %px . 174 745
+;set %py . 174 953
+;set %px . 175 745
+;set %py . 175 973
+;set %px . 176 745
+;set %py . 176 994
+;set %px . 177 745
+;set %py . 177 1011
+;set %px . 178 745
+;set %py . 178 1030
+;set %px . 179 745
+;set %py . 179 1052
+;set %px . 180 745
+;set %py . 180 1071
+;set %px . 181 745
+;set %py . 181 1088
+;set %px . 182 745
+;set %py . 182 1108
+;set %px . 183 745
+;set %py . 183 1125
+;set %px . 184 745
+;set %py . 184 1139
+;set %px . 185 745
+;set %py . 185 1158
+;set %px . 186 745
+;set %py . 186 1177
+;set %px . 187 745
+;set %py . 187 1195
+;set %px . 188 745
+;set %py . 188 1212
+;set %px . 189 745
+;set %py . 189 1227
+;set %px . 190 745
+;set %py . 190 1240
+;set %px . 191 745
+;set %py . 191 1258
+;set %px . 192 745
+;set %py . 192 1275
+;set %px . 193 745
+;set %py . 193 1283
+;set %px . 194 737
+;set %py . 194 1291
+;set %px . 195 737
+;set %py . 195 1306
+;set %px . 196 737
+;set %py . 196 1313
+;set %px . 197 719
+;set %py . 197 1331
+;set %px . 198 711
+;set %py . 198 1349
+;set %px . 199 698
+;set %py . 199 1349
+;set %px . 200 696
+;set %py . 200 1342
+;set %px . 201 694
+;set %py . 201 1332
+;set %px . 202 694
+;set %py . 202 1320
+;set %px . 203 694
+;set %py . 203 1304
+;set %px . 204 694
+;set %py . 204 1281
+;set %px . 205 694
+;set %py . 205 1269
+;set %px . 206 694
+;set %py . 206 1254
+;set %px . 207 694
+;set %py . 207 1240
+;set %px . 208 694
+;set %py . 208 1227
+;set %px . 209 694
+;set %py . 209 1218
+;set %px . 210 669
+;set %py . 210 1218
+;set %px . 211 663
+;set %py . 211 1221
+;set %px . 212 663
+;set %py . 212 1228
+;set %px . 213 657
+;set %py . 213 1234
+;set %px . 214 657
+;set %py . 214 1243
+;set %px . 215 657
+;set %py . 215 1257
+;set %px . 216 657
+;set %py . 216 1268
+;set %px . 217 657
+;set %py . 217 1277
+;set %px . 218 657
+;set %py . 218 1289
+;set %px . 219 657
+;set %py . 219 1306
+;set %px . 220 657
+;set %py . 220 1317
+;set %px . 221 657
+;set %py . 221 1324
+;set %px . 222 657
+;set %py . 222 1333
+;set %px . 223 657
+;set %py . 223 1344
+;set %px . 224 657
+;set %py . 224 1353
+;set %px . 225 657
+;set %py . 225 1368
+;set %px . 226 657
+;set %py . 226 1379
+;set %px . 227 657
+;set %py . 227 1393
+;set %px . 228 657
+;set %py . 228 1405
+;set %px . 229 657
+;set %py . 229 1418
+;set %px . 230 657
+;set %py . 230 1430
+;set %px . 231 657
+;set %py . 231 1438
+;set %px . 232 657
+;set %py . 232 1449
+;set %px . 233 650
+;set %py . 233 1447
+;set %px . 234 641
+;set %py . 234 1447
+;set %px . 235 637
+;set %py . 235 1443
+;set %px . 236 634
+;set %py . 236 1437
+;set %px . 237 634
+;set %py . 237 1425
+;set %px . 238 634
+;set %py . 238 1418
+;set %px . 239 611
+;set %py . 239 1418
+;set %px . 240 610
+;set %py . 240 1403
+;set %px . 241 610
+;set %py . 241 1395
+;set %px . 242 610
+;set %py . 242 1379
+;set %px . 243 610
+;set %py . 243 1359
+;set %px . 244 610
+;set %py . 244 1340
+;set %px . 245 610
+;set %py . 245 1321
+;set %px . 246 613
+;set %py . 246 1318
+;set %px . 247 613
+;set %py . 247 1304
+;set %px . 248 613
+;set %py . 248 1292
+;set %px . 249 613
+;set %py . 249 1280
+;set %px . 250 613
+;set %py . 250 1267
+;set %px . 251 613
+;set %py . 251 1257
+;set %px . 252 613
+;set %py . 252 1244
+;set %px . 253 613
+;set %py . 253 1234
+;set %px . 254 613
+;set %py . 254 1226
+;set %px . 255 610
+;set %py . 255 1220
+;set %px . 256 606
+;set %py . 256 1216
+;set %px . 257 606
+;set %py . 257 1206
+;set %px . 258 601
+;set %py . 258 1201
+set %tametype TC ; typ zwierzat do tame ( Orly )
+set %cast 29 ; byl cast jest wrestl :)
+set %rail 258 ; ile lokacji
+; -----------koniec edycji-----------------------
+set %mark 1
+initevents
+top:
+finditem %tametype G_15
+if #findkind = -1 2
+gosub move
+goto top
+set %taming #findid
+gosub taming #findid
+if #result = fail 2
+ignoreitem #findid
+goto top
+if #sysmsg = udalo_ci_sie_oswoic_stworzenie_-_orzel
+{
+gosub kill #findid
+}
+goto top
+;--------NIE DOTYKAJ ------------------
+sub move
+set %x %px . %mark
+set %y %py . %mark
+move %x %y 0
+set %mark %mark + 1
+if %mark > %rail
+set %mark 1
+return
+sub kill
+msg podazajcie za mna $
+msg ochraniajcie mnie $
+set #ltargetid %1
+event macro 6 0
+target 6s
+event macro 27 0
+event pathfind #findx #findy #findz
+wait 15
+goto weit
+weit:
+if #enemyid = N/A
+{
+finditem YFM G_1
+if #findkind = 1
+{
+set %zwloki #FINDID
+ignoreitem %zwloki
+set #LOBJECTID TSF C_ , #BACKPACKID
+event macro 17 0
+target 10s
+wait 1
+set #LTARGETID %zwloki
+set #LTARGETKIND 1
+event macro 22 0
+wait 3
+set #lobjectid %zwloki
+event macro 17 0
+wait 10
+dalej:
+finditem VRD_VLK_PUD C_ . %zwloki
+set %piora #FINDID
+if #findcnt < 1
+{
+wait 2s
+event macro 6 0
+return
+}
+ exevent drag %piora 9999
+ wait 8
+ exevent dropc #BACKPACKID
+ wait 1
+ goto dalej
+}
+ }
+goto weit
+sub taming
+deletejournal 1
+set #scnt2 0
+set %xa #charposx
+set %ya #charposy
+w:
+finditem %1
+if #finddist > 3 3
+   {
+   event pathfind #findx #findy #findz
+   event sysmessage petla testowa
+   wait 10
+   if #scnt2 > 50
+      {
+      if #charposx = %xa && #charposy = %ya
+         {
+         event sysmessage Ignoruje cel!
+         ;ignoreitem #findid
+         set %xa 0
+         set %ya 0
+         return fail
+         }
+      }
+   goto w
+   }
+;goto w
+set #ltargetid %1
+event macro 13 35
+target 6s
+event macro 22 0
+set %timer #scnt + 20
+s:
+for %i 1 5
+{
+scanjournal %i
+if udalo_ci_sie_oswoic_stworzenie in #journal 2
+deletejournal
+return Sucess
+if nie_udalo_ci_sie_oswoic in #journal 2
+deletejournal
+goto w
+if zwierze_jest_juz_oswojone in #journal 2
+deletejournal
+return fail
+if far_away in #journal 2
+deletejournal
+return fail
+}
+if %timer < #scnt
+return fail
+finditem %1
+if #finddist > 3 2
+event pathfind #findx #findy #findz
+wait 10
+goto s
