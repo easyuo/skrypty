@@ -9,6 +9,73 @@
 ; Revision Date: 4/28/2015
 ; Public Release: 6/10/2004
 
+; 66.0 - Grizzly
+
+
+; 0% - krowa, pies, kura
+; 1% - kot
+; 2% - juczny kon, juczna lama
+; 3% - ptaki, papuga
+; 8% - owca, koza, krolik
+; 13% - ogromna ropucha, prosie
+; 18% - szczur
+; 23% - dziki kot, dziki pies, mouglin, bagienny mouglin
+; 24% - mala zaba
+; 25% - jelen
+; 26% - kruk
+; 28% - sniezny mouglin
+; 29% - nietoperz mong
+; 30% - jelen, wiewiorka, fretka
+; 31% - wilk
+; 33% - ogromny szczur, kon trykenski, mroczny mouglin, wiekszy mongbat
+; 34% - zaba
+; 35% - maciora
+; 36% - mors
+; 37% - ropucha
+; 38% - niedzwiedz brunatny
+; 39% - gremlin, waz
+; 40% - ogromny skorpion, kon, morgan, gelderlander, szary waz
+; 41% - lania, ameba
+; 42% - pajak
+; 43% - wielka zaba, kon pustynny
+; 44% - szary wilk
+; 45% - byk, niedzwiedz czarny
+; 48% - lesny ostard, dziobak
+; 49% - goryl
+; 51% - wsciekly wilk, lodowy waz
+; 53% - plomienny jaszczur, sniezny ostard
+; 54% - olbrzymi pajak
+; 55% - byk
+; 56% - olbrzymi skorpion
+; 57% - aligator, chochlik
+; 58% - orzel, krokodyl, mustang, montrun, mroczny kagok, armok1
+; 59% - skalny jaszczur
+; 60% - pustynny ostard, ogromny waz, olbrzymi skalny pajak, shadeon, taigok, chigok, kirin, lesny pelzacz, wlochaty pajeczak, widmowy chochlik, skalny pelzacz
+; 61% - arktyczny wilk
+; 62% - niedzwiedz polarny, pantera, olbrzymi skalny skorpion, samiec beta, pustynny lis
+; 63% - lodowa tarantula, dziki rzadki ostard, pegaz, mglisty wierzchowiec, mglista armana, shadeon, karmazynowy kagok, armok2
+; 65% - szalony ostard, armok3, mglisty armok, czarna pantera
+; 66% - imp, niedzwiedz grizzly
+; 67% - lampart sniezny, plomienna tarantula
+; 68% - wsciekly wilk - Przywodca stada, jadowita ropucha
+; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
+; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
+; 73% - tarantula, lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
+; 74% - pajak szablonogi
+; 76% - wiekszy piekielny ogar
+; 77% - smok bagienny, wargh
+; 78% - drake, lodowy drake, morski drake, bagienny drake
+; 80% - lodowa wyverna, wyverna, plomienna wyverna
+; 81% - pancernik
+; 82% - opancerzony smok bagienny, koszmar
+; 83% - olbrzymia tarantula, pajak wampir, wodny ostard
+; 85% - prastara istota
+; 86% - lodowy smok
+; 88% - smok
+; 91% - jednorozec
+; 92% - skalny smok
+; 93% - ogar zgnilizny
+
 initevents
 
 set %followers 7
@@ -295,17 +362,17 @@ menu set tamecount %tamecount
 return
 
 sub Taming
-finditem %1 G_18
+ finditem %1
 
-if #findkind = -1
-return
+ if #findkind = -1
+ return
 
-set %tameid #findid
-set %tametype #findtype
-set %tamedist #finddist
+ set %tameid #findid
+ set %tametype #findtype
+ set %tamedist #finddist
 
-if %tameid <> #ltargetid
-event exmsg %tameid 3 30 Wybierz mnie!
+ if %tameid <> #ltargetid
+ event exmsg %tameid 3 30 Wybierz mnie!
 
 ; Auto Atak
 gosub AutoAttack
@@ -367,15 +434,15 @@ set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN
 if %tameskill >= 580 && %tameskill < 640
 set %tameable TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
 if %tameskill >= 640 && %tameskill < 700
-set %tameable PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
+set %tameable JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
 if %tameskill >= 700 && %tameskill < 736
-set %tameable YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
+set %tameable JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
 if %tameskill >= 736 && %tameskill < 760
-set %tameable YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+set %tameable JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 760 && %tameskill < 796
-set %tameable CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
-set %tameable CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -390,6 +457,7 @@ set %tameable CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG
 ; UF_ - Plomienny jaszczur
 ; TC_ - Orze³
 ; CB_ - Ogromna ropucha
+; KG_ - Armok / szalony ostard
 ; HH  - Pustynny Gryf
 ; XX  - Byk
 

@@ -1,0 +1,47 @@
+; Kartografia
+; Autor: Krowa (i ktos wczesniej cos dziwnego napisal, Veis? :D )
+; Data: 21.11.2017
+
+set #LSKILL 12
+
+event sysmessage "Wskaz pojemnik na zapisane mapy"
+
+;set #TARGCURS 1
+; repeat
+; until #TARGCURS = 0
+
+set %pojemnik #LTARGETID
+
+szukaj:
+ finditem XVH ; Czysta mapa
+ if #FINDCNT = 0
+ {
+  event sysmessage "Nie masz czystych map!"
+  halt
+ }
+ event macro 14
+ target
+ set #LTARGETID #FINDID
+ set #LTARGETKIND 1
+ event macro 22
+ 
+ repeat
+  event sysmessage Czekam na okienko
+  wait 5
+ until #CONTKIND = IIDD
+
+; 1. Mapa szczegolowa 65  65
+; 2. Mapa regionu     110 65
+; 3. Mapa swiata      150 65
+
+ chooseSkill cart
+ if #skill < 400
+  click 65 65 dmc
+ if #skill < 700
+  click 110 65 dmc
+ else
+  click 150 65 dmc
+
+wait 10s
+
+goto szukaj
