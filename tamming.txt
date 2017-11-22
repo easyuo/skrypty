@@ -86,10 +86,11 @@ set %followers 7
 set %tamming_odleglos 6
 set %sound D:\games\uo\easyuo\tada.wav
 
-set %KsiegaRun1 PYRLWDE
-set %KsiegaRun2 RWRLWDE
-set %leczRoznica 40
+set %leczRoznica 20
 
+set %KsiegaRun1 WIIFNQE
+set %KsiegaRun2 WIIFNQE
+; set %KsiegaRun2 SBFZOQE
 set %ksiegaStajnia %KsiegaRun1
 set %runaStajnia 16
 
