@@ -287,9 +287,7 @@ sub Dispatch
 				if #findrep = %mojaReputacja && #findid <> #charid
 				{
 					set %zwierzeta %zwierzeta + 1
-					event exmsg #findid 3 30 %zwierzeta
-
-				}
+ 				}
 			}
 
 			if %zwierzeta > 2
@@ -438,16 +436,17 @@ if %tameskill >= 520 && %tameskill < 580
 set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE
 if %tameskill >= 580 && %tameskill < 640
 set %tameable TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
+
 if %tameskill >= 640 && %tameskill < 700
 set %tameable JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
 if %tameskill >= 700 && %tameskill < 736
-set %tameable JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
+set %tameable TG_TF_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
 if %tameskill >= 736 && %tameskill < 760
-set %tameable JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+set %tameable TG_TF_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 760 && %tameskill < 796
-set %tameable JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable TG_TF_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
-set %tameable JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable TG_TF_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -611,7 +610,7 @@ sub TamingMonitor
 		{
 			menu get zabijMagia
 			if #menures = #true
-		 	gosub TamingKill
+		 	gosub TamingMageryKill
 		}
 	 }
 	 return success
@@ -705,151 +704,47 @@ sub TamingMonitor
 return
 
 sub TamingRelease
- menu get zabijOswojonymi
- if #menures = #false
+
+ event macro 1 0 Podazajcie za mna.
+
+ menu get zabijMagia
+ if #menures = #true
  {
-	event macro 1 0 Podazajcie za mna moje mile
-	return
+  menu set status Zabijam stworzenie magia.
+  gosub TamingMageryKill
+  return
  }
+
+ menu get zabijOswojonymi
+ if #menures = #true
+ {
+  menu set status Zabijam stworzenie innymi oswojonymi.
+  gosub zabijOswojonymiStworzeniami
+  return
+ }
+
+ return
 
  menu set status Odstawiam zwierzeta do
  gosub GetAnimalDisplacement
 
-TamingReleaseLoop:
- if #contid = #charid
- {
-	event macro 8 2
-	wait 10
-	contpos %statusposx %statusposy
-	wait 10
- }
- if #contid = %tameid
- {
-	gosub TamingRename
-	event macro 1 0 ZabijMnie jestes wolny
-	wait 10
- }
-
- if #followers < %tamefollow
- {
-	menu get zabijMagia
-	if #menures = #true
-	{
-   gosub TamingKill
-	 return
-  }
- }
- set %attempt ( %attempt % 5 ) + 1
- finditem %tameid
- if #findkind = -1
-  return
- if %attempt > 1 && #finddist > 3
- {
-	event macro 1 0 Zaczekajcie tutaj na mnie!
-	event pathfind #findx #findy #findz
-	wait 2s
-	set %attempt 0
-	goto TamingReleaseLoop
- }
- if #finddist = 0
- set %adjust #true
- if #finddist = 1
- {
-	set %deltax #findx - #charposx
-	set %deltay #findy - #charposy
-	if %deltay < 0 && %deltax = 0
-	set %adjust #true
-	if %deltay < 0 && %deltax < 0
-	set %adjust #true
-	if %deltay = 0 && %deltax < 0
-	set %adjust #true
- }
- if %adjust = #true
- {
-	if %attempt = 1
-	{
-		event macro 5 7 ; walk west
-		event macro 5 7 ; walk west
-		wait 1s
-	}
-	if %attempt = 2
-	{
-		event macro 5 2 ; walk north east
-		event macro 5 2 ; walk north east
-		event macro 5 2 ; walk north east
-		wait 1s
-	}
-	if %attempt = 3
-	{
-		event macro 5 6 ; walk south west
-		event macro 5 6 ; walk south west
-		event macro 5 6 ; walk south west
-		wait 1s
-	}
-	if %attempt = 4
-	{
-		event macro 5 1 ; walk north
-		event macro 5 1 ; walk north
-		event macro 5 1 ; walk north
-		wait 1s
-	}
-	if %attempt = 5
-	{
-		event macro 5 4 ; walk south east
-		event macro 5 4 ; walk south east
-		event macro 5 4 ; walk south east
-		event macro 5 4 ; walk south east
-		wait 1s
-	}
-	set %adjust #false
-	goto TamingReleaseLoop
-}
-finditem %tameid
-if #findkind = -1
-return
-gosub GetScreenXY #findx #findy #findz 0 %screenydisp
-menu get releasecontext
-if #menures = #true
-{
-	click %screenx %screeny F
-	wait 1s
-	goto TamingReleaseLoop
-}
-menu get zabijOswojonymi
-if #menures = #true
-{
-	click %screenx %screeny G
-	wait 10
-	click %screenx %screeny P
-	wait 10
-	goto TamingReleaseLoop
-}
-event macro 1 0 Podazajcie za mna
 return
 
-sub TamingRename
-menu set status Ranaming Animal
-contpos 5 30
-wait 5
-set %screenx #contposx + 130
-set %screeny #contposy + 20
-click %screenx %screeny
-for %i 1 5
-{
-	key RIGHT
-}
-for %i 1 20
-{
-	key BACK
-}
-msg ZabijMnie$
-click %screenx %screeny r
-return
-
-sub TamingKill
+sub zabijOswojonymiStworzeniami
  menu set status Zabijam zwierze.
  event exmsg %tameid 3 30 Zabijam!
-TamingKillLoop:
+ set #ltargetid %tameid
+ set #ltargetkind 1
+ event macro 1 0 Zabijcie!
+ target 6s
+ event macro 22 0 ; last target
+ wait 1s
+return
+
+sub TamingMageryKill
+ menu set status Zabijam zwierze.
+ event exmsg %tameid 3 30 Zabijam!
+TamingMageryKillLoop:
  finditem %tameid
  if #findkind = -1
   return
@@ -859,9 +754,8 @@ TamingKillLoop:
 	if #skill > 500
 	{
 		event macro 13 46 ; meditation
-		repeat
-		until #MANA = #MAXMANA
-		goto TamingKillLoop
+		wait 5s
+		goto TamingMageryKillLoop
 	}
 	else
 	{
@@ -875,43 +769,20 @@ TamingKillLoop:
  event macro 15 50 ; Flame Strike
  target 6s
  event macro 22 0 ; last target
- wait 2s
-goto TamingKillLoop
-return
-
-; clickScreenXYZ by ScriptFellow modded by Roadkill
-; Mods by UncleDave
-sub GetScreenXY
-set %1 ( %1 - #charposx ) * 22 ; world x-coordinate
-set %2 ( #charposy - %2 ) * 22 ; world y-coordinate
-set %3 ( %3 - #charposz ) * 4 ; world z-coordinate
-if %0 < 4 || %4 = N/A
-set %4 0 ; x displacement, added to screen coordinate
-if %0 < 5 || %5 = N/A
-set %5 35 ; y displacement, added to screen coordinate
-set %screenx #clileft + #clixres / 2 + %1 + %2 + %4
-set %screeny #clitop + #cliyres / 2 + %1 - %2 - %3 + %5
-set %offscreen #true
-if %screenx > #clileft &&
-+ %screeny > #clitop &&
-+ %screenx < ( #clileft + #clixres ) &&
-+ %screeny < ( #clitop + #cliyres )
-{
-	set %offscreen #false
-	;click %screenx %screeny F
-}
+ wait 1s
+goto TamingMageryKillLoop
 return
 
 ; GetYDisplacementForAnimType by Roadkill
 ; Mods by UncleDave
 sub GetAnimalDisplacement
-set %screenydisp -32
-if %tametype in GE_ZD_L_M_TF__IG_NG__ZF_PF_EG_CO_TG_PG_VD
-set %screenydisp -25
-if %tametype in AH
-set %screenydisp -45
-if %tametype in DG_AG_WC_RF_WG_TC
-set %screenydisp -15
+  set %screenydisp -32
+ if %tametype in GE_ZD_L_M_TF__IG_NG__ZF_PF_EG_CO_TG_PG_VD
+  set %screenydisp -25
+ if %tametype in AH
+  set %screenydisp -45
+ if %tametype in DG_AG_WC_RF_WG_TC
+  set %screenydisp -15
 return
 
 sub SetReagentContainer
