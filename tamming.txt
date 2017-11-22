@@ -93,7 +93,7 @@ set %KsiegaRun1 WIIFNQE
 set %KsiegaRun2 WIIFNQE
 ; set %KsiegaRun2 SBFZOQE
 set %stajniaKsiegaID SBFZOQE
-set %stajniaRuna 14
+set %stajniaRuna 11
 
 set %runaStart 1
 set %runaKoniec 16
@@ -277,7 +277,6 @@ sub Dispatch
 		menu get odstawdostajni
 		if #menures = #true
 		{
-     event macro 1 0 Podarzajcie za mna. Wracamy.
      ignoreitem reset
 		 set %zwierzeta 0
 		 finditem #CHARID
@@ -620,6 +619,7 @@ sub TamingMonitor
   }
 	if Udalo_ci_sie_oswoic in #journal
 	{
+   event macro 1 0 Witaj. Podazajcie za mna.
    if Twoje_zwierze_zachowuje_sie_niespokojnie in #journal
 	 {
 		event sysmessage Zwierze zachowuje sie niespokojnie
@@ -1164,7 +1164,7 @@ for %a 1 #findcnt
 	set #ltargetid #findid
 
 	event exmsg #FINDID 3 30 Przechowuje #findType
-	event macro 1 0 przechowaj
+	event macro 1 0 Sprzedaj
 	set #ltargetid #findid
 	set #ltargetkind 1
 	target 3s
@@ -1233,6 +1233,7 @@ else
 	return
 
 sub OdstawDoStajni
+ event macro 1 0 Podazajcie za mna. Wracamy!
  event exmsg #CHARID 3 30 Odstawiam zwierzeta do stajni!
  ; Do stajennego
  call libs\runebookCL.lib.euo runebook %stajniaKsiegaID %stajniaRuna
@@ -1261,9 +1262,10 @@ sub Leczenie
 	else
 	{
    gosub LeczenieIVM
+   wait 10
   }
 
-  if #HITS > 80 && #MANA > 22
+  if #HITS > 50 && #MANA > 22
 	{
 	 if #STR <= 100
 		gosub BlessStr
