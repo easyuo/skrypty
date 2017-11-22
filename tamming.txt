@@ -84,6 +84,7 @@ initevents
 
 set %followers 7
 set %tamming_odleglos 6
+set %tamming_odleglos_czekaj_po_prowokacji 5s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
 set %leczRoznica 20
@@ -91,14 +92,14 @@ set %leczRoznica 20
 set %KsiegaRun1 WIIFNQE
 set %KsiegaRun2 WIIFNQE
 ; set %KsiegaRun2 SBFZOQE
-set %ksiegaStajnia %KsiegaRun1
-set %runaStajnia 16
+set %stajniaKsiegaID SBFZOQE
+set %stajniaRuna 14
 
 set %runaStart 1
 set %runaKoniec 16
 
-set %runaAktualna %runaStart
-set %runaNastepna %runaStart
+set %runaAktualna %runaStart - 1
+set %runaNastepna %runaStart - 1
 set %ksiegaAktualna %KsiegaRun1
 
 set %zwierzetaOdstawiam XE
@@ -113,7 +114,6 @@ SET %jukaloot JSL_USL_WOH_YWL_
 SET %paragonloot IIF_IKF_BUD_HIF_
 ;Resource loot lists
 SET %feather VLK
-
 
 gosub InitMenu
 gosub InitAnimalTaming
@@ -171,9 +171,14 @@ menu button otworzPojemnikKamienie 150 155 160 25 Pojemnik KAMIENIE
 
 menu text lbl_przerwa_po_gate 10 185 Przerwa po gate w sekundach
 menu Edit przerwa_po_gate 160 183 30 1
+menu button idzStajnia 195 181 100 25 Idz STAJNIA
 
 menu check odstawdostajni 10 165 130 15 #true Zwierzêta do stajni
 menu check leczenie 10 205 130 15 #true Leczenie Magia
+
+menu text lbl_aktualna_runa 10 226 Aktualna runa:
+menu Edit aktualna_runa 90 223 25 %runaStart
+menu Edit ostatnia_runa 120 223 25 %runaKoniec
 
 ; --------
 ; Status
@@ -235,7 +240,7 @@ sub Dispatch
  gosub FindClosestItem %finditems
  if %finddist = N/A
  {
-	menu get returnstart
+  menu get returnstart
 	if #menures = #true
 	{
 		gosub PathfindWait %charstartx %charstarty %charstartz
@@ -250,58 +255,49 @@ sub Dispatch
 	menu get autobramy
 	if #menures = #true
 	{
-		set %runaNastepna %runaAktualna + 1
+    ; Aktualna runa z Menu
+    menu get aktualna_runa
+    set %runaAktualna #MENURES
+    set %runaNastepna %runaAktualna + 1
+
 		if %runaNastepna > %runaKoniec
-		{
 			set %runaNastepna %runaStart
-		}
-
 		menu get przerwa_po_gate
-
 		if #menures > 0
-		{
 			set %przerwa_po_gate_sekundy #menures , s
-		}
 		else
-		{
 			set %przerwa_po_gate_sekundy 60 , s
-		}
 
 		event sysmessage Dajemy mobkom czas na respown. Czekam %przerwa_po_gate_sekundy
 		wait %przerwa_po_gate_sekundy
+		event sysmessage Przenosze do miejsca: %runaNastepna
 
-		event sysmessage Przenosze do: %runaNastepna
-
+    ; Jezeli odstawiamy oswojone mobki do stajni to stawiana jest brama do stajnegoo, mobki sprzedawane/przechowywane a nastepnie
+    ; kolejna pozycja z runebooka.
 		menu get odstawdostajni
 		if #menures = #true
 		{
-			ignoreitem reset
-			set %zwierzeta 0
-
-			finditem #CHARID
-      set %mojaReputacja #FINDREP
-      event exmsg #CHARID 3 30 R: #FINDREP
-
-			finditem * G_7
-			for %a 1 #findcnt
+     event macro 1 0 Podarzajcie za mna. Wracamy.
+     ignoreitem reset
+		 set %zwierzeta 0
+		 finditem #CHARID
+     set %mojaReputacja #FINDREP
+		 finditem * G_7
+		 for %a 1 #findcnt
 			{
 				set #findindex %a
 				if #findrep = %mojaReputacja && #findid <> #charid
-				{
 					set %zwierzeta %zwierzeta + 1
- 				}
 			}
-
 			if %zwierzeta > 2
-			{
 				gosub OdstawDoStajni
-			}
 		}
 
-		gosub UzyjRunebooka %KsiegaRun1 %runaNastepna
-
+    ; Gate do nastepnej lokalizacji
+    call libs\runebookCL.lib.euo runebook %KsiegaRun1 %runaNastepna
+;		gosub UzyjRunebooka
 		set %runaAktualna %runaNastepna
-
+		menu set aktualna_runa %runaAktualna
 		; Resetujemy mobki to tamowania.
 		ignoreitem reset
 
@@ -344,6 +340,14 @@ sub ScriptIdletime
   gosub OtworzPojemnikNaKamienie
   gosub MenuUpdateStats
  }
+
+ if #menubutton = idzStajnia
+ {
+  set #menubutton N/A
+  gosub OdstawDoStajni
+  gosub MenuUpdateStats
+ }
+ 
 return
 
 sub MenuUpdateStats
@@ -441,17 +445,16 @@ if %tameskill >= 520 && %tameskill < 580
 set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE
 if %tameskill >= 580 && %tameskill < 640
 set %tameable TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
-
 if %tameskill >= 640 && %tameskill < 700
-set %tameable JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
+set %tameable FN_JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
 if %tameskill >= 700 && %tameskill < 736
-set %tameable QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
+set %tameable PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
 if %tameskill >= 736 && %tameskill < 760
-set %tameable QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+set %tameable PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 760 && %tameskill < 796
-set %tameable QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
-set %tameable TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -471,7 +474,7 @@ set %tameable TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE
 ; XX  - Byk
 
 if %tameskill >= 820
-set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
+set %tameable PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
 
  gosub TamingIgnore gain
 return
@@ -507,8 +510,13 @@ if %1 = gain
 return
 
 sub TameAnimal
+
  menu set status Zaczynam oswajac
  TamingLoop:
+  menu get leczenie
+  if #menures = #true
+   gosub Leczenie
+   
   finditem %tameid
   if #findkind = -1
    return
@@ -522,8 +530,18 @@ sub TameAnimal
 
   if #finddist > 10
   {
-   menu set status Zwierze jest zbyt daleko
    gosub AutoAttack
+   menu set status Zwierze jest zbyt daleko! Czekam... %tamming_odleglos_czekaj_po_prowokacji
+   wait %tamming_odleglos_czekaj_po_prowokacji
+   finditem %tameid
+   if #findkind = -1
+    return
+   if #finddist > %tamming_odleglos
+   {
+    event exmsg %tameid 3 30 Zwierze jest zbyt daleko! Ignoruje tymczasowo!
+		gosub TamingIgnore temp %tameid
+		return
+   }
    gosub PathfindWait #findx #findy #findz
    if %moveres = error
    {
@@ -598,7 +616,6 @@ sub TamingMonitor
   }
 	if Nie_udalo_ci_sie_oswoic_tego in #journal
 	{
-   event sysmessage Nie udalo sie. Oswajam jeszcze raz
    return retry
   }
 	if Udalo_ci_sie_oswoic in #journal
@@ -622,7 +639,6 @@ sub TamingMonitor
   }
 	if Zdenerwowal in #journal
 	{
-   event sysmessage Zwierze sie zdenerwowalo. Probujemy jeszcze raz
    return retry
   }
 	if Jestes_za_daleko in #journal
@@ -709,9 +725,6 @@ sub TamingMonitor
 return
 
 sub TamingRelease
-
- event macro 1 0 Podazajcie za mna.
-
  menu get zabijMagia
  if #menures = #true
  {
@@ -740,6 +753,7 @@ sub zabijOswojonymiStworzeniami
  event exmsg %tameid 3 30 Zabijam!
  set #ltargetid %tameid
  set #ltargetkind 1
+ event macro 1 0 Podazajcie za mna!
  event macro 1 0 Zabijcie!
  target 6s
  event macro 22 0 ; last target
@@ -890,11 +904,7 @@ sub AutoAttack
     SET #LTARGETID %tameid
     EVENT macro 27 ; Attack
     wait 10
-    event sysmessage WarModeOn
-    gosub WarModeOn
-
-    event sysmessage WarModeOff
-    gosub WarModeOFF
+    gosub WarModeToggle
    }
   }
  }
@@ -1223,69 +1233,65 @@ else
 	return
 
 sub OdstawDoStajni
-event exmsg #CHARID 3 30 Odstawiam zwierzeta do stajni!
-; Do stajennego
-gosub UzyjRunebooka %ksiegaStajnia %runaStajnia
-; Odstawianie zwierzat
-gosub PrzechowajZwierzeta
-gosub ZbierzRzeczy
-; Powrót od stajennego w poprzednie miejsce
-;gosub UzyjRunebooka %ksiegaAktualna %runaNastepna
-
+ event exmsg #CHARID 3 30 Odstawiam zwierzeta do stajni!
+ ; Do stajennego
+ call libs\runebookCL.lib.euo runebook %stajniaKsiegaID %stajniaRuna
+ gosub PrzechowajZwierzeta
+ gosub ZbierzRzeczy
+ ; Powrót od stajennego w poprzednie miejsce
+ ;gosub UzyjRunebooka %ksiegaAktualna %runaNastepna
 return
 
 ; Do leczenie u wymannowania mobka - tak przynajmniej uwazaj¹ m¹drzy
 sub Leczenie
-
- while #hits < #maxhits - %leczRoznica
+ if #HITS < #MAXHITS - %leczRoznica
  {
-	gosub LeczenieIVM
-	gosub Lustro
-
-	if #hits > 90
-	{
-	 if #str <= 100
-	 {
-		gosub BlessStr
-		gosub LeczenieIVM
-	 }
-
-	 if #int <= 100
-		gosub BlessInt
-
-	 if C in #charStatu
-		gosub LeczenieOdtruj
-	}
- }
-
- return
-
-sub LeczenieOdtruj
-
-  if #mana < 11
-     event macro 1 0 .wypij duza mana
-
-  if #mana >= 11
+  if #MANA < 30
   {
-    event macro 15 24
-    target 3s
-    event macro 23 0
+   if #ENEMYID = N/A
+   {
+    event macro 13 46 ; meditation
+    wait 6s
+   }
+   else
+   {
+    gosub wypijMana
+   }
+	}
+	else
+	{
+   gosub LeczenieIVM
   }
 
+  if #HITS > 80 && #MANA > 22
+	{
+	 if #STR <= 100
+		gosub BlessStr
+	 if #INT <= 100
+		gosub BlessInt
+	 if C in #CHARSTATUS
+		gosub LeczenieOdtruj
+	}
+	if #MANA > 80
+   gosub Lustro
+ }
+return
+
+sub LeczenieOdtruj
+ event macro 15 24
+ target 3s
+ event macro 23 0
 return
 
 sub LeczenieIVM
-
   if #mana < 11
-     event macro 1 0 .wypij duza mana
-
+   gosub wypijMana
   if #mana >= 11
   {
 	 event macro 15 28
    target 3s
    event macro 23 0
-  }
-                                            `
+  }                                          `
 return
 
 sub Lustro
@@ -1337,3 +1343,17 @@ sub WarModeOff
  until #PIXCOL = 14603990 || #PIXCOL = 16777207 ; PEACE
 return
 
+
+sub WarModeToggle
+ EVENT macro 6 ; Toggle War Mode
+ wait 1s
+ EVENT macro 6 ; Toggle War Mode
+ wait 10
+; gosub WarModeOn
+; gosub WarModeOFF
+return
+
+sub
+ event macro 1 0 .wypij mala mana
+ event macro 1 0 .wypij duza mana
+return
