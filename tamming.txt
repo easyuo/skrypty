@@ -1,13 +1,84 @@
 ;=========================================
-; Script Name: Krowa Tamer Plus 4.3
+; Script Name: Krowa Tamer Plus 4.4
 ; Author: Based on Uncle Dave (mod by Krowa)
-; Author: Krowa
-; Version: 4.3
+; Author: Krowa4.51.0
 ; Client Tested with: 4.0.9b
 ; EUO version tested with: 1.5.1.285
 ; Shard OSI / FS: OSI Tested Only
 ; Revision Date: 4/28/2015
 ; Public Release: 6/10/2004
+
+set %wersja "4.4"
+
+; 66.0 - Grizzly
+
+
+; 0% - krowa, pies, kura
+; 1% - kot
+; 2% - juczny kon, juczna lama
+; 3% - ptaki, papuga
+; 8% - owca, koza, krolik
+; 13% - ogromna ropucha, prosie
+; 18% - szczur
+; 23% - dziki kot, dziki pies, mouglin, bagienny mouglin
+; 24% - mala zaba
+; 25% - jelen
+; 26% - kruk
+; 28% - sniezny mouglin
+; 29% - nietoperz mong
+; 30% - jelen, wiewiorka, fretka
+; 31% - wilk
+; 33% - ogromny szczur, kon trykenski, mroczny mouglin, wiekszy mongbat
+; 34% - zaba
+; 35% - maciora
+; 36% - mors
+; 37% - ropucha
+; 38% - niedzwiedz brunatny
+; 39% - gremlin, waz
+; 40% - ogromny skorpion, kon, morgan, gelderlander, szary waz
+; 41% - lania, ameba
+; 42% - pajak
+; 43% - wielka zaba, kon pustynny
+; 44% - szary wilk
+; 45% - byk, niedzwiedz czarny
+; 48% - lesny ostard, dziobak
+; 49% - goryl
+; 51% - wsciekly wilk, lodowy waz
+; 53% - plomienny jaszczur, sniezny ostard
+; 54% - olbrzymi pajak
+; 55% - byk
+; 56% - olbrzymi skorpion
+; 57% - aligator, chochlik
+; 58% - orzel, krokodyl, mustang, montrun, mroczny kagok, armok1
+; 59% - skalny jaszczur
+; 60% - pustynny ostard, ogromny waz, olbrzymi skalny pajak, shadeon, taigok, chigok, kirin, lesny pelzacz, wlochaty pajeczak, widmowy chochlik, skalny pelzacz
+; 61% - arktyczny wilk
+; 62% - niedzwiedz polarny, pantera, olbrzymi skalny skorpion, samiec beta, pustynny lis
+; 63% - lodowa tarantula, dziki rzadki ostard, pegaz, mglisty wierzchowiec, mglista armana, shadeon, karmazynowy kagok, armok2
+; 65% - szalony ostard, armok3, mglisty armok, czarna pantera
+; 66% - imp, niedzwiedz grizzly
+; 67% - lampart sniezny
+; 68% - wsciekly wilk - Przywodca stada, jadowita ropucha
+; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
+; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
+; 73% - tarantula, lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
+
+; 69% - plomienna tarantula ??? - jeszcze nie wiadomo gdzie dokladnie :)
+
+; 74% - pajak szablonogi
+; 76% - wiekszy piekielny ogar
+; 77% - smok bagienny, wargh
+; 78% - drake, lodowy drake, morski drake, bagienny drake
+; 80% - lodowa wyverna, wyverna, plomienna wyverna
+; 81% - pancernik
+; 82% - opancerzony smok bagienny, koszmar
+; 83% - olbrzymia tarantula, pajak wampir, wodny ostard
+; 85% - prastara istota
+; 86% - lodowy smok
+; 88% - smok
+; 91% - jednorozec
+; 92% - skalny smok
+; 93% - ogar zgnilizny
 
 initevents
 
@@ -15,9 +86,11 @@ set %followers 7
 set %tamming_odleglos 6
 set %sound D:\games\uo\easyuo\tada.wav
 
-set %KsiegaRun1 PYRLWDE
-set %KsiegaRun2 RWRLWDE
+set %leczRoznica 20
 
+set %KsiegaRun1 WIIFNQE
+set %KsiegaRun2 WIIFNQE
+; set %KsiegaRun2 SBFZOQE
 set %ksiegaStajnia %KsiegaRun1
 set %runaStajnia 16
 
@@ -31,7 +104,7 @@ set %ksiegaAktualna %KsiegaRun1
 set %zwierzetaOdstawiam XE
 
 SET %zloto POF_
-SET %kamienie 	HVF_UVF_FVF_EVF_OVF_VUF_GVF_RVF_BVF_VVF_NVF_ZVF_EVF_HVF_BVF_RVF_ZVF_GVF_NVF_UVF_FXS_GXS_ZWS_AXS_TWS_WWS_VWS_UWS_VVF_CWL_LWL_UJG_IJG 
+SET %kamienie 	HVF_UVF_FVF_EVF_OVF_VUF_GVF_RVF_BVF_VVF_NVF_ZVF_EVF_HVF_BVF_RVF_ZVF_GVF_NVF_UVF_FXS_GXS_ZWS_AXS_TWS_WWS_VWS_UWS_VVF_CWL_LWL_UJG_IJG
 SET %ziola KUF_JUF_KZF_JZF_MZF_WZF_RZF_SZF_DUF_TZF_UZF_YZF_IUF_
 SET %scrolls AUL_BUL_cul_dul_EUL_FUL_GUL_hul_iul_JUL_KUL_LUL_MUL_nul_oul_PUL_QUL_RUL_SUL_tul_UUL_vul_wul_XUL_YUL_zul_avl_gvl_fvl_ivl_hvl_cvl_NTL_otl_ptl_qtl_rtl_stl_ttl_utl_VTL_wtl_XTL_YTL_ZTL_qxl_pxl_zxl_nxl_wxl_vxl_yxl_xxl_zfj_byl_cyl_dyl_eyl_fyl_gyl_hyl_iyl_jyl_kyl_kym_pym_sym_tym_wym_uym_
 SET %arrowsbolts RWF_LNK_FKF_
@@ -47,13 +120,13 @@ gosub InitAnimalTaming
 gosub InitPickupRegs
 
 loop:
-gosub Dispatch
+ gosub Dispatch
 goto loop
 
 sub InitMenu
 menu clear
-menu window title Krowa Tamer Plus 4.3
-menu window size 320 260
+menu window title Krowa Tamer Plus %wersja
+menu window size 320 460
 menu window color $E0E0E0
 menu font bgcolor $E0E0E0
 menu font name MS Sans Serif
@@ -61,19 +134,18 @@ menu font size 8
 menu font style b
 menu text lblmovement 10 5 Features
 menu font style n
-menu check autotame 10 20 130 15 #false AUTO OSWAJANIE
-;menu check pickupregs 10 35 130 15 #false Zbieraj ziola
-menu check autoatak 10 35 130 15 #false AUTO ATAK
+menu check autotame 10 20 130 15 #false AUTO Oswajanie
+menu check autoatak 10 35 130 15 #false Auto Prowokacja
 menu font style b
 menu text lblrelease 10 55 Jak uwalniac zwierzeta
 menu font style n
 menu check autobramy 10 70 130 15 #false Auto BRAMY
-menu check releaserename 10 85 130 15 #false Zmien nazwê
-menu check releasekill 10 100 130 15 #false Zabijaj magi¹
+menu check zabijOswojonymi 10 85 130 15 #false ZABIJAJ oswojonymi
+menu check zabijMagia 10 100 130 15 #false Zabijaj magi¹
 menu font style b
 menu text lblmisc 10 120 Poruszanie postacia
 menu font style n
-menu check dontmove 10 135 130 15 #true Nie ruszaj postacia
+menu check dontmove 10 135 130 15 #true Nie ruszaj postaci
 menu check returnstart 10 150 130 15 #false Powrot na poczatek
 menu font style b
 menu text lblstatistics 150 5 Statystyki
@@ -81,32 +153,35 @@ menu font style n
 menu text lbltameskill 150 20 Animal Taming:
 menu text lblloreskill 150 35 Animal Lore:
 menu text lbltameid 150 50 Animal Id:
-menu text lbltamecount 150 65 Podejsc:
+menu text lbltamecount 150 65 Reputacja:
+menu text lbltamecount 150 80 Podejsc:
 menu font align right
 menu text tameskill 310 20 0/0
 menu text loreskill 310 35 0/0
 menu text tameid 310 50 N/A
-menu text tamecount 310 65 0
+menu text tamecount 310 80 0
 menu font align left
-menu button manualtame 150 90 80 25 Reczne osw.
-menu button resetstart 150 115 80 25 Reset Start
-menu button ignorecurrent 230 90 80 25 Ignoruj aktualne
-menu button resetignore 230 115 80 25 Reset IGNOR
-menu button setregcont 150 140 160 25 Wskaz pojemnik na ziola
+
+menu button manualtame 150 105 80 25 OSWAJAJ
+menu button resetstart 150 130 80 25 Reset Start
+menu button ignorecurrent 230 105 80 25 Ignoruj aktualne
+menu button resetignore 230 130 80 25 Reset IGNOR
+menu button otworzPojemnikKamienie 150 155 160 25 Pojemnik KAMIENIE
 
 menu text lbl_przerwa_po_gate 10 185 Przerwa po gate w sekundach
 menu Edit przerwa_po_gate 160 183 30 1
 
 menu check odstawdostajni 10 165 130 15 #true Zwierzêta do stajni
+menu check leczenie 10 205 130 15 #false Leczenie Magia
 
 ; --------
 ; Status
 ; --------
 
-menu shape bgstatus 0 238 320 17 3 7 1 $999999 7 $E0E0E0
+menu shape bgstatus 0 438 320 17 3 7 1 $999999 7 $E0E0E0
 menu font color $666666
-menu text lblstatus 5 240 Status:
-menu text status 40 240 Rozpoczynam
+menu text lblstatus 5 440 Status:
+menu text status 40 440 Rozpoczynam
 
 ; --------
 ; Status
@@ -140,33 +215,25 @@ return
 
 sub Dispatch
 
-menu set status Idle
+ menu set status Idle
 
-gosub Leczenie
+ menu get leczenie
+ if #menures = #true
+  gosub Leczenie
 
-gosub ScriptIdletime
-gosub TamingCheckSkill
-set %finditems N/A
-menu get autotame
-if #menures = #true
-{
-	gosub TamingIgnore reset
+ gosub ScriptIdletime
+ gosub TamingCheckSkill
+ set %finditems N/A
+ menu get autotame
+ if #menures = #true
+ {
+  gosub TamingIgnore reset
 	set %finditems %tameable
-}
-menu get pickupregs
-if #menures = #true
-{
-	if %finditems = N/A
+ }
 
-	set %finditems %reagents
-	else
-	set %finditems %finditems , _ , %reagents
-}
-
-gosub FindClosestItem %finditems
-
-if %finddist = N/A
-{
+ gosub FindClosestItem %finditems
+ if %finddist = N/A
+ {
 	menu get returnstart
 	if #menures = #true
 	{
@@ -203,17 +270,17 @@ if %finddist = N/A
 		wait %przerwa_po_gate_sekundy
 
 		event sysmessage Przenosze do: %runaNastepna
-		
+
 		menu get odstawdostajni
 		if #menures = #true
 		{
 			ignoreitem reset
 			set %zwierzeta 0
-			
+
 			finditem #CHARID
       set %mojaReputacja #FINDREP
       event exmsg #CHARID 3 30 R: #FINDREP
-			
+
 			finditem * G_7
 			for %a 1 #findcnt
 			{
@@ -221,9 +288,7 @@ if %finddist = N/A
 				if #findrep = %mojaReputacja && #findid <> #charid
 				{
 					set %zwierzeta %zwierzeta + 1
-					event exmsg #findid 3 30 %zwierzeta
-
-				}
+ 				}
 			}
 
 			if %zwierzeta > 2
@@ -233,7 +298,7 @@ if %finddist = N/A
 		}
 
 		gosub UzyjRunebooka %KsiegaRun1 %runaNastepna
-		
+
 		set %runaAktualna %runaNastepna
 
 		; Resetujemy mobki to tamowania.
@@ -244,103 +309,112 @@ if %finddist = N/A
 	; ----------------------------------------------------
 	; RuneBook
 	; ----------------------------------------------------
-
-}
-
-if %finddist <> N/A
-{
+ }
+ if %finddist <> N/A
+ {
 	if %findtype in %tameable
 	gosub Taming %findid
 	if %findtype in %reagents
 	gosub PickupRegs %findid
-}
-
+ }
 return
 
 sub ScriptIdletime
-if #menubutton = manualtame 2
-set #menubutton N/A
-gosub TamingManual
-if #menubutton = resetignore 2
-set #menubutton N/A
-ignoreitem reset
-if #menubutton = resetstart 4
-set #menubutton N/A
-set %charstartx #charposx
-set %charstarty #charposy
-set %charstartz #charposz
-if #menubutton = setregcont 2
-set #menubutton N/A
-gosub SetReagentContainer
-gosub MenuUpdateStats
-gosub PickupRegsNearby
+ if #menubutton = manualtame 2
+ {
+  set #menubutton N/A
+  gosub TamingManual
+ }
+ if #menubutton = resetignore 2
+ {
+  set #menubutton N/A
+  ignoreitem reset
+ }
+ if #menubutton = resetstart 4
+ {
+  set #menubutton N/A
+  set %charstartx #charposx
+  set %charstarty #charposy
+  set %charstartz #charposz
+ }
+ if #menubutton = otworzPojemnikKamienie 2
+ {
+  set #menubutton N/A
+  gosub OtworzPojemnikNaKamienie
+  gosub MenuUpdateStats
+ }
 return
 
 sub MenuUpdateStats
-chooseskill anim
-str right #skill 1
-set %_skilldec #strres
-set %_skill #skill / 10
-set %_skillcap #skillcap / 10
-menu set tameskill %_skill , #dot , %_skilldec , / , %_skillcap
-chooseskill anil
-str right #skill 1
-set %_skilldec #strres
-set %_skill #skill / 10
-set %_skillcap #skillcap / 10
-menu set loreskill %_skill , #dot , %_skilldec , / , %_skillcap
-menu set tameid %tameid
-menu set tamecount %tamecount
+ chooseskill anim
+ str right #skill 1
+ set %_skilldec #strres
+ set %_skill #skill / 10
+ set %_skillcap #skillcap / 10
+ menu set tameskill %_skill , #dot , %_skilldec , / , %_skillcap
+
+ chooseskill anil
+ str right #skill 1
+ set %_skilldec #strres
+ set %_skill #skill / 10
+ set %_skillcap #skillcap / 10
+ menu set loreskill %_skill , #dot , %_skilldec , / , %_skillcap
+ menu set tameid %tameid
+ menu set tamecount %tamecount
 return
 
 sub Taming
-finditem %1 G_18
+ finditem %1
 
-if #findkind = -1
-return
+ if #findkind = -1
+ return
 
-set %tameid #findid
-set %tametype #findtype
-set %tamedist #finddist
+ set %tameid #findid
+ set %tametype #findtype
+ set %tamedist #finddist
 
-if %tameid <> #ltargetid
-event exmsg %tameid 3 30 Wybierz mnie!
+ if %tameid <> #ltargetid
+ event exmsg %tameid 3 30 Wybierz mnie!
 
-; Auto Atak
-gosub AutoAttack
-gosub Leczenie
-set %tamecount 0
-gosub MenuUpdateStats
-gosub TameAnimal
+ ; Auto Atak
+ menu get leczenie
+ if #menures = #true
+  gosub Leczenie
 
-set %tameid N/A
+ gosub AutoAttack
+ set %tamecount 0
+ gosub MenuUpdateStats
+ gosub TameAnimal
+
+ set %tameid N/A
 
 return
 
 sub TamingManual
-if %tameid <> N/A
-{
-	event sysmessage Juz cos oswajasz.
-	return
-}
-menu set status Waiting For Target
-gosub GetTargetId
-gosub Taming #ltargetid
+ if %tameid <> N/A
+ {
+  event sysmessage Juz cos oswajasz.
+  return
+ }
+ menu set status Czekam na cel
+ gosub GetTargetId
+ gosub Taming #ltargetid
 return
 
 sub TamingCheckSkill
-menu get autotame
-if #menures = #false
-return
-chooseskill anim
-if #skill = #skillcap
-{
-	display ok Taming skillcap reached
+ menu get autotame
+ if #menures = #false
+  return
+ chooseskill anim
+ if #skill = #skillcap
+ {
+	display ok Stalo sie cos niemozliwego. 100 Animal Tamingu
 	menu set autotame #false
 	return
-}
-if %tameskill = #skill
+ }
+ if %tameskill = #skill
 return
+
 set %tameskill #skill
 ; ---------------------------------------------------
 ; this chart was auto-generated using TamingChart.xls
@@ -364,20 +438,25 @@ set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN
 if %tameskill >= 520 && %tameskill < 580
 set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE
 if %tameskill >= 580 && %tameskill < 640
-set %tameable TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
+set %tameable TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
+
 if %tameskill >= 640 && %tameskill < 700
-set %tameable BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
+set %tameable JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
 if %tameskill >= 700 && %tameskill < 736
-set %tameable CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
+set %tameable TG_TF_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
 if %tameskill >= 736 && %tameskill < 760
-set %tameable CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+set %tameable TG_TF_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 760 && %tameskill < 796
-set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable TG_TF_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
+set %tameable TG_TF_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
+; TF_ - Prosiaki
+; PF_ - Owce
 ; JD_ - Ogromny waz
 ; QF_ - Jaszczor gorski
 ; AF_ - Wyverna
+; NG_ - Krowa
 ; HD_ - Pajak szablonogi
 ; IH_ - Lesny pelzacz
 ; BK_ - Dziobak
@@ -385,33 +464,36 @@ if %tameskill >= 796 && %tameskill < 820
 ; UF_ - Plomienny jaszczur
 ; TC_ - Orze³
 ; CB_ - Ogromna ropucha
-; HH - Pustynny Gryf
+; KG_ - Armok / szalony ostard
+; HH  - Pustynny Gryf
+; XX  - Byk
 
-set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 if %tameskill >= 820
 set %tameable BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
-gosub TamingIgnore gain
+
+ gosub TamingIgnore gain
 return
 
 sub TamingIgnore
-if %1 = perm
-{
+ if %1 = perm
+ {
 	ignoreitem %2
 	return
-}
-if %1 = temp
-{
+ }
+ if %1 = temp
+ {
 	ignoreitem %2 1
-	set %tameigtimer #systime + 60000
+	set %tameigtimer #systime + 60000    ; Oryginalnie bylo 60000 [60s]
 	return
-}
-if %1 = reset && #systime > %tameigtimer
-{
+ }
+ if %1 = reset && #systime > %tameigtimer
+ {
+
 	ignoreitem reset 1
 	return
-}
-if %1 = skill
-{
+ }
+ if %1 = skill
+ {
 	ignoreitem %2 2
 	return
 }
@@ -423,484 +505,287 @@ if %1 = gain
 return
 
 sub TameAnimal
-menu set status Zaczynam oswajac
+ menu set status Zaczynam oswajac
+ TamingLoop:
+  finditem %tameid
+  if #findkind = -1
+   return
+  if #findrep = 1 || #findrep = 2
+  {
+   gosub TamingIgnore perm %tameid
+   return
+  }
 
-TamingLoop:
-finditem %tameid G_16
-if #findkind = -1
-return
+  event exmsg %tameid 3 30 Oswajam!
 
-if #findrep = 1 || #findrep = 2
-{
-	event exmsg %tameid 3 30 Nie oswajam! Jest oswojony.
-	gosub TamingIgnore perm %tameid
-	return
-}
-
-event exmsg %tameid 3 30 Oswajam!
-
-if #finddist > 10
-{
-	menu set status Zwierze jest zbyt daleko
-
-	; Auto Atak
-	gosub AutoAttack
-
-	gosub PathfindWait #findx #findy #findz
-	if %moveres = error
-	{
+  if #finddist > 10
+  {
+   menu set status Zwierze jest zbyt daleko
+   gosub AutoAttack
+   gosub PathfindWait #findx #findy #findz
+   if %moveres = error
+   {
 		gosub TamingIgnore temp %tameid
 		return
-	}
-	if #menubutton = ignorecurrent
-	{
+   }
+   if #menubutton = ignorecurrent
+   {
 		set #menubutton N/A
 		gosub TamingIgnore perm %tameid
 		return
-	}
+   }
+   gosub ScriptIdletime
+   goto TamingLoop
+  }
+ set %tamecount %tamecount + 1
+ set %tamejournal #jindex + 1
+ set %tamefollow #followers
+ set #ltargetid %tameid
+ set #ltargetkind 1
+ event macro 13 35 ; animal taming
+ target 5s
+ event macro 22 0 ; last target
+ gosub AutoAttack
+ gosub TamingMonitor
+ if #result = success
+ {
+  gosub TamingRelease
+  gosub TamingIgnore perm %tameid
+  return
+ }
+ if #result = retry
+ {
 	gosub ScriptIdletime
 	goto TamingLoop
-}
-set %tamecount %tamecount + 1
-set %tamejournal #jindex + 1
-set %tamefollow #followers
-set #ltargetid %tameid
-set #ltargetkind 1
-event macro 13 35 ; animal taming
-target 2s
-event macro 22 0 ; last target
-
-; Auto Atak
-gosub AutoAttack
-
-gosub TamingMonitor
-if #result = success
-{
-	gosub TamingRelease
-	gosub TamingIgnore perm %tameid
-	return
-}
-if #result = retry
-{
-	gosub ScriptIdletime
-	goto TamingLoop
-}
-if #result = retrylater
-{
+ }
+ if #result = retrylater
+ {
 	gosub TamingIgnore temp %tameid
 	return
-}
-if #result = ignore
-{
+ }
+ if #result = ignore
+ {
 	gosub TamingIgnore perm %tameid
 	return
-}
-if #result = cancel
-{
+ }
+ if #result = cancel
+ {
 	menu set autotame #false
 	return
-}
-if #result = skill
-{
+ }
+ if #result = skill
+ {
 	gosub TamingIgnore skill %tameid
 	return
 }
-gosub ScriptIdletime
-goto TamingLoop
+ gosub ScriptIdletime
+ goto TamingLoop
 return
 
 sub TamingMonitor
-set %movetimer 0
-set %tametimer #systime + 18000
-TamingMonitorLoop:
-if #jindex >= %tamejournal
-{
+ set %movetimer 0
+ set %tametimer #systime + 18000
+ TamingMonitorLoop:
+ if #jindex >= %tamejournal
+ {
 	scanjournal %tamejournal
 	set %tamejournal %tamejournal + 1
-	if Ktore_zwierze_chcesz in #journal
-	menu set status Oswajam zwierze
-
+	if Ktore_stworzenie_chcesz in #journal
+	{
+   menu set status Oswajam zwierze
+  }
 	if Nie_udalo_ci_sie_oswoic_tego in #journal
-	return retry
-
+	{
+   event sysmessage Nie udalo sie. Oswajam jeszcze raz
+   return retry
+  }
 	if Udalo_ci_sie_oswoic in #journal
 	{
-		sound %sound
-		
-		wait 2s
-		
-		event sysmessage #journal
-		
-		if Twoje_zwierze_zachowuje_sie_niespokojnie in #journal
+   if Twoje_zwierze_zachowuje_sie_niespokojnie in #journal
+	 {
+		event sysmessage Zwierze zachowuje sie niespokojnie
+		menu get odstawdostajni
+		if #menures = #true
 		{
-			event sysmessage Zwierze zachowuje sie niespokojnie
-			menu get odstawdostajni
-			if #menures = #true
-			{
-				gosub OdstawDoStajni
-			}
-			else
-			{
-				menu get releasekill
-				if #menures = #true
-				gosub TamingKill
-			}
+	   gosub OdstawDoStajni
 		}
-		return success
-	}
-
-	if Zdenerwowales_zwierze in #journal
-	return retry
+		else
+		{
+			menu get zabijMagia
+			if #menures = #true
+		 	gosub TamingMageryKill
+		}
+	 }
+	 return success
+  }
+	if Zdenerwowal in #journal
+	{
+   event sysmessage Zwierze sie zdenerwowalo. Probujemy jeszcze raz
+   return retry
+  }
 	if Jestes_za_daleko in #journal
-	return retry
+	{
+   return retry
+  }
+  if Nie_mozesz_sie_poruszyc in #journal ; Sieci, paraliz
+	{
+   return retry
+  }
+  if Udalo_Ci_sie_wyswobodzic in #journal ; Paraliz z sieci - koniec
+	{
+   return retry
+  }
+	if You_must_wait_to_perform in #journal
+  {
+   return retry
+  }
 	if clear_path in #journal
-	return retry
+	{
+   return retry
+  }
 	if too_many_followers in #journal
-	return cancel
+	{
+   return cancel
+  }
 	if That_is_not_within_your in #journal
-	return retrylater
-	if Zwierze_zbyt_mocno_sie in #journal
-	return retrylater
-	if distracted in #journal
-	return retrylater
-	if someone_else in #journal
-	return retrylater
+	{
+   event exmsg #CHARID 3 30 Nie widze zwierzaka!
+   return retrylater
+  }
+  if Zwierze_zbyt_mocno_sie in #journal
+  {
+   return retrylater
+  }
+  if distracted in #journal
+  {
+   return retrylater
+  }
+  if someone_else in #journal
+	{
+   return retrylater
+  }
 	if tame_already in #journal
-	return ignore
-	if Nie_mozesz_go_oswoic in #journal
-	return ignore
-	if To_zwierze_jest_juz_oswojone in #journal
-	return ignore
-	if Nie_mozesz_oswoic_tego in #journal
-	return ignore
-	if no_chance in #journal
-	return skill
-}
-if #followers > %tamefollow
-return success
-if #menubutton = ignorecurrent
-return ignore
-if #systime > %tametimer
-return retry
-finditem %tameid G_16
-if #findkind = -1
-return retry
-if #finddist > 3 && #systime > %movetimer
-{
+	{
+   return ignore
+  }
+  if Nie_mozesz_go_oswoic in #journal
+	{
+   return ignore
+  }
+  if To_zwierze_jest_juz_oswojone in #journal
+	{
+   return ignore
+  }
+  if Nie_mozesz_oswoic_tego in #journal
+	{
+   return ignore
+  }
+  if Nie_masz_szans_na in #journal
+	{
+   return skill
+  }
+ }
+ if #followers > %tamefollow
+  return success
+ if #menubutton = ignorecurrent
+  return ignore
+ if #systime > %tametimer
+  return retry
+
+ finditem %tameid
+ if #findkind = -1
+  return retry
+ if #finddist > 3 && #systime > %movetimer
+ {
 	menu get dontmove
 	if #menures = #false
 	event pathfind #findx #findy #findz
 	set %movetimer #systime + 1500
-}
-gosub ScriptIdletime
-goto TamingMonitorLoop
+ }
+ gosub ScriptIdletime
+ goto TamingMonitorLoop
 return
 
 sub TamingRelease
-menu get releaserename
-if #menures = #false
-{
-	event macro 1 0 Podazajcie za mna moje mile
-	return
-}
 
+ event macro 1 0 Podazajcie za mna.
 
-menu set status Odstawiam zwierzeta do
+ menu get zabijMagia
+ if #menures = #true
+ {
+  menu set status Zabijam stworzenie magia.
+  gosub TamingMageryKill
+  return
+ }
 
-gosub GetAnimalDisplacement
+ menu get zabijOswojonymi
+ if #menures = #true
+ {
+  menu set status Zabijam stworzenie innymi oswojonymi.
+  gosub zabijOswojonymiStworzeniami
+  return
+ }
 
-TamingReleaseLoop:
-if #contid = #charid
-{
-	event macro 8 2
-	wait 10
-	contpos %statusposx %statusposy
-	wait 10
-}
-if #contid = %tameid
-{
-	gosub TamingRename
-	event macro 1 0 ZabijMnie jestes wolny
-	wait 10
-}
-if #contname = normal_gump
-{
-	if #contsize = 118_186
-	{
-		set %xx #contposx + 50
-		set %yy #contposy + 165
-		click %xx %yy F
-		wait 1s
-		if #contsize = 270_120
-		{
-			set %xx #contposx + 35
-			set %yy #contposy + 90
-			click %xx %yy F
-			wait 15
-		}
-	}
-	else
-	{
-		set %xx #contposx + 50
-		set %yy #contposy + 10
-		click %xx %yy R
-		wait 15
-	}
-}
-if #followers < %tamefollow
-{
-	menu get releasekill
-	if #menures = #true
-	gosub TamingKill
-	return
-}
-set %attempt ( %attempt % 5 ) + 1
-finditem %tameid
-if #findkind = -1
-return
-if %attempt > 1 && #finddist > 3
-{
-	event macro 1 0 All Stay
-	event pathfind #findx #findy #findz
-	wait 2s
-	set %attempt 0
-	goto TamingReleaseLoop
-}
-if #finddist = 0
-set %adjust #true
-if #finddist = 1
-{
-	set %deltax #findx - #charposx
-	set %deltay #findy - #charposy
-	if %deltay < 0 && %deltax = 0
-	set %adjust #true
-	if %deltay < 0 && %deltax < 0
-	set %adjust #true
-	if %deltay = 0 && %deltax < 0
-	set %adjust #true
-}
-if %adjust = #true
-{
-	if %attempt = 1
-	{
-		event macro 5 7 ; walk west
-		event macro 5 7 ; walk west
-		wait 1s
-	}
-	if %attempt = 2
-	{
-		event macro 5 2 ; walk north east
-		event macro 5 2 ; walk north east
-		event macro 5 2 ; walk north east
-		wait 1s
-	}
-	if %attempt = 3
-	{
-		event macro 5 6 ; walk south west
-		event macro 5 6 ; walk south west
-		event macro 5 6 ; walk south west
-		wait 1s
-	}
-	if %attempt = 4
-	{
-		event macro 5 1 ; walk north
-		event macro 5 1 ; walk north
-		event macro 5 1 ; walk north
-		wait 1s
-	}
-	if %attempt = 5
-	{
-		event macro 5 4 ; walk south east
-		event macro 5 4 ; walk south east
-		event macro 5 4 ; walk south east
-		event macro 5 4 ; walk south east
-		wait 1s
-	}
-	set %adjust #false
-	goto TamingReleaseLoop
-}
-finditem %tameid
-if #findkind = -1
-return
-gosub GetScreenXY #findx #findy #findz 0 %screenydisp
-menu get releasecontext
-if #menures = #true
-{
-	click %screenx %screeny F
-	wait 1s
-	goto TamingReleaseLoop
-}
-menu get releaserename
-if #menures = #true
-{
-	click %screenx %screeny G
-	wait 10
-	click %screenx %screeny P
-	wait 10
-	goto TamingReleaseLoop
-}
-event macro 1 0 Podazajcie za mna
+ return
+
+ menu set status Odstawiam zwierzeta do
+ gosub GetAnimalDisplacement
+
 return
 
-sub TamingRename
-menu set status Ranaming Animal
-contpos 5 30
-wait 5
-set %screenx #contposx + 130
-set %screeny #contposy + 20
-click %screenx %screeny
-for %i 1 5
-{
-	key RIGHT
-}
-for %i 1 20
-{
-	key BACK
-}
-msg ZabijMnie$
-click %screenx %screeny r
+sub zabijOswojonymiStworzeniami
+ menu set status Zabijam zwierze.
+ event exmsg %tameid 3 30 Zabijam!
+ set #ltargetid %tameid
+ set #ltargetkind 1
+ event macro 1 0 Zabijcie!
+ target 6s
+ event macro 22 0 ; last target
+ wait 1s
 return
 
-sub TamingKill
-menu set status Zabijam zwierze.
-event sysmessage Zabijam zwierze.
-TamingKillLoop:
-finditem %tameid
-if #findkind = -1
-return
-if #mana < 40
-{
+sub TamingMageryKill
+ menu set status Zabijam zwierze.
+ event exmsg %tameid 3 30 Zabijam!
+TamingMageryKillLoop:
+ finditem %tameid
+ if #findkind = -1
+  return
+ if #mana < 40
+ {
 	chooseskill medi
 	if #skill > 500
 	{
 		event macro 13 46 ; meditation
-		wait 15s
-		goto TamingKillLoop
+		wait 5s
+		goto TamingMageryKillLoop
 	}
 	else
 	{
 		event sysmessage Musisz miec conajmniej 50 procent medytacji.
-		menu set releasekill #false
+		menu set zabijMagia #false
 		return
 	}
-}
-set #ltargetid %tameid
-set #ltargetkind 1
-chooseskill eval
-if #skill >= 800
-event macro 15 50 ; Flame Strike
-;event macro 15 41 ; Energy Bolt
-else
-{
-	chooseskill necr
-	if #skill >= 800
-	event macro 15 109 ; pain strike
-	else
-	{
-		event sysmessage You must have at least 80 skill in Necromancy or Evaluating Intelligence to use this option.
-		menu set releasekill #false
-		return
-	}
-}
-target 6s
-event macro 22 0 ; last target
-wait 2s
-goto TamingKillLoop
-return
-
-; clickScreenXYZ by ScriptFellow modded by Roadkill
-; Mods by UncleDave
-sub GetScreenXY
-set %1 ( %1 - #charposx ) * 22 ; world x-coordinate
-set %2 ( #charposy - %2 ) * 22 ; world y-coordinate
-set %3 ( %3 - #charposz ) * 4 ; world z-coordinate
-if %0 < 4 || %4 = N/A
-set %4 0 ; x displacement, added to screen coordinate
-if %0 < 5 || %5 = N/A
-set %5 35 ; y displacement, added to screen coordinate
-set %screenx #clileft + #clixres / 2 + %1 + %2 + %4
-set %screeny #clitop + #cliyres / 2 + %1 - %2 - %3 + %5
-set %offscreen #true
-if %screenx > #clileft &&
-+ %screeny > #clitop &&
-+ %screenx < ( #clileft + #clixres ) &&
-+ %screeny < ( #clitop + #cliyres )
-{
-	set %offscreen #false
-	;click %screenx %screeny F
-}
+ }
+ set #ltargetid %tameid
+ set #ltargetkind 1
+ event macro 15 50 ; Flame Strike
+ target 6s
+ event macro 22 0 ; last target
+ wait 1s
+goto TamingMageryKillLoop
 return
 
 ; GetYDisplacementForAnimType by Roadkill
 ; Mods by UncleDave
 sub GetAnimalDisplacement
-set %screenydisp -32
-if %tametype in GE_ZD_L_M_TF__IG_NG__ZF_PF_EG_CO_TG_PG_VD
-set %screenydisp -25
-if %tametype in AH
-set %screenydisp -45
-if %tametype in DG_AG_WC_RF_WG_TC
-set %screenydisp -15
-return
-
-sub SetReagentContainer
-if %tameid <> N/A
-{
-	event sysmessage Zaczekaj az skonczysz oswajac.
-	return
-}
-event sysmessage Target the container to drop reagents.
-gosub GetTargetId
-set %regcont #ltargetid
-return
-
-sub PickupRegs
-finditem %1 G_16
-if #findkind = -1
-return
-menu set status Picking Up Reagents
-set %regsid #findid
-set %regsdist #finddist
-if %regsdist > 2
-{
-	gosub PathfindWait #findx #findy #findz
-	if %moveres = error
-	{
-		ignoreitem %regsid
-		return
-	}
-}
-gosub GetContainerPos %regcont
-if #result = #false
-{
-	event sysmessage Unable to find reagent container.
-	menu set pickupregs #false
-	return
-}
-set %js #jindex
-event drag %regsid
-wait 10
-if #contname = stack_gump
-key ENTER
-set %je #jindex
-for %ji %js %je
-{
-	scanjournal %ji
-	if can_not_pick in #journal 2
-	ignoreitem %regsid
-	return
-}
-click %contdropx %contdropy
-wait 10
-return
-
-sub PickupRegsNearby
-menu get pickupregs
-if #menures = #false
-return
-finditem %reagents G_2
-if #findkind <> -1
-gosub PickupRegs #findid
+  set %screenydisp -32
+ if %tametype in GE_ZD_L_M_TF__IG_NG__ZF_PF_EG_CO_TG_PG_VD
+  set %screenydisp -25
+ if %tametype in AH
+  set %screenydisp -45
+ if %tametype in DG_AG_WC_RF_WG_TC
+  set %screenydisp -15
 return
 
 sub FindClosestItem
@@ -980,34 +865,31 @@ return
 return
 
 sub AutoAttack
-menu get autoatak
-if #menures = #true
-{
-menu set status AUTO ATAK
-finditem %tameid
-if #findkind = -1
-{
-event sysmessage Nie znalazlem niczego do atakowania.
-return
-}
-else
-{
-if #FINDREP = 4 || #FINDREP = 6 ; 4 - szary / 6 - red
-{
-	event exmsg %tameid 3 30 Atakuje! Reputacja #FINDREP
-	SET #LTARGETID %tameid
-	EVENT macro 27 ; Attack
-	wait 1s
-	EVENT macro 6 ; Toggle War Mode
-	event exmsg %tameid 3 30 Przestaje
-	wait 1s
-	event exmsg %tameid 3 30 atakowac
-	EVENT macro 6 ; Toggle War Mode
-	wait 1s
-}
-
-}
-}
+ menu get autoatak
+ if #menures = #true
+ {
+  menu set status Automatyczne prowokowanie stworzenia
+  finditem %tameid
+  if #findkind = -1
+  {
+   event sysmessage Nie znalazlem niczego do prowokowania.
+   return
+  }
+  else
+  {
+   if #FINDREP = 4 || #FINDREP = 6 ; 4 - szary / 6 - red
+   {
+    event exmsg %tameid 3 30 Prowokuje!
+    SET #LTARGETID %tameid
+    EVENT macro 27 ; Attack
+    wait 10
+    EVENT macro 6 ; Toggle War Mode
+    wait 10
+    EVENT macro 6 ; Toggle War Mode
+    wait 10
+   }
+  }
+ }
 return #true
 
 sub GetContainerPos
@@ -1347,11 +1229,11 @@ return
 ; Do leczenie u wymannowania mobka - tak przynajmniej uwazaj¹ m¹drzy
 sub Leczenie
 
- while #hits < #maxhits
+ while #hits < #maxhits - %leczRoznica
  {
 	gosub LeczenieIVM
 	gosub Lustro
-		
+
 	if #hits > 90
 	{
 	 if #str <= 100
@@ -1359,15 +1241,15 @@ sub Leczenie
 		gosub BlessStr
 		gosub LeczenieIVM
 	 }
-	 
+
 	 if #int <= 100
 		gosub BlessInt
-		
+
 	 if C in #charStatu
 		gosub LeczenieOdtruj
 	}
  }
- 
+
  return
 
 sub LeczenieOdtruj
@@ -1388,7 +1270,7 @@ sub LeczenieIVM
 
   if #mana < 11
      event macro 1 0 .wypij duza mana
-     
+
   if #mana >= 11
   {
 	 event macro 15 28
@@ -1403,15 +1285,23 @@ sub Lustro
 	wait 3s
 	event macro 23 0
  return
-	
+
 sub BlessStr
 	event macro 15 15
-	wait 3s
+	target 3s
 	event macro 23 0
 return
 
 sub BlessInt
 	event macro 15 9
-	wait 3s
+	target 3s
 	event macro 23 0
+return
+
+sub OtworzPojemnikNaKamienie
+ finditem LKF C_ , #BACKPACKID
+ for #FINDINDEX 1 #FINDCNT
+ {
+  call libs\pojemnik.euo otworz #FINDID
+ }
 return

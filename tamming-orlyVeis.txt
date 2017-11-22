@@ -1,0 +1,433 @@
+;==================================
+; Auto-Taming v. 0.1 ( BETA )
+; Orly - Yew
+; Start Skryptu - x: 971 y: 942
+; Autor: Veis
+; Modyfikacje: Krowa
+; Wszelkie bledy zglaszac na irc
+;==================================
+; ---------------edytujemy x/y ( ustawione na YEW (czesc off) ) --------------
+
+; Ignorujemy orzelki zamkniete w domu :)
+ignoreitem reset
+
+ignoreitem FJLTRD
+ignoreitem IJLTRD
+ignoreitem VILTRD
+
+ignoreitem TZKTRD
+ignoreitem UZKTRD
+ignoreitem OZKTRD
+
+
+set %px . 0 971
+set %py . 0 942
+set %px . 1 971
+
+set %px . 17 969
+set %py . 17 1046
+set %px . 18 945
+set %py . 18 1028
+set %px . 19 945
+set %py . 19 1041
+set %px . 20 945
+set %py . 20 1056
+set %px . 21 945
+set %py . 21 1066
+set %px . 22 945
+set %py . 22 1079
+set %px . 23 945
+set %py . 23 1094
+set %px . 24 945
+set %py . 24 1113
+set %px . 25 945
+set %py . 25 1133
+set %px . 26 945
+set %py . 26 1151
+set %px . 27 922
+set %py . 27 1151
+set %px . 28 922
+set %py . 28 1137
+set %px . 29 922
+set %py . 29 1121
+set %px . 30 922
+set %py . 30 1104
+set %px . 31 922
+set %py . 31 1085
+set %px . 32 922
+set %py . 32 1066
+set %px . 33 922
+set %py . 33 1047
+set %px . 34 922
+set %py . 34 1029
+set %px . 35 922
+set %py . 35 1018
+set %px . 36 922
+set %py . 36 999
+set %px . 37 922
+set %py . 37 983
+set %px . 38 922
+set %py . 38 966
+set %px . 39 922
+set %py . 39 952
+set %px . 40 922
+set %py . 40 938
+set %px . 41 922
+set %py . 41 924
+set %px . 42 922
+set %py . 42 911
+set %px . 43 922
+set %py . 43 897
+set %px . 44 922
+set %py . 44 877
+set %px . 45 922
+set %py . 45 860
+set %px . 46 922
+set %py . 46 844
+set %px . 47 922
+set %py . 47 830
+set %px . 48 919
+set %py . 48 818
+set %px . 49 919
+set %py . 49 808
+set %px . 50 919
+set %py . 50 794
+set %px . 51 890
+set %py . 51 794
+set %px . 52 890
+set %py . 52 808
+set %px . 53 890
+set %py . 53 825
+set %px . 54 890
+set %py . 54 838
+set %px . 55 890
+set %py . 55 854
+set %px . 56 890
+set %py . 56 870
+set %px . 57 890
+set %py . 57 880
+set %px . 58 890
+set %py . 58 893
+set %px . 59 890
+set %py . 59 912
+set %px . 60 890
+set %py . 60 928
+set %px . 61 890
+set %py . 61 941
+set %px . 62 890
+set %py . 62 954
+set %px . 63 890
+set %py . 63 964
+set %px . 64 890
+set %py . 64 977
+set %px . 65 890
+set %py . 65 990
+set %px . 66 890
+set %py . 66 1004
+set %px . 67 890
+set %py . 67 1020
+set %px . 68 890
+set %py . 68 1033
+set %px . 69 890
+set %py . 69 1051
+set %px . 70 890
+set %py . 70 1065
+set %px . 71 890
+set %py . 71 1080
+set %px . 72 890
+set %py . 72 1096
+set %px . 73 890
+set %py . 73 1110
+set %px . 74 890
+set %py . 74 1126
+set %px . 75 890
+set %py . 75 1142
+set %px . 76 890
+set %py . 76 1158
+set %px . 77 890
+set %py . 77 1174
+set %px . 78 890
+set %py . 78 1188
+set %px . 79 857
+set %py . 79 1188
+set %px . 80 857
+set %py . 80 1175
+set %px . 81 857
+set %py . 81 1154
+set %px . 82 857
+set %py . 82 1136
+set %px . 83 857
+set %py . 83 1125
+set %px . 84 857
+set %py . 84 1105
+set %px . 85 857
+set %py . 85 1087
+set %px . 86 857
+set %py . 86 1072
+set %px . 87 857
+set %py . 87 1055
+set %px . 88 857
+set %py . 88 1040
+set %px . 89 857
+set %py . 89 1025
+set %px . 90 857
+set %py . 90 1004
+set %px . 91 857
+set %py . 91 986
+set %px . 92 857
+set %py . 92 966
+
+
+set %px . 119 818
+set %py . 119 978
+set %px . 120 818
+set %py . 120 999
+set %px . 121 786
+set %py . 121 1021
+set %px . 122 786
+set %py . 122 1038
+set %px . 123 786
+set %py . 123 1039
+set %px . 124 786
+set %py . 124 1051
+set %px . 125 786
+set %py . 125 1066
+set %px . 126 786
+set %py . 126 1082
+set %px . 127 786
+set %py . 127 1094
+set %px . 128 819
+set %py . 128 1104
+set %px . 129 819
+set %py . 129 1120
+set %px . 130 819
+set %py . 130 1133
+set %px . 131 821
+set %py . 131 1133
+set %px . 132 821
+set %py . 132 1140
+set %px . 133 821
+set %py . 133 1153
+set %px . 134 818
+set %py . 134 1156
+set %px . 135 795
+set %py . 135 1156
+set %px . 136 789
+set %py . 136 1156
+set %px . 137 789
+set %py . 137 1143
+set %px . 138 789
+set %py . 138 1132
+set %px . 139 789
+set %py . 139 1117
+set %px . 140 789
+set %py . 140 1101
+set %px . 141 789
+set %py . 141 1085
+set %px . 142 789
+set %py . 142 1069
+set %px . 143 789
+set %py . 143 1054
+set %px . 144 789
+set %py . 144 1037
+set %px . 145 789
+set %py . 145 1021
+set %px . 146 789
+set %py . 146 1005
+set %px . 147 789
+set %py . 147 985
+set %px . 148 789
+set %py . 148 973
+set %px . 149 789
+set %py . 149 958
+
+; Koniec
+
+set %tametype PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE ; typ zwierzat do tame ( Orly )
+set %cast 29 ; byl cast jest wrestl :)
+set %rail 149 ; ile lokacji
+set %hpdiff 40
+; -----------koniec edycji-----------------------
+set %mark 1
+
+initevents
+top:
+ finditem %tametype G_15
+ if #findkind = -1 2
+ gosub move
+goto top
+
+ set %tamingID #findid
+ gosub taming %tamingID
+
+ if #result = fail 2
+  ignoreitem #findid
+ 
+  if #HITS <= #MAXHITS - %hpdiff
+  gosub Leczenie
+ 
+goto top
+
+;--------NIE DOTYKAJ ------------------
+sub move
+ set %x %px . %mark
+ set %y %py . %mark
+ move %x %y 0
+ set %mark %mark + 1
+ if %mark > %rail
+ set %mark 1
+return
+
+sub kill
+ msg podazajcie za mna $
+ msg ochraniajcie mnie $
+ set #ltargetid %1
+ event macro 6 0
+ target 6s
+ event macro 27 0
+ event pathfind #findx #findy #findz
+ wait 15
+ goto weit
+
+ weit:
+ if #enemyid = N/A
+ {
+  finditem YFM G_1
+  if #findkind = 1
+  {
+   set %zwloki #FINDID
+   ignoreitem %zwloki
+   set #LOBJECTID TSF C_ , #BACKPACKID
+   event macro 17 0
+   target 10s
+   wait 1
+   set #LTARGETID %zwloki
+   set #LTARGETKIND 1
+   event macro 22 0
+   wait 3
+   set #lobjectid %zwloki
+   event macro 17 0
+   wait 10
+
+   dalej:
+    finditem VRD_VLK_PUD C_ . %zwloki
+    set %piora #FINDID
+    if #findcnt < 1
+    {
+     wait 2s
+     event macro 6 0
+     return
+    }
+   exevent drag %piora 9999
+   wait 8
+   exevent dropc #BACKPACKID
+   wait 1
+   goto dalej
+  }
+ }
+
+ goto weit
+
+return
+
+sub taming
+ deletejournal 1
+ set #scnt2 0
+ set %xa #charposx
+ set %ya #charposy
+ w:
+ finditem %tamingID
+ if #finddist > 3 3
+   {
+   event pathfind #findx #findy #findz
+   event sysmessage petla testowa
+   wait 10
+   if #scnt2 > 50
+      {
+      if #charposx = %xa && #charposy = %ya
+         {
+         event sysmessage Ignoruje cel!
+         ;ignoreitem #findid
+         set %xa 0
+         set %ya 0
+         return fail
+         }
+      }
+   goto w
+   }
+;goto w
+ set #ltargetid %tamingID
+ event macro 13 35
+ target 6s
+ event macro 22 0
+ set %timer #scnt + 20
+
+s:
+ for %i 1 5
+{
+scanjournal %i
+if udalo_ci_sie_oswoic_stworzenie in #journal 2
+deletejournal
+return Sucess
+if nie_udalo_ci_sie_oswoic in #journal 2
+deletejournal
+goto w
+if zwierze_jest_juz_oswojone in #journal 2
+deletejournal
+return fail
+if far_away in #journal 2
+deletejournal
+return fail
+}
+
+if %timer < #scnt
+return fail
+
+finditem %1
+if #finddist > 3 2
+ event pathfind #findx #findy #findz
+wait 10
+goto s
+
+sub zabijOswojone
+
+ event macro 1 0 Uwalniam was
+
+ finditem %tameid
+ if #findkind = -1
+ {
+  event sysmessage Nie znalazlem niczego do atakowania.
+  return
+ }
+ else
+ {
+  if #FINDREP = 4 || #FINDREP = 6 ; 4 - szary / 6 - red
+  {
+ 	 event exmsg %tameid 3 30 Atakuje! Reputacja #FINDREP
+ 	 SET #LTARGETID %tameid
+ 	 EVENT macro 27 ; Attack
+   wait 1s
+	 EVENT macro 6 ; Toggle War Mode
+	 event exmsg %tameid 3 30 Przestaje
+	 wait 1s
+	 event exmsg %tameid 3 30 atakowac
+	 EVENT macro 6 ; Toggle War Mode
+	 wait 1s
+  }
+ }
+
+return #true
+
+
+sub Leczenie
+  while #HITS <= #MAXHITS - %hpdiff
+  {
+   if #mana < 11
+    event macro 1 0 .wypij duza mana
+
+   event macro 15 28
+   target 3s
+   event macro 23 0
+   wait 10
+  }
+return

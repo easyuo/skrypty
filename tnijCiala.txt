@@ -3,7 +3,7 @@
 ; Wycina ziola z ciala lopatka.
 
 set %tnijCiala 1
-set %kopLopatka 1
+set %kopLopatka 0
 
 set %sztylet TSF
 set %lopatka WSF

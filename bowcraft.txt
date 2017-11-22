@@ -16,26 +16,89 @@ initevents
 ;  1 - belty
 ;  2 - strzaly
 
- set %produkcja 1
+ set %produkcja 0
 ; =================
- 
- ; Szukamy pojemnikow w glownym plecaku (woreczki, plecaki)
+
+;----------------
+; PLECAK ROBOCZY
+;----------------
+ ; Szukamy pojemnika roboczego w glownym plecaku
  finditem CKF_ZJF C_ , #BACKPACKID
  set %plecak #FINDID
  event sysmessage Znalazlem plecak do pracy: %plecak
  call libs\pojemnik.euo otworz %plecak
+ 
+;------
+; LOOP
+;------
+loop:
 
-start:
+ if %produkcja = 0
+  gosub drzewce
 
-if %produkcja = 0
- goto drzewce
+ if %produkcja = 1 || %produkcja = 2
+  gosub piora
 
-if %produkcja = 1 || %produkcja = 2
- goto piora
+goto loop
 
-piora:
+sub drzewce
+ event sysmessage Robimy drzewce
+ ;-------------------------------
+ ; Szukamy narzedzi fleczerskich
+ ;-------------------------------
+ ; Szukamy pojemnika roboczego w glownym plecaku
+ finditem %narzedzia C_ , #BACKPACKID
+ if #FINDCNT > 0
+ {
+  set %narzedzieID #FINDID
 
+  gosub przeniesDrewno
 
+  set #LOBJECTID %narzedzieID
+  event macro 17          ; Use LastObject - Znalezione narzedzia
+
+  repeat
+   wait 1
+  until #CONTKIND = GJZ && #CONTSIZEX = 510
+  click  40 125 dmc     ; materialy
+  repeat
+   wait 1
+  until #CONTKIND = GJZ && #CONTSIZEX = 510
+
+  set %pracowac 1
+
+  repeat
+   finditem %drewno C_ , %plecak ; Szukamy drewna w roboczym plecaku
+   if #FINDSTACK > 0
+   {
+    set %drewnoRoboczeID #FINDID
+    click 280 125 dmc     ; drzewce
+    target 5s
+    set #LTARGETID %drewnoRoboczeID
+    set #LTARGETKIND 1
+    event macro 22
+   
+    gosub przeniesDrewno
+    gosub przeniesDrzewce
+
+    repeat
+     finditem %narzedzieID C_ , #BACKPACKID
+     if #FINDCNT = 0
+      goto loop
+    until #CONTKIND = GJZ && #CONTSIZEX = 510
+   }
+  until %pracowac = 1
+  
+ }
+ else
+ {
+  event sysmessage Nie mamy narzedzi fleczerskich. KONIEC
+  halt
+ }
+
+return
+
+sub piora
  finditem %piora C_ , %plecak ; Szukamy pior w plecaku roboczym
  if #FINDCNT = 0
  {
@@ -49,51 +112,73 @@ piora:
   }
  }
 
-finditem %piora C_ , %plecak ; Szukamy pior w plecaku roboczym
-if #FINDSTACK > 1
-{
-   ignoreitem #FINDID
-   goto piora
-}
-if #FINDID = x
-{
-
-}
-
-set #LOBJECTID #FINDID
-finditem %drzewce C_
-if #FINDSTACK > 1 , #BACKPACKID
-{
- ignoreitem #FINDID
-   goto piora
-}
-if #FINDID = x
-{
+ finditem %piora C_ , %plecak ; Szukamy pior w plecaku roboczym
+ if #FINDSTACK > 1
+ {
+  call libs\przenies.euo przedmiot #FINDID #BACKPACKID #FINDSTACK
+   goto loop
+ }
+ if #FINDSTACK = 1
+ {
+  set #LOBJECTID #FINDID
+  finditem %drzewce C_
+  if #FINDSTACK > 1 , #BACKPACKID
+  {
+  ignoreitem #FINDID
+   goto loop
+  }
+  if #FINDID = x
+  {
    event sysmessage Nie masz drzewcow! Zatrzymuje
    halt
-}
-set #LTARGETID #FINDID
+  }
+  set #LTARGETID #FINDID
 
-if %produkcja = 1
-{
- event sysmessage Produkujemy belty
- event macro 17
- target
- event macro 22
- wait 10
- click 60 60 mc d
- wait 10
-}
+  if %produkcja = 1
+  {
+   event sysmessage Produkujemy belty
+   event macro 17
+   target
+   event macro 22
+   wait 10
+   click 60 60 mc d
+   wait 10
+  }
 
-if %produkcja = 2
-{
- event sysmessage Produkujemy strzaly
- event macro 17
- target 5s
- event macro 22
- wait 10
- click 105 60 mc d
- wait 10
-}
+ if %produkcja = 2
+ {
+  event sysmessage Produkujemy strzaly
+  event macro 17
+  target 5s
+  event macro 22
+  wait 10
+  click 105 60 mc d
+  wait 10
+ }
+return
 
-goto start
+sub przeniesDrewno
+ finditem %drewno C_ , %plecak ; Szukamy drewna w plecaku roboczym
+ if #FINDCNT = 0
+ {
+  finditem %drewno C_ , #BACKPACKID
+  if #FINDCNT > 0
+  {
+   call libs\przenies.euo przedmiot #FINDID %plecak 1
+  }
+  else
+  {
+   event sysmessage Nie masz drewna! Zatrzymuje!
+   halt
+  }
+ }
+return
+
+sub przeniesDrzewce
+ finditem %drzewce C_ , #BACKPACKID  ; Szukamy drewna w plecaku roboczym
+ repeat
+  call libs\przenies.euo przedmiot #FINDID %plecak #FINDSTACK
+  finditem %drzewce C_ , #BACKPACKID  ; Szukamy drewna w plecaku roboczym
+ until #FINDCNT = 0
+return
+
