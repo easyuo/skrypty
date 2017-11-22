@@ -30,18 +30,22 @@ loop:
   wait 5
  until #CONTKIND = IIDD
 
+;                     X   Y
 ; 1. Mapa szczegolowa 65  65
 ; 2. Mapa regionu     110 65
 ; 3. Mapa swiata      150 65
 
+ set %clickY 65
+
  chooseSkill cart
  if #skill < 400
-  click 65 65 dmc
+  set %clickX 65
  if #skill < 700
-  click 110 65 dmc
+  set %clickX 110
  else
-  click 150 65 dmc
+  set %clickX 150
 
+ click %clickX %clickY dmc
  wait 10s
  
  finditem XVH ; Czysta mapa
