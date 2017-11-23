@@ -7,7 +7,6 @@
 ; Shard OSI / FS: OSI Tested Only
 ; Revision Date: 4/28/2015
 ; Public Release: 6/10/2004
-
 set %wersja "4.4"
 
 ; 66.0 - Grizzly
@@ -61,10 +60,10 @@ set %wersja "4.4"
 ; 68% - wsciekly wilk - Przywodca stada, jadowita ropucha
 ; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
 ; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
-; 73% - tarantula, lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
+; 73% - lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
 
 ; 69% - plomienna tarantula ??? - jeszcze nie wiadomo gdzie dokladnie :)
-
+ ??? tarantula,
 ; 74% - pajak szablonogi
 ; 76% - wiekszy piekielny ogar
 ; 77% - smok bagienny, wargh
@@ -82,18 +81,21 @@ set %wersja "4.4"
 
 initevents
 
+ignoreitem reset
+ignoreitem #CHARID
+
 set %followers 7
 set %tamming_odleglos 6
 set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
-set %leczRoznica 20
+set %leczRoznica 1
 
 set %KsiegaRun1 WIIFNQE
 set %KsiegaRun2 WIIFNQE
 ; set %KsiegaRun2 SBFZOQE
 set %stajniaKsiegaID SBFZOQE
-set %stajniaRuna 11
+set %stajniaRuna 12
 
 set %runaStart 1
 set %runaKoniec 16
@@ -120,6 +122,12 @@ gosub InitAnimalTaming
 gosub InitPickupRegs
 
 loop:
+ if #MENUBUTTON = CLOSED
+ {
+  event exmsg #CHARID 3 30 Menu zamkniete. Makro zatrzymane!
+  halt
+ }
+
  gosub Dispatch
 goto loop
 
@@ -177,7 +185,7 @@ menu check odstawdostajni 10 165 130 15 #true Zwierzêta do stajni
 menu check leczenie 10 205 130 15 #true Leczenie Magia
 
 menu text lbl_aktualna_runa 10 226 Aktualna runa:
-menu Edit aktualna_runa 90 223 25 %runaStart
+menu Edit aktualna_runa 90 223 25 0
 menu Edit ostatnia_runa 120 223 25 %runaKoniec
 
 ; --------
@@ -445,15 +453,17 @@ set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN
 if %tameskill >= 580 && %tameskill < 640
 set %tameable TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
 if %tameskill >= 640 && %tameskill < 700
-set %tameable FN_JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
-if %tameskill >= 700 && %tameskill < 736
-set %tameable PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
-if %tameskill >= 736 && %tameskill < 760
-set %tameable PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+set %tameable W_FN_JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
+if %tameskill >= 700 && %tameskill < 730
+set %tameable W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD
+if %tameskill >= 730 && %tameskill < 740
+set %tameable AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
+if %tameskill >= 740 && %tameskill < 760
+set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 760 && %tameskill < 796
-set %tameable PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
-set %tameable PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -471,6 +481,33 @@ set %tameable PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF
 ; KG_ - Armok / szalony ostard
 ; HH  - Pustynny Gryf
 ; XX  - Byk
+; W   - Imp
+
+; 65% - szalony ostard, armok3, mglisty armok, czarna pantera
+; 66% - imp, niedzwiedz grizzly
+; 67% - lampart sniezny
+; 68% - wsciekly wilk - Przywodca stada, jadowita ropucha
+; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
+; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
+; 73% - tarantula, lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
+
+; 69% - plomienna tarantula ??? - jeszcze nie wiadomo gdzie dokladnie :)
+
+; 74% - pajak szablonogi
+; 76% - wiekszy piekielny ogar
+; 77% - smok bagienny, wargh
+; 78% - drake, lodowy drake, morski drake, bagienny drake
+; 80% - lodowa wyverna, wyverna, plomienna wyverna
+; 81% - pancernik
+; 82% - opancerzony smok bagienny, koszmar
+; 83% - olbrzymia tarantula, pajak wampir, wodny ostard
+; 85% - prastara istota
+; 86% - lodowy smok
+; 88% - smok
+; 91% - jednorozec
+; 92% - skalny smok
+; 93% - ogar zgnilizny
+
 
 if %tameskill >= 820
 set %tameable PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
@@ -1173,19 +1210,21 @@ sub PrzechowajZwierzeta
 
 ignoreitem reset
 
+event macro 1 0 Zaczekajcie tutaj na mnie
 finditem * G_2
-for %a 1 #findcnt
-{
-	set #findindex %a
-	set #ltargetid #findid
-
-	event exmsg #FINDID 3 30 Przechowuje #findType
-	event macro 1 0 Sprzedaj
-	set #ltargetid #findid
-	set #ltargetkind 1
-	target 3s
-	event macro 22 0 ; last target
-}
+;for %a 1 #findcnt
+;{
+;	set #findindex %a
+;	set #ltargetid #findid
+;
+;	event exmsg #FINDID 3 30 Przechowuje #findType
+;	event macro 1 0 Sprzedaj
+;
+;	set #ltargetid #findid
+;	set #ltargetkind 1
+;	target 3s
+;	event macro 22 0 ; last target
+;}
 
 event exmsg #CHARID 3 30 Koniec
 ; event macro 1 0 Jestescie wolne
