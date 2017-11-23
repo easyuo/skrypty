@@ -114,11 +114,8 @@ set %runaY16 170
   if #FINDCNT > 0
   {
    set %kamieniePojemnik #FINDID
+   call libs\pojemnik.euo otworz %kamieniePojemnik
   }
-
-  call libs\pojemnik.euo otworz %kamieniePojemnik
-
-;  finditem %kamienie C_ , %kamieniePojemnik ; Pojemnik na kamienie
   finditem %kamienie C ; Szukamy kamieni we wszystkich otwartych pojemnikach.
   if #FINDCNT > 0
   {

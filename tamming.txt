@@ -529,11 +529,11 @@ sub TameAnimal
 
   if #finddist > %tamming_odleglos
   {
-   gosub AutoAttack
    ; Tutaj czekamy jezeli postac ma sie nie ruszac
    menu get dontmove
    if #menures = #true
    {
+    gosub AutoAttack
     menu set status Zwierze jest zbyt daleko! Czekam... %tamming_odleglos_czekaj_po_prowokacji
     wait %tamming_odleglos_czekaj_po_prowokacji
    }
@@ -547,8 +547,10 @@ sub TameAnimal
      gosub TamingIgnore temp %tameid
      return
     }
+    gosub AutoAttack
    }
 
+  finditem %tameid
   ; Jezeli nadal, mimo proby podejscia do stworzenia / prowokacji jest ono zbyt daleko ignorujemy je tymczasowo
   if #finddist > %tamming_odleglos
   {
