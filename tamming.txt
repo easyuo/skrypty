@@ -84,7 +84,7 @@ initevents
 
 set %followers 7
 set %tamming_odleglos 6
-set %tamming_odleglos_czekaj_po_prowokacji 5s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
+set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
 set %leczRoznica 20
@@ -527,26 +527,40 @@ sub TameAnimal
 
   event exmsg %tameid 3 30 Oswajam!
 
-  if #finddist > 10
+  if #finddist > %tamming_odleglos
   {
    gosub AutoAttack
-   menu set status Zwierze jest zbyt daleko! Czekam... %tamming_odleglos_czekaj_po_prowokacji
-   wait %tamming_odleglos_czekaj_po_prowokacji
+   ; Tutaj czekamy jezeli postac ma sie nie ruszac
+   menu get dontmove
+   if #menures = #true
+   {
+    menu set status Zwierze jest zbyt daleko! Czekam... %tamming_odleglos_czekaj_po_prowokacji
+    wait %tamming_odleglos_czekaj_po_prowokacji
+   }
+   ; Inaczej podchodzimy do stworzenia
+   else
+   {
+    event sysmessage Podchodzimy do zwierzaka
+    gosub PathfindWait #findx #findy #findz
+    if %moveres = error
+    {
+     gosub TamingIgnore temp %tameid
+     return
+    }
+   }
+
+  ; Jezeli nadal, mimo proby podejscia do stworzenia / prowokacji jest ono zbyt daleko ignorujemy je tymczasowo
+  if #finddist > %tamming_odleglos
+  {
+   event exmsg %tameid 3 30 Zwierze jest zbyt daleko! Ignoruje tymczasowo!
+   gosub TamingIgnore temp %tameid
+   return
+  }
+
    finditem %tameid
    if #findkind = -1
     return
-   if #finddist > %tamming_odleglos
-   {
-    event exmsg %tameid 3 30 Zwierze jest zbyt daleko! Ignoruje tymczasowo!
-		gosub TamingIgnore temp %tameid
-		return
-   }
-   gosub PathfindWait #findx #findy #findz
-   if %moveres = error
-   {
-		gosub TamingIgnore temp %tameid
-		return
-   }
+
    if #menubutton = ignorecurrent
    {
 		set #menubutton N/A
@@ -835,51 +849,51 @@ sub GetTargetId
 return
 
 sub PathfindWait
-set %moveres unknown
-menu get dontmove
-if #menures = #true
-return
-if #charposx = %1 && #charposy = %2
-{
+ set %moveres unknown
+ menu get dontmove
+ if #menures = #true
+  return
+ if #charposx = %1 && #charposy = %2
+ {
 	set %moveres success
 	return
-}
-set %js #jindex
-event pathfind %1 %2 %3
-wait 10
-set %je #jindex
-for %ji %js %je
-{
-	scanjournal %ji
+ }
+ set %js #jindex
+ event pathfind %1 %2 %3
+ wait 10
+ set %je #jindex
+ for %ji %js %je
+ {
+  scanjournal %ji
 	if pathfinding in #journal
 	{
-		set %movex #charposx
-		set %movey #charposy
-		set %movetimer #systime + 500
-PathfindWaitLoop:
-		if #systime < %movetimer
-		goto PathfindWaitLoop
-		if %movex = %1 && %movey = %2
-		{
-			set %moveres success
-			return
-		}
-		if %movex = #charposx && %movey = #charposy
-		{
-			set %moveres stopped
-			return
-		}
-		set %movex #charposx
-		set %movey #charposy
-		set %movetimer #systime + 500
-		goto PathfindWaitLoop
-	}
+	 set %movex #charposx
+	 set %movey #charposy
+	 set %movetimer #systime + 500
+   PathfindWaitLoop:
+   if #systime < %movetimer
+   goto PathfindWaitLoop
+   if %movex = %1 && %movey = %2
+   {
+  	set %moveres success
+    return
+   }
+   if %movex = #charposx && %movey = #charposy
+   {
+    set %moveres stopped
+    return
+   }
+   set %movex #charposx
+   set %movey #charposy
+   set %movetimer #systime + 500
+   goto PathfindWaitLoop
+  }
 	if can't_get_there in #journal
-{
-set %moveres error
-return
-}
-}
+  {
+   set %moveres error
+   return
+  }
+ }
 return
 
 sub AutoAttack
