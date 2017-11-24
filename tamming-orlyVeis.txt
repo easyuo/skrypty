@@ -11,15 +11,6 @@
 ; Ignorujemy orzelki zamkniete w domu :)
 ignoreitem reset
 
-ignoreitem FJLTRD
-ignoreitem IJLTRD
-ignoreitem VILTRD
-
-ignoreitem TZKTRD
-ignoreitem UZKTRD
-ignoreitem OZKTRD
-
-
 set %px . 0 971
 set %py . 0 942
 set %px . 1 971
@@ -272,15 +263,18 @@ goto top
 sub move
  set %x %px . %mark
  set %y %py . %mark
+ event macro 1 Podazajcie za mna
+ event macro 1 Ochraniajcie mnie
  move %x %y 0
+ event sysmessage Punkt: %mark X: %x Y: %y
  set %mark %mark + 1
  if %mark > %rail
  set %mark 1
 return
 
 sub kill
- msg podazajcie za mna $
- msg ochraniajcie mnie $
+ event macro 1 Podazajcie za mna
+ event macro 1 Ochraniajcie mnie
  set #ltargetid %1
  event macro 6 0
  target 6s
@@ -376,6 +370,12 @@ if zwierze_jest_juz_oswojone in #journal 2
 deletejournal
 return fail
 if far_away in #journal 2
+deletejournal
+return fail
+if That_is_not_within in #journal 2
+deletejournal
+return fail
+if Nie_mozesz_go_oswoic in #journal 2
 deletejournal
 return fail
 }
