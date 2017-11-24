@@ -924,26 +924,25 @@ finditem VRD_VLK_PUD C_ . %zwloki
 set %piora #FINDID
 if #findcnt < 1
 {
-wait 2s
-event macro 6 0
-return
+ wait 2s
+ event macro 6 0
+ return
 }
- exevent drag %piora 9999
- wait 8
- exevent dropc #BACKPACKID
- wait 1
+ call libs\przenies.euo przedmiot %piora #BACKPACKID #FINDSTACK
  goto dalej
 }
  }
 goto weit
+
 sub taming
-deletejournal 1
-set #scnt2 0
-set %xa #charposx
-set %ya #charposy
+ deletejournal 1
+ set #scnt2 0
+ set %xa #charposx
+ set %ya #charposy
+
 w:
-finditem %1
-if #finddist > 3 3
+ finditem %1
+ if #finddist > 3 3
    {
    event pathfind #findx #findy #findz
    event sysmessage petla testowa
@@ -962,11 +961,12 @@ if #finddist > 3 3
    goto w
    }
 ;goto w
-set #ltargetid %1
-event macro 13 35
-target 6s
-event macro 22 0
-set %timer #scnt + 20
+ set #ltargetid %1
+ event macro 13 35
+ target 6s
+ event macro 22 0
+ set %timer #scnt + 20
+
 s:
 for %i 1 5
 {
@@ -984,6 +984,7 @@ if far_away in #journal 2
 deletejournal
 return fail
 }
+
 if %timer < #scnt
 return fail
 finditem %1

@@ -33,10 +33,13 @@ set %zioloNazwa5 Perly
 set %zioloTyp6 WZF ; belladona
 set %zioloNazwa6 Belladona
 
+set %zioloTyp6 JUF ; belladona
+set %zioloNazwa6 Krwawnik
+
 set %zioloTablicaRozmiar 6
 
 set %ziolaDoSuszenia TIJ_OIJ_HJJ_ZIJ_
-set %doOdlozenia KZF_JUF_MZF_JZF_TZF_VZF_NZF_HUF_YZF_XZF_
+set %doOdlozenia KZF_JUF_MZF_JZF_TZF_VZF_NZF_HUF_YZF_XZF_WZF_
 
 ; ==== EDYCJA ====
 ; Zmienna %sklad ustawi siê automatycznie, bêdzie to pojemnik w którym przechowywane bêdš wykopane zio³a.
