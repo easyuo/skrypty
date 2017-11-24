@@ -85,7 +85,7 @@ ignoreitem reset
 ignoreitem #CHARID
 
 set %followers 7
-set %tamming_odleglos 6
+set %tamming_odleglos 7
 set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
