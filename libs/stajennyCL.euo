@@ -1,22 +1,39 @@
  ; EWH - bilety na zwierzeta
  ; ZJF - plecaki
  ; OKF - pojemnik na ziola
- ; - pojemnik na kamienie
+ ; LKF - pojemnik na kamienie
 event sysmessage 0: %0
 event sysmessage 1: %1
 event sysmessage 2: %2
+
+set !sprzedawajStworzenia = 0
+set !przechowujStworzenia = 1
+set !wyciagajStworzeniaZBiletow 0
+
 ignoreitem reset
 ignoreitem #CHARID
 finditem IS_HS G_2 ; Szukamy stajnnego
 if #FINDCNT > 0
  set %stajennyID #FINDID
+
+finditem OKF C_ , #BACKPACKID
+if #FINDCNT > 0
+ set !pojemnikZiolaID #FINDID
+ 
+finditem LKF C_ , #BACKPACKID
+if #FINDCNT > 0
+ set !pojemnikKamienieID #FINDID
+ 
+
+
 event macro 1 0 Zaczekajcie tutaj na mnie
 call libs\pojemnik.euo otworz #BACKPACKID
-finditem ZJF C_ , #BACKPACKID
+finditem ZJF
 for #FINDINDEX 1 #FINDCNT
 {
- ignoreitem #FINDID ; Ignorujemy wszystkie plecaki w naszym plecaku przed przechowaniem tak aby pozniej przetwarzac tylko nowe plecaki.
+ ignoreitem #FINDID ; Ignorujemy wszystkie plecaki
 }
+
 
 ; Przechowujemy stworzenia
 finditem * G_2
@@ -32,13 +49,24 @@ if #FINDCNT > 0
  }
 }
 
-set #LTARGETID #CHARID
 set #LTARGETKIND 1
+
+; Sortowanie ziol
 event macro 1 0 .sortuj ziola
-target
+target 10s
+if !pojemnikZiolaID <> N/A
+ set #LTARGETID !pojemnikZiolaID
+else
+ set #LTARGETID #CHARID
 event macro 22 0 ; last target
+
+; Sortowanie kamieni
 event macro 1 0 .sortuj kamienie
-target
+target 10s
+if !pojemnikKamienieID <> N/A
+ set #LTARGETID !pojemnikKamienieID
+else
+ set #LTARGETID #CHARID
 event macro 22 0 ; last target
 
 ; Sprawdzanie plecakow z mobkow
@@ -66,37 +94,46 @@ finditem ZJF C_ , #BACKPACKID
  until #FINDCNT = 0
 
 ; Bilety na zwierzeta
-finditem EWH C_ , #BACKPACKID
-if #FINDCNT > 0
+if !wyciagajStworzeniaZBiletow = 1
 {
- for #FINDINDEX 1 #FINDCNT
+ finditem EWH C_ , #BACKPACKID
+ if #FINDCNT > 0
  {
-  call libs\przenies.euo przedmiot #FINDID %stajennyID #FINDSTACK
-  set %jrnl #jindex
-  set !jestZwierze 0
-  while !jestZwierze = 0
+  for #FINDINDEX 1 #FINDCNT
   {
-   if #jindex > %jrnl
-   {
-    set %jrnl %jrnl + 1
-    scanjournal %jrnl
-    if Opiekuj_sie_nim in #journal
-    set !jestZwierze 1
-   }
+   call libs\przenies.euo przedmiot #FINDID %stajennyID #FINDSTACK
+   set %jestZwierze 0
+   set !lastjindex #jindex
+   repeat
+    if #jindex >= !lastjindex
+    {
+     scanjournal !lastjindex
+     set !lastjindex !lastjindex + 1
+     if Opiekuj in #journal
+     {
+      set %jestZwierze 1
+      event sysmeesage Stajenny dal zwierze.
+     }
+    }
+   until %jestZwierze = 1
   }
  }
 }
-; Sprzedajemy stworzenia
-finditem * G_2
-if #FINDCNT > 0
+
+if !sprzedawajStworzenia = 1
 {
- for #FINDINDEX 1 #FINDCNT
+; Sprzedajemy stworzenia
+ finditem * G_2
+ if #FINDCNT > 0
  {
-	event macro 1 0 Sprzedaj #FINDTYPE
-	set #LTARGETID #FINDID
-	set #LTARGETKIND 1
-	target 3s
-	event macro 22 0 ; last target
+  for #FINDINDEX 1 #FINDCNT
+  {
+ 	 event macro 1 0 sprzedaj
+ 	 set #LTARGETID #FINDID
+ 	 set #LTARGETKIND 1
+ 	 target 3s
+ 	 event macro 22 0 ; last target
+  }
  }
 }
 

@@ -1,0 +1,22 @@
+; Biblioteka:   Blesowanie
+; Autor:        Krowa
+; Data:         24.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+sub Lustro
+	event macro 15 35
+	wait 3s
+return
+
+sub BlessStr
+	event macro 15 15
+	target 3s
+	event macro 23 0
+return
+
+sub BlessInt
+	event macro 15 9
+	target 3s
+	event macro 23 0
+return

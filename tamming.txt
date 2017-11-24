@@ -89,13 +89,13 @@ set %tamming_odleglos 9
 set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
-set %leczRoznica 1
+set %leczRoznica 10
 
 set %KsiegaRun1 WIIFNQE
 set %KsiegaRun2 WIIFNQE
 ; set %KsiegaRun2 SBFZOQE
 set %stajniaKsiegaID SBFZOQE
-set %stajniaRuna 6
+set %stajniaRuna 16
 
 set %runaStart 1
 set %runaKoniec 16
@@ -470,7 +470,7 @@ set %tameable W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_
 ; QF_ - Jaszczor gorski
 ; AF_ - Wyverna
 ; NG_ - Krowa
-; HD_ - Pajak szablonogi
+; HD_ - Pajak szablonogi  / Tarantula
 ; IH_ - Lesny pelzacz
 ; BK_ - Dziobak
 ; MG_ - Mgliste wierzchowce
@@ -590,7 +590,7 @@ sub TameAnimal
   ; Jezeli nadal, mimo proby podejscia do stworzenia / prowokacji jest ono zbyt daleko ignorujemy je tymczasowo
   if #finddist > %tamming_odleglos
   {
-   event exmsg %tameid 3 30 Zwierze jest zbyt daleko! Ignoruje tymczasowo!
+   event exmsg %tameid 3 30 Zwierze jest zbyt daleko! Dystans: #finddist
    gosub TamingIgnore temp %tameid
    return
   }

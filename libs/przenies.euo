@@ -7,17 +7,21 @@
 ; call libs\przenies.euo przedmiot %CO %GDZIE %ILE
 sub przenies
   exevent drag %2 %4
+  wait 1
   exevent dropc %3
   repeat
    finditem %2 C
   until #FINDBAGID = %3 || #FINDKIND = -1
+  wait 1
 exit
 
 sub przedmiot
   exevent drag %2 %4
+  wait 1
   exevent dropc %3
   repeat
    finditem %2 C
   until #FINDBAGID = %3 || #FINDKIND = -1
+  wait 1
 exit
 
