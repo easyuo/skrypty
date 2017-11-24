@@ -85,7 +85,7 @@ ignoreitem reset
 ignoreitem #CHARID
 
 set %followers 7
-set %tamming_odleglos 7
+set %tamming_odleglos 9
 set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
@@ -861,7 +861,8 @@ sub FindClosestItem
  finditem %1 G_
  set %findid #findid
  set %findtype #findtype
- set %finddist #finddist
+ set %finddist #FINDDIST
+ event exmsg #FINDID 3 30 Dystans: %finddist
  if #findcnt > 1
  {
 	for %i 1 #findcnt
