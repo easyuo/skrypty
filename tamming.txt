@@ -95,7 +95,7 @@ set %KsiegaRun1 WIIFNQE
 set %KsiegaRun2 WIIFNQE
 ; set %KsiegaRun2 SBFZOQE
 set %stajniaKsiegaID SBFZOQE
-set %stajniaRuna 12
+set %stajniaRuna 6
 
 set %runaStart 1
 set %runaKoniec 16
@@ -103,7 +103,6 @@ set %runaKoniec 16
 set %runaAktualna %runaStart - 1
 set %runaNastepna %runaStart - 1
 set %ksiegaAktualna %KsiegaRun1
-
 set %zwierzetaOdstawiam XE
 
 SET %zloto POF_
@@ -187,6 +186,10 @@ menu check leczenie 10 205 130 15 #true Leczenie Magia
 menu text lbl_aktualna_runa 10 226 Aktualna runa:
 menu Edit aktualna_runa 90 223 25 0
 menu Edit ostatnia_runa 120 223 25 %runaKoniec
+
+menu text lbl_stajnia 10 246 Stajnia:
+menu Edit stajniaKsiegaID 90 243 55 %stajniaKsiegaID
+menu Edit stajniaNumerRuny 155 243 25 %stajniaRuna
 
 ; --------
 ; Status
@@ -317,9 +320,9 @@ sub Dispatch
  if %finddist <> N/A
  {
 	if %findtype in %tameable
-	gosub Taming %findid
+   gosub Taming %findid
 	if %findtype in %reagents
-	gosub PickupRegs %findid
+   gosub PickupRegs %findid
  }
 return
 
@@ -377,23 +380,19 @@ sub MenuUpdateStats
 return
 
 sub Taming
- finditem %1
 
+ finditem %1
  if #findkind = -1
  return
-
  set %tameid #findid
  set %tametype #findtype
  set %tamedist #finddist
-
  if %tameid <> #ltargetid
  event exmsg %tameid 3 30 Wybierz mnie!
-
  ; Auto Atak
  menu get leczenie
  if #menures = #true
   gosub Leczenie
-
  gosub AutoAttack
  set %tamecount 0
  gosub MenuUpdateStats
@@ -1207,28 +1206,7 @@ sub OtworzPojemnik
 return
 
 sub PrzechowajZwierzeta
-
-ignoreitem reset
-
-event macro 1 0 Zaczekajcie tutaj na mnie
-finditem * G_2
-;for %a 1 #findcnt
-;{
-;	set #findindex %a
-;	set #ltargetid #findid
-;
-;	event exmsg #FINDID 3 30 Przechowuje #findType
-;	event macro 1 0 Sprzedaj
-;
-;	set #ltargetid #findid
-;	set #ltargetkind 1
-;	target 3s
-;	event macro 22 0 ; last target
-;}
-
-event exmsg #CHARID 3 30 Koniec
-; event macro 1 0 Jestescie wolne
-
+ call libs\stajennyCL.euo
 return
 
 sub ZbierzRzeczy
@@ -1291,11 +1269,19 @@ sub OdstawDoStajni
  event macro 1 0 Podazajcie za mna. Wracamy!
  event exmsg #CHARID 3 30 Odstawiam zwierzeta do stajni!
  ; Do stajennego
+
+ menu get stajniaKsiegaID
+ set %stajniaKsiegaID #menures
+ menu get stajniaNumerRuny
+ set %stajniaRuna #menures
+
  call libs\runebookCL.lib.euo runebook %stajniaKsiegaID %stajniaRuna
  gosub PrzechowajZwierzeta
- gosub ZbierzRzeczy
- ; Powrót od stajennego w poprzednie miejsce
- ;gosub UzyjRunebooka %ksiegaAktualna %runaNastepna
+
+; gosub ZbierzRzeczy
+; Powrót od stajennego w poprzednie miejsce
+; gosub UzyjRunebooka %ksiegaAktualna %runaNastepna
+
 return
 
 ; Do leczenie u wymannowania mobka - tak przynajmniej uwazaj¹ m¹drzy

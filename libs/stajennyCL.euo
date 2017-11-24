@@ -1,0 +1,121 @@
+ ; EWH - bilety na zwierzeta
+ ; ZJF - plecaki
+ ; OKF - pojemnik na ziola
+ ; - pojemnik na kamienie
+event sysmessage 0: %0
+event sysmessage 1: %1
+event sysmessage 2: %2
+ignoreitem reset
+ignoreitem #CHARID
+finditem IS_HS G_2 ; Szukamy stajnnego
+if #FINDCNT > 0
+ set %stajennyID #FINDID
+event macro 1 0 Zaczekajcie tutaj na mnie
+call libs\pojemnik.euo otworz #BACKPACKID
+finditem ZJF C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+{
+ ignoreitem #FINDID ; Ignorujemy wszystkie plecaki w naszym plecaku przed przechowaniem tak aby pozniej przetwarzac tylko nowe plecaki.
+}
+
+; Przechowujemy stworzenia
+finditem * G_2
+if #FINDCNT > 0
+{
+ for #FINDINDEX 1 #FINDCNT
+ {
+  event macro 1 0 przechowaj
+  set #LTARGETID #FINDID
+  set #LTARGETKIND 1
+  target 3s
+  event macro 22 0 ; last target
+ }
+}
+
+set #LTARGETID #CHARID
+set #LTARGETKIND 1
+event macro 1 0 .sortuj ziola
+target
+event macro 22 0 ; last target
+event macro 1 0 .sortuj kamienie
+target
+event macro 22 0 ; last target
+
+; Sprawdzanie plecakow z mobkow
+call libs\pojemnik.euo otworz #BACKPACKID
+
+finditem ZJF C_ , #BACKPACKID
+ repeat
+  if #FINDCNT > 0
+  {
+   set !aktualnieSprawdzanyPlecak #FINDID
+   call libs\pojemnik.euo otworz !aktualnieSprawdzanyPlecak
+   ignoreitem !aktualnieSprawdzanyPlecak
+   finditem * C_ , !aktualnieSprawdzanyPlecak
+   repeat
+    call libs\przenies.euo przedmiot #FINDID #BACKPACKID #FINDSTACK
+    finditem * C_ , !aktualnieSprawdzanyPlecak
+   until #FINDCNT = 0
+   event macro 1 0 .upusc
+   target
+   set #LTARGETID !aktualnieSprawdzanyPlecak
+   set #LTARGETKIND 1
+   event macro 22 0 ; Upuszczamy pusty plecak na ziemie
+  }
+  finditem ZJF C_ , #BACKPACKID
+ until #FINDCNT = 0
+
+; Bilety na zwierzeta
+finditem EWH C_ , #BACKPACKID
+if #FINDCNT > 0
+{
+ for #FINDINDEX 1 #FINDCNT
+ {
+  call libs\przenies.euo przedmiot #FINDID %stajennyID #FINDSTACK
+  set %jrnl #jindex
+  set !jestZwierze 0
+  while !jestZwierze = 0
+  {
+   if #jindex > %jrnl
+   {
+    set %jrnl %jrnl + 1
+    scanjournal %jrnl
+    if Opiekuj_sie_nim in #journal
+    set !jestZwierze 1
+   }
+  }
+ }
+}
+; Sprzedajemy stworzenia
+finditem * G_2
+if #FINDCNT > 0
+{
+ for #FINDINDEX 1 #FINDCNT
+ {
+	event macro 1 0 Sprzedaj #FINDTYPE
+	set #LTARGETID #FINDID
+	set #LTARGETKIND 1
+	target 3s
+	event macro 22 0 ; last target
+ }
+}
+
+
+; Przechowujemy stworzenia ktorych nie mozemy sprzedac
+finditem * G_2
+if #FINDCNT > 0
+{
+ for #FINDINDEX 1 #FINDCNT
+ {
+  event macro 1 0 przechowaj
+  set #LTARGETID #FINDID
+  set #LTARGETKIND 1
+  target 3s
+  event macro 22 0 ; last target
+ }
+}
+
+event exmsg #CHARID 3 30 Koniec.
+
+exit
+
