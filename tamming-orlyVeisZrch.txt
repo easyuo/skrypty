@@ -231,137 +231,241 @@ set %py . 508 1001
 
 
 
-
-
+ignoreitem reset
 set %tametype AH_RD_XG_TC_BG_JG ; typ zwierzat do tame ( Orly )
-set %cast 29 ; byl cast jest wrestl :)
 set %rail 500 ; ile lokacji
 ; -----------koniec edycji-----------------------
 set %mark 300
 initevents
-top:
-finditem %tametype G_15
-if #findkind = -1 2
-gosub move
-goto top
-set %taming #findid
-gosub taming #findid
-if #result = fail 2
-ignoreitem #findid
-goto top
-if #sysmsg = udalo_ci_sie_oswoic_stworzenie_-_orzel
-{
-gosub kill #findid
-}
-goto top
+loop:
+ finditem %tametype G_15
+ if #findkind = -1 2
+ {
+  gosub move
+  goto loop
+ }
+ set %tamingId #findid
+
+ gosub taming %tamingId
+
+ if #result = fail 2
+  ignoreitem %tamingId
+
+ if #result = Sucess
+  gosub kill %tamingId
+
+goto loop
 ;--------NIE DOTYKAJ ------------------
 sub move
-set %x %px . %mark
-set %y %py . %mark
-move %x %y 0
-set %mark %mark + 1
-if %mark > %rail
-set %mark 300
+ set %x %px . %mark
+ set %y %py . %mark
+ event sysmessage Ide do punktu X: %x Y: %y [ %mark ]
+ move %x %y 0
+ set %mark %mark + 1
+ if %mark > %rail
+  set %mark 300
 return
+
 sub kill
-msg podazajcie za mna $
-msg ochraniajcie mnie $
-set #ltargetid %1
-event macro 6 0
-target 6s
-event macro 27 0
-event pathfind #findx #findy #findz
-wait 5
-goto weit
-weit:
-if #enemyid = N/A
-{
-finditem YFM G_1
-if #findkind = 1
-{
-set %zwloki #FINDID
-ignoreitem %zwloki
-set #LOBJECTID TSF C_ , #BACKPACKID
-event macro 17 0
-target 10s
-wait 1
-set #LTARGETID %zwloki
-set #LTARGETKIND 1
-event macro 22 0
-wait 3
-set #lobjectid %zwloki
-event macro 17 0
-wait 10
-dalej:
-finditem VRD_VLK_PUD C_ . %zwloki
-set %piora #FINDID
-if #findcnt < 1
-{
- wait 2s
+ event macro 1 0 podazajcie za mna
+ event macro 1 0 ochraniajcie mnie
+ set #ltargetid %1
+ event exmsg %1 3 30 Zabijam!
  event macro 6 0
- return
-}
- call libs\przenies.euo przedmiot %piora #BACKPACKID #FINDSTACK
- goto dalej
-}
+ target 6s
+ event macro 27 0
+ event pathfind #findx #findy #findz
+ wait 1s
+
+killCzekaj:
+ if #enemyid = N/A
+ {
+  finditem YFM G_1
+  if #FINDCNT > 0
+  {
+   repeat
+    call libs\tnijciala.euo
+    event macro .grab ziola zloto kamienie
+    wait 1s
+    event macro .grab ustawione
+    finditem YFM G_1
+   until #FINDCNT = 0
+
+   finditem VRD_VLK_PUD G_2
+   if #FINDCNT > 0
+   {
+    repeat
+     event macro 1 0 .grab ustawione
+     wait 1s
+     finditem VRD_VLK_PUD G_2
+    until #FINDCNT = 0
+   }
+  }
+  
+  
+  
  }
-goto weit
+ else
+ {
+  finditem #ENEMYID
+  if #FINDDIST < 2
+  {
+   gosub Leczenie
+   event sysmessage Wrog jest przy mnie.
+   goto killCzekaj
+  }
+ }
+
+return
 
 sub taming
+ event exmsg %1 3 30 Oswajam!
  deletejournal 1
  set #scnt2 0
  set %xa #charposx
  set %ya #charposy
 
-w:
+tamingLoop:
  finditem %1
  if #finddist > 3 3
+ {
+  event pathfind #findx #findy #findz
+  wait 10
+  if #scnt2 > 50
+  {
+   if #charposx = %xa && #charposy = %ya
    {
-   event pathfind #findx #findy #findz
-   event sysmessage petla testowa
-   wait 10
-   if #scnt2 > 50
-      {
-      if #charposx = %xa && #charposy = %ya
-         {
-         event sysmessage Ignoruje cel!
-         ;ignoreitem #findid
-         set %xa 0
-         set %ya 0
-         return fail
-         }
-      }
-   goto w
+    event sysmessage Ignoruje cel!
+    ;ignoreitem #findid
+    set %xa 0
+    set %ya 0
+    return fail
    }
-;goto w
+  }
+  goto tamingLoop
+ }
  set #ltargetid %1
  event macro 13 35
  target 6s
  event macro 22 0
  set %timer #scnt + 20
 
-s:
-for %i 1 5
-{
-scanjournal %i
-if udalo_ci_sie_oswoic_stworzenie in #journal 2
-deletejournal
-return Sucess
-if nie_udalo_ci_sie_oswoic in #journal 2
-deletejournal
-goto w
-if zwierze_jest_juz_oswojone in #journal 2
-deletejournal
-return fail
-if far_away in #journal 2
-deletejournal
-return fail
-}
+scanJournal:
+ for %i 1 5
+ {
+  scanjournal %i
+  if udalo_ci_sie_oswoic_stworzenie in #journal 2
+  {
+   deletejournal
+   return Sucess
+  }
+  if nie_udalo_ci_sie_oswoic in #journal 2
+  {
+   deletejournal
+   goto tamingLoop
+  }
+  if To_zwierze_jest_juz_oswojone in #journal 2
+  {
+   deletejournal
+   event macro 1  0 podazajcie za mna
+   return fail
+  }
+  if far_away in #journal 2
+  {
+   deletejournal
+   return fail
+  }
+  
+  if You_must_wait in #journal 2
+  {
+   deletejournal
+   wait 2s
+   goto tamingLoop
+  }
+ }
 
-if %timer < #scnt
-return fail
-finditem %1
-if #finddist > 3 2
-event pathfind #findx #findy #findz
-wait 10
-goto s
+ if %timer < #scnt
+  return fail
+
+ finditem %1
+ if #finddist > 3 2
+  event pathfind #findx #findy #findz
+ wait 10
+goto scanJournal
+return
+
+
+; Do leczenie u wymannowania mobka - tak przynajmniej uwazaj¹ m¹drzy
+sub Leczenie
+ if #HITS < #MAXHITS - 30
+ {
+  if #MANA < 30
+  {
+   if #ENEMYID = N/A
+   {
+    event macro 13 46 ; meditation
+    wait 6s
+   }
+   else
+   {
+    gosub wypijMana
+   }
+	}
+	else
+	{
+   gosub LeczenieIVM
+   wait 10
+  }
+
+  if #HITS > 50 && #MANA > 22
+	{
+	 if #STR <= 100
+		gosub BlessStr
+	 if #INT <= 100
+		gosub BlessInt
+	 if C in #CHARSTATUS
+		gosub LeczenieOdtruj
+	}
+	if #MANA > 80
+   gosub Lustro
+ }
+return
+
+sub LeczenieOdtruj
+ event macro 15 24
+ target 3s
+ event macro 23 0
+return
+
+sub LeczenieIVM
+  if #mana < 11
+   gosub wypijMana
+  if #mana >= 11
+  {
+	 event macro 15 28
+   target 3s
+   event macro 23 0
+  }                                          `
+return
+
+sub Lustro
+	event macro 15 35
+	wait 3s
+return
+
+sub BlessStr
+	event macro 15 15
+	target 3s
+	event macro 23 0
+return
+
+sub BlessInt
+	event macro 15 9
+	target 3s
+	event macro 23 0
+return
+
+sub wypijMana
+ event macro 1 0 .wypij mala mana
+ event macro 1 0 .wypij duza mana
+return

@@ -234,10 +234,6 @@ sub Dispatch
 
  menu set status Idle
 
- menu get leczenie
- if #menures = #true
-  gosub Leczenie
-
  gosub ScriptIdletime
  gosub TamingCheckSkill
  set %finditems N/A
@@ -307,7 +303,10 @@ sub Dispatch
     call libs\runebookCL.lib.euo runebook %KsiegaRun1 %runaNastepna
 ;		gosub UzyjRunebooka
 		set %runaAktualna %runaNastepna
-		menu set aktualna_runa %runaAktualna
+ 		menu set aktualna_runa %runaAktualna
+
+    ; Jezeli w docelowej lokalizacji ma byc odpalony inny skrypt to dzieje sie to tutaj
+    call taming\ , %KsiegaRun1 , _ , %runaAktualna , .euo
 		; Resetujemy mobki to tamowania.
 		ignoreitem reset
 
@@ -357,7 +356,7 @@ sub ScriptIdletime
   gosub OdstawDoStajni
   gosub MenuUpdateStats
  }
- 
+
 return
 
 sub MenuUpdateStats
@@ -459,10 +458,12 @@ if %tameskill >= 730 && %tameskill < 740
 set %tameable AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 if %tameskill >= 740 && %tameskill < 760
 set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
-if %tameskill >= 760 && %tameskill < 796
-set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+if %tameskill >= 760 && %tameskill < 780
+set %tameable OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+if %tameskill >= 780 && %tameskill < 796
+set %tameable YE_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
-set %tameable W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -478,9 +479,10 @@ set %tameable W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_
 ; TC_ - Orze³
 ; CB_ - Ogromna ropucha
 ; KG_ - Armok / szalony ostard
-; HH  - Pustynny Gryf
-; XX  - Byk
-; W   - Imp
+; HH_ - Pustynny Gryf
+; XX_ - Byk
+; OF_ - kon / pegaz
+; W_  - Imp
 
 ; 65% - szalony ostard, armok3, mglisty armok, czarna pantera
 ; 66% - imp, niedzwiedz grizzly
@@ -488,12 +490,14 @@ set %tameable W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_
 ; 68% - wsciekly wilk - Przywodca stada, jadowita ropucha
 ; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
 ; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
-; 73% - tarantula, lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
-
-; 69% - plomienna tarantula ??? - jeszcze nie wiadomo gdzie dokladnie :)
-
+; 73% - lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
 ; 74% - pajak szablonogi
 ; 76% - wiekszy piekielny ogar
+; 76.x - ksiezycowy armok
+; 76.5 lub .6% - plomienna tarantula
+
+; tarantula ???? :)
+
 ; 77% - smok bagienny, wargh
 ; 78% - drake, lodowy drake, morski drake, bagienny drake
 ; 80% - lodowa wyverna, wyverna, plomienna wyverna
@@ -509,7 +513,7 @@ set %tameable W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_
 
 
 if %tameskill >= 820
-set %tameable PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
+set %tameable OF_PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
 
  gosub TamingIgnore gain
 return
@@ -551,7 +555,7 @@ sub TameAnimal
   menu get leczenie
   if #menures = #true
    gosub Leczenie
-   
+
   finditem %tameid
   if #findkind = -1
    return
@@ -682,9 +686,22 @@ sub TamingMonitor
 		}
 		else
 		{
-			menu get zabijMagia
-			if #menures = #true
-		 	gosub TamingMageryKill
+     menu get zabijOswojonymi
+     if #menures = #true
+     {
+      menu set status Zabijam stworzenie innymi oswojonymi.
+      gosub zabijOswojonymiStworzeniami
+     }
+
+     menu get zabijMagia
+     if #menures = #true
+     {
+      menu set status Zabijam stworzenie magia.
+      gosub TamingMageryKill
+     }
+
+     return
+
 		}
 	 }
 	 return success
@@ -777,23 +794,22 @@ sub TamingMonitor
 return
 
 sub TamingRelease
- menu get zabijMagia
- if #menures = #true
- {
-  menu set status Zabijam stworzenie magia.
-  gosub TamingMageryKill
-  return
- }
 
  menu get zabijOswojonymi
  if #menures = #true
  {
   menu set status Zabijam stworzenie innymi oswojonymi.
   gosub zabijOswojonymiStworzeniami
-  return
  }
 
- return
+ menu get zabijMagia
+ if #menures = #true
+ {
+  menu set status Zabijam stworzenie magia.
+  gosub TamingMageryKill
+ }
+
+return
 
  menu set status Odstawiam zwierzeta do
  gosub GetAnimalDisplacement
@@ -950,7 +966,7 @@ sub AutoAttack
   {
    if #FINDREP = 0
     return #FALSE ; Paragon
-    
+
    if #FINDREP = 4 || #FINDREP = 6 ; 4 - szary / 6 - red
    {
     event exmsg %tameid 3 30 Prowokuje!
@@ -1397,7 +1413,7 @@ sub WarModeToggle
 ; gosub WarModeOFF
 return
 
-sub
+sub wypijMana
  event macro 1 0 .wypij mala mana
  event macro 1 0 .wypij duza mana
 return

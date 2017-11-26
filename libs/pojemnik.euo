@@ -10,4 +10,5 @@ sub otworz
  repeat
   event macro 17 0
  until #CONTID = #LOBJECTID
+ wait 1
 exit

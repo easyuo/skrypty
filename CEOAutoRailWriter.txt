@@ -1,0 +1,406 @@
+;==================================
+; Script Name: CEOAutoRailWriter
+; Author: CEO
+; Version: 1.3a
+; Client Tested with: 4.0.1b
+; EUO version tested with: 1.4 (005F)
+; Shard OSI / FS:
+; Revision Date: 12-22-03
+; Public Release:12-22-03
+; Purpose: Simple method for writing a rail file. Just hit Record and walk the path.
+;============================================
+initevents
+;--------------------------- Change these to fit your needs
+set %ztolerance 3
+set %dtolerance 4
+set %targetx_text ltargetx
+set %targety_text ltargety
+set %targetz_text ltargetz
+set %filename railspots.txt
+;might need to set this use "command" instead of "cmd" for your OS
+set %cmd cmd
+;----------------------------
+set %version 1.3a
+set %debug #false
+set %totalspots 0
+set %totalltargets 0
+set %testrail #false
+if EXEC notin #opts
+{
+        display ok In order to save the rail file you must have $"Allow Execute" on.
++ Enable this option$from the Easyuo menu:$$Options>Configuration>Allow Execute$$Halting...
+        halt
+}
+gosub initmenu
+set #menubutton N/A
+Mainloop:
+wait 5
+if #menubutton <> N/A
+        gosub #menubutton
+if *500 = waiting && ! %testrail
+{
+        menu font bgcolor silver
+        menu font color black
+        menu button TestRail 200 5 60 20  Test Rail
+        menu font bgcolor black
+        menu font color red
+        set %testrail #true
+}
+gosub DisplayCords
+goto Mainloop
+
+sub TestRail
+set *502 railspots.txt
+set *503 1
+set *504 run
+set *501 start
+set #menubutton N/A
+return
+
+sub Write
+show menu
+menu delete record
+set #menubutton N/A
+menu delete write
+menu font bgcolor blue
+menu font color white
+menu text status 55 5 Writing File
+menu font bgcolor black
+menu font color red
+str mid #date 3 2
+set %date #strres
+str right #date 2
+set %date %date , / , #strres
+str left #date 2
+set %date %date , / , #strres
+execute %cmd /c echo #smc , * Created with CEOAutoRailWriter on , #spc , %date , #spc , * > %filename
+execute %cmd /c echo #smc , #spc >> %filename
+execute %cmd /c echo set % , endspot , #spc , %totalspots >> %filename
+menu text hs 10 30 Saving Spot:
+menu font color white
+for %i 1 %totalspots
+{
+        menu delete ss
+        menu text ss 85 30 %i
+        wait 1
+        execute %cmd /c echo set % , X , %i , #spc , %railspotx . %i >> %filename
+        execute %cmd /c echo set % , Y , %i , #spc , %railspoty . %i >> %filename
+        execute %cmd /c echo set % , Z , %i , #spc , %railspotz . %i >> %filename
+        if %target . %i = #true
+        {
+                execute %cmd /c echo set % , %targetx_text , %i , #spc , %ltargetx . %i >> %filename
+                execute %cmd /c echo set % , %targety_text , %i , #spc , %ltargety . %i >> %filename
+                execute %cmd /c echo set % , %targetz_text , %i , #spc , %ltargetz . %i >> %filename
+                execute %cmd /c echo set % , ltargetkind , %i , #spc , %ltargetkind . %i >> %filename
+                execute %cmd /c echo set % , ltargettile , %i , #spc , %ltargettile . %i >> %filename
+
+        }
+}
+menu font bgcolor silver
+menu font color black
+menu button Record 10 150 50 20  Record
+menu font bgcolor black
+menu font color red
+set %totalspots 0
+menu delete rx
+menu delete ry
+menu delete rz
+menu delete ss
+menu delete hs
+menu delete fh
+gosub DisplayTotalSpots
+menu delete status
+return
+
+sub Record
+show menu
+set %lpc #lpc
+set #lpc 1000
+for %i 1 %totalspots
+{
+        set %ltargetx . %i n/a
+}
+set #lpc %lpc
+set %totalspots 1
+set %totalltargets 0
+gosub WalkOn
+gosub DisplayTotalSpots
+gosub RecordSpot
+menu delete Record
+menu font bgcolor silver
+menu font color black
+menu button Stop 10 150 50 20  Stop
+menu button LTARGET 110 150 50 20  Ltarget
+menu font bgcolor black
+menu delete recording
+menu font bgcolor red
+menu font color white
+menu text status 55 5 Recording
+menu font bgcolor black
+menu font color red
+menu text ath 10 30 Auto Timer:
+set %recording #true
+set #menubutton N/A
+Record1:
+show menu
+if #menubutton = ltarget
+{
+        if %lastpos <> %lastrailspot
+        {
+                         set %totalspots %totalspots + 1
+                        gosub DisplayTotalSpots
+                        gosub RecordSpot
+                        gosub DisplayCords
+        }
+        gosub record_ltarget
+        gosub DisplayTotalSpots
+}
+if #menubutton <> N/A
+{
+        gosub #menubutton
+        if ! %recording
+        {
+                menu delete ltarget
+                return
+        }
+}
+wait 5
+if %lastpos <> %lastrailspot
+{
+        set %timetowrite %lastmoved - #scnt
+        menu delete ttw
+        if %timetowrite <= 5
+        {
+                menu font color yellow
+                menu text ttw 75 30 %timetowrite
+                menu font color red
+                if %timetowrite <= 0
+                {
+                        set %totalspots %totalspots + 1
+                        gosub DisplayTotalSpots
+                        gosub RecordSpot
+                }
+        }
+}
+gosub DisplayCords
+if %record_spot
+{
+        set %totalspots %totalspots + 1
+        gosub DisplayTotalSpots
+        gosub RecordSpot
+}
+goto Record1
+
+return
+
+sub RecordSpot
+set %lastspotx #charposx
+set %lastspoty #charposy
+set %lastspotz #charposz
+set %railspotx . %totalspots %lastspotx
+set %railspoty . %totalspots %lastspoty
+set %railspotz . %totalspots %lastspotz
+gosub DisplayRecordedSpot
+set %lastrailspot %lastspotx , _ , %lastspoty , _ , %lastspotz
+set %lastpos %lastrailspot
+set %lastmoved #scnt + 5
+menu delete ttw
+return
+
+sub DisplayRecordedSpot
+menu font align right
+menu font color white
+menu delete rx
+menu text rx 135 70 %lastspotx
+menu delete ry
+menu text ry 175 70 %lastspoty
+menu delete rz
+menu text rz 215 70 %lastspotz
+menu font color red
+menu font align left
+return
+
+sub stop
+menu delete Stop
+menu font bgcolor silver
+menu font color black
+menu button Record 10 150 50 20  Record
+set #menubutton N/A
+menu delete status
+menu delete ath
+menu delete ttw
+set %recording #false
+if %totalspots > 1
+        menu button Write 60 150 50 20  Write
+menu font bgcolor black
+menu font color lime
+gosub RunON
+return
+
+sub InitMenu
+menu clear
+menu font alight left
+menu window size 270 200
+menu window title CEOAutoRailWriter %version
+menu window color black
+menu font bgcolor BLACK
+menu font color red
+menu show
+menu font size 9
+menu text s 10 5 Status:
+menu text fnameheader 5 180 Filename:
+menu font size 8
+menu font color white
+menu edit fname 70 175 130 %filename
+menu font size 9
+menu font color red
+menu text h1x 130 35 X
+menu text h1y 170 35 Y
+menu text h1z 210 35 Z
+menu text h1 10 50 Current Position:
+menu text h5 10 70 Last Recorded:
+menu text h4 10 85 Total Railspots:
+menu text h4 145 85 Total # , LTargets:
+gosub DisplayTotalSpots
+menu font align left
+menu font style b
+menu font color yellow
+menu text hh 5 100 Rail Parameters :
+menu font style n
+menu font color red
+menu text h2 10 115 Max distance between spots:
+menu text h3 10 130 Z tolerance:
+menu font color yellow
+menu text t2 175 115 %dtolerance
+menu text t3 80 130 %ztolerance
+menu font color red
+gosub displayCords
+menu font bgcolor silver
+menu font color black
+menu button Record 10 150 50 20  Record
+menu button getfname 201 178 30 20 upd
+if *500 = waiting
+{
+        menu button TestRail 200 5 60 20  Test Rail
+        set %testrail #true
+}
+menu font bgcolor black
+menu font color red
+set #menubutton N/A
+menu delete total
+menu font color lime
+if ! %debug
+        menu hideeuo
+return
+
+
+sub DisplayTotalSpots
+menu font align right
+menu font color white
+menu delete tspots
+menu delete tltargets
+menu text tspots 120 85 %totalspots
+menu text tltargets 255 84 %totalltargets
+menu font align left
+menu font color red
+return
+
+sub DisplayCords
+set %record_spot #false
+if #charposx , _ , #charposy , _ , #charposz = %lastpos
+        return
+menu font align right
+menu font color lime
+X:
+if %lastposx = #charposx
+        goto Y
+menu delete x
+menu text x 135 50 #charposx
+set %dif abs ( %lastspotx - #charposx )
+if %dif > %dtolerance
+        set %record_spot #true
+set %lastposx #charposx
+Y:
+if %lastposy = #charposy
+        goto Z
+set %dif abs ( %lastspoty - #charposy )
+if %dif > %dtolerance
+        set %record_spot #true
+menu delete y
+menu text y 175 50 #charposy
+set %lastposy #charposy
+Z:
+if #lastposz = #charposz
+        goto DC_End
+set %dif abs ( %lastspotz - #charposz )
+if %dif > %ztolerance
+        set %record_spot #true
+menu delete z
+menu text z 215 50 #charposz
+set %lastposx #charposz
+
+DC_End:
+set %lastpos #charposx , _ , #charposy , _ , #charposz
+menu font align left
+menu font color red
+set %lastmoved #scnt + 7
+menu delete ttw
+return
+
+Sub WalkOn
+;purpose: toggle always run off
+event macro 32 0
+wait 10 10
+if now_off IN #SYSMSG
+        return
+event macro 32 0
+return
+
+Sub RunON
+;purpose: toggle always run on
+event macro 32 0
+wait 10 10
+if now_on IN #SYSMSG
+        return
+event macro 32 0
+return
+
+sub closed
+if ! %debug
+        terminate euo
+return
+
+sub record_ltarget
+event macro 13 14
+targetloop:
+        if #targcurs = 1
+                goto targetloop
+if %ltargetx . %totalspots <> n/a
+{
+        set %totalspots %totalspots + 1
+        gosub DisplayTotalSpots
+        gosub RecordSpot
+}
+set %ltargetx . %totalspots #ltargetx
+set %ltargety . %totalspots #ltargety
+set %ltargetz . %totalspots #ltargetz
+set %ltargetkind . %totalspots #ltargetkind
+set %ltargettile . %totalspots #ltargettile
+set %totalltargets %totalltargets + 1
+set %target . %totalspots #true
+set #menubutton n/a
+return
+
+sub getfname
+menu get fname
+if #menuRes <> %filename
+{
+        set %filename #menuRes
+        menu font color white
+        menu font size 8
+        menu edit fname 70 175 130 %filename
+        menu font color lime
+        menu font size 9
+}
+set #menubutton n/a
+return

@@ -1,0 +1,296 @@
+;====RoadkillsRailWriter.txt===
+;ver 1.0 8jul03 by Roadkill
+;ver 1.1 21Jul03 added verbage where the file shows up for those who cant use windows find
+;purpose: write railspotsxxx.txt files for use with my UltraTamer, test them on-the-fly
+;       satisfy my sense of humor
+;=====configuration section... THERE IS NONE! Copy/Paste, PRESS PLAY!====
+;=====end of configuration section, don't TOUCH below!!======
+set %version 1.2
+set %spot 0
+set %nextspot %spot + 1
+set %endspot N/A
+set %tmpfile RKsptTmp.txt
+set %filename orlyYew.txt
+gosub writemenu
+menuloop:
+
+ onhotkey F1
+  gosub markspot
+ onhotkey F2
+  gosub eraseSpot
+ onhotkey F3
+  gosub testspot
+ onhotkey F4
+  gosub writefile
+
+ if #menubutton <> N/A
+ {
+  gosub #menubutton
+  set #menubutton N/A
+  gosub writemenu
+ }
+goto menuloop
+;===================
+sub writemenu
+        if %menuinitialized
+                goto _writebuttons
+        menu show
+        menu hideeuo
+        menu clear
+        menu window size 500 220
+        menu window color black
+        menu font bgcolor black
+        menu font size 9
+        menu font style b
+        menu font color red
+        menu text ix 0 0 --Welcome to Roadkill's RailWriter.  This script will let you create or$
+                        + append a file of railspots in the format for Roadkill's UltraTamer.$
+                        + All the options can be done with the buttons on the right including:
+        menu text ix 0 45 ..Set and check the filename for editing/creation,UltraTamer format.$
+                        + Mark a new spot, Erase last spot, Test spot by running back and$
+                        + forth to previous spot, test rail to that point, write railspots file.$
+        menu text ix 0 90 ---INSTRUCTIONS: Follow the Prompts!----$
+                        + Press CONTINUE button below when ready, type/edit in your filename,$
+                        + Press the Set-Filename button.  Walk to first spot and begin marking!
+_writebuttons:
+        menu window title Roadkills RailWriter ver. %version #spc #spc
+                + Last spot set: %spot #spc #spc file: %filename
+        menu font size 7
+        menu edit edFilename  400  14 100 %filename
+        menu font size 9
+        menu font style b
+        menu font color yellow
+        menu text txt            400   0 enter filename
+        menu button chkfilename  400  35 100 20 Set-Filename
+        menu button markspot     400  60 100 20 Mark Spot %nextspot
+        menu button eraseSpot    400  80 100 20 Erase Spot %spot
+        menu button testspot     400 100 100 20 Test Spot
+        menu button testrail     400 120 100 20 Test Rail
+        menu button writefile    400 140 100 20 Write File
+        menu font style n
+        if ! %menuinitialized
+                gosub WaitForContinue
+        set %menuinitialized #true
+
+return
+;============
+sub chkFileName
+        menu get edFilename
+        set %filename #menures
+return
+;===================
+sub markspot
+        set %spot %spot + 1
+        set %x . %spot #charposx
+        set %y . %spot #charposy
+        set %z . %spot #charposz
+        event exmsg #CHARID 3 30 X: %x . %spot Y: %y . %spot Z: %z . %spot
+        menu window title Roadkills RailWriter ver. %version #spc #spc
+                + Last spot set: %spot #spc #spc file: %filename
+        menu text ix 0 0 Spot number %spot marked.$
+        set %nextspot %spot + 1
+        gosub WaitForContinue
+return
+;=============
+sub erasespot
+        menu text ix 0 0 OK I've erased that spot, you are now working on spot %spot again$
+        gosub WaitForContinue
+        if %spot > 0 2
+                set %spot %spot - 1
+                set %nextspot %nextspot - 1
+return
+;=============
+sub testspot
+        if %spot = 1
+        {
+                menu text ix 0 0 There is only one spot so far, you need 2 to test it man!$
+                gosub WaitForContinue
+                return
+        }
+        menu text ix 0 0 testing...
+        gosub RndShtTalk
+        set %testspot %spot - 1
+_movetoTestSpot:
+        set %pathfinding #false
+        set %x %x . %testspot
+        set %y %y . %testspot
+        set %z %z . %testspot
+        move %x %y a 6s
+_checklocation:
+        IF #charposx = %x && #charposy = %y && #charposz = %z
+        {
+                if %testspot = %spot - 1
+                {
+                        menu text ix 0 0 That seemed to work well, now moving back to the spot$
+                        set %testspot %spot
+                        goto _movetoTestSpot
+                }
+                if %testspot = %spot
+                {
+                        menu text ix 0 0 Alright that spot is good! Walk to your next one and mark,$
+                                        + or test the whole rail. You can erase this spot so you $
+                                        + can remark it, if it suxxored. $
+                        gosub WaitForContinue
+                        set %pathfinding #false
+                        goto _exitTestSpot
+                }
+        }
+        if %pathfinding
+        {
+                menu text ix 0 0  Well, that spot really suxx Ceed-bad! We couldn't pathfind to it$
+                                + either, so I'm going to auto-erase the thing, and you can retry.$
+                                + Try to make straight legs less than 25 tiles with no jinks.$
+                gosub WaitForContinue
+                gosub erasespot
+                set %pathfinding #false
+                goto _exitTestSpot
+        }
+        menu text ix 0 0 We didn't get to the spot, evidently there was some blockage or$
+                        + the leg was too long to walk in 6s, the limit I use. However, we may be $
+                        +  able to pathfind to it.  This will WORK in UltraTamer, it's just not$
+        menu text ix 0 45 as good a spot as it could be! Testing pathfinding to your $
+                        + kinda crappy spot... You can erase the spot if you want later.$
+        gosub WaitForContinue
+        event pathfind %x %y %z
+        wait 4s
+        set %pathfinding #true
+        goto _checklocation
+_exitTestSpot:
+return
+;================
+sub TestRail
+        set %start %spot
+        set %finish 1
+        set %2ndlap #false
+        menu text ix 0 0 You should be standing near your LAST spot, I will run to the first$
+                        + spot then back.  If it works, you can continue adding spots,$
+                        + if not you'll have to fix the offending spot, and do 69$
+        menu text ix 0 45 "Hail Roadkill"s before you can restart the script.$
+        gosub WaitForContinue
+        menu text ix 0 0 testing...
+_TestRailLoop:
+        for %i %start %finish
+        {
+                gosub RndShtTalk
+                set %x %x . %i
+                set %y %y . %i
+                set %z %z . %i
+                move %x %y a 6s
+                IF #charposx <> %x || #charposy <> %y
+                {
+                        event pathfind %x %y %z
+                        wait 4s
+                        IF #charposx <> %x || #charposy <> %y || #charposz <> %z
+                        {
+                                menu text ix 0 0 BooHoo...your rail suxxored Like Ceed!$
+                                + The bad spot is number %i ,I'm returning you to edit mode.$
+                                + Erase this spot, then you'll have to redo the rest.$
+                                gosub WaitForContinue
+                                set %spot %i
+                                set %nextspot %spot + 1
+                                goto _exitTestRail
+                        }
+                }
+        }
+        if %2ndlap
+        {
+                menu text ix 0 0  The whole rail seemed to test good. If you're at the last spot$
+                + and you're sure it will reach the first spot from here, you can$
+                + write the RailSpots file! Don't forget to Hail Roadkill!$
+                gosub WaitForContinue
+                goto _exitTestRail
+        }
+        set %start 1
+        set %finish %spot
+        set %2ndlap #true
+        goto _TestRailLoop
+_exitTestRail:
+return
+;=======
+sub WaitForContinue
+;%1 is optional, but if it exists and is "halt?" then a halt? button is displayed
+        set #menubutton N/A
+return
+;=======
+sub RndShtTalk
+        set %_a #random % 10
+        menu font style b
+        menu font size 10
+        menu font color red
+        menu delete iix
+        if %_a = 0
+                menu text iix 0 15 Roadkill > Ceed
+        if %_a = 1
+                menu text iix 0 15 Roadkill PWnZ the.Mgt
+        if %_a = 2
+                menu text iix 0 15 Roadkill RoXx0rz Devine!
+        if %_a = 3
+                menu text iix 0 15 CeedSuXx0RzM3!
+        if %_a = 4
+                menu text iix 0 15 Roadius Wootimus!
+        if %_a = 5
+                menu text iix 0 15 old_asm < Roadkill
+        if %_a = 6
+                menu text iix 0 15 ScriptFellow < ..er nevermind.
+        if %_a = 7
+                menu text iix 0 15 the.WZA...His mind is boolean!
+        if %_a = 8
+                menu text iix 0 15 I'mTCBY! Lick me!
+        if %_a = 9
+                menu text iix 0 15 Cheffe RuleZ all!
+        menu font style n
+        menu font size 9
+        menu font color yellow
+return
+;========
+sub writefile
+;ver 1.1 21Jul03 by Roadkill
+;purpose: write the railspots file you specified.  Test whether to use Cmd or Command
+;       as the comspec for win95ish or NTish
+        set %endspot %spot
+        set #menubutton N/A
+        menu text ix 0 0 I must know what kind of Operating system$
+                        + you are using to write the file, don't mess $
+                        + this up!  YOU MUST HAVE ALLOW EXECUTE ENABLED!!
+        menu button win95 0 200 200 20 Windows 95/98/ME
+        menu button winnt 200 200 200 20 Windows NT/2000/XP
+        set %cmd cmd
+
+        menu delete ix
+        menu text ix 0 0 WRITING THE FILE NOW, this may take awhile...$
+                        + it will be written to the dir that easyuo is in.$
+                        + If it's not there use Windows find, and check AllowExecute on$
+        menu delete win95
+        menu delete winnt
+if EXEC notin #opts
+{
+  display ok I told you TWICE NOW!! In order to save the rail file you must have $"Allow Execute" on.
++ Enable this option$from the Easyuo menu:$$Options>Configuration>Allow Execute$$Halting...
+  halt
+}
+writefile:
+        execute %cmd /c echo #smc %filename > %filename
+        execute %cmd /c echo #smc If_I_could_kiss_Roadkill's_butt_now_I_would! >> %filename
+        execute %cmd /c echo #smc you-may-want-to-unremark-and-set-these-if-customrail >> %filename
+        execute %cmd /c echo #smc set % , enemytypes xxxxxxx >> %filename
+        execute %cmd /c echo #smc set % , searchrange 15 >> %filename
+        execute %cmd /c echo #smc set % , maxvertical 10 >> %filename
+        execute %cmd /c echo #smc set % , petid xxx_yyy >> %filename
+
+        execute %cmd /c echo set  % , endspot %endspot >> %filename
+        for %i 1 %endspot
+        {
+                execute %cmd /c echo set  % , x . %i %x . %i >> %filename
+                execute %cmd /c echo set  % , y . %i %y . %i >> %filename
+                execute %cmd /c echo set  % , z . %i %z . %i >> %filename
+        }
+        execute %cmd /c echo EXIT >> %filename
+        wait 30
+        menu text ix 0 0 Your rail and some helpful remarks/var settings have been written.$
+                + Please open the file now (in EUO dir) and make sure it's good.$
+                + If DOS boxes didn't pop up, it didn't write, check allow execute!$
+halt
+  ;i know that halt instead of return aint kosher, but it had to be done for onhotkey
+;=========end of RoadkillsRailWriter.txt====
+
+

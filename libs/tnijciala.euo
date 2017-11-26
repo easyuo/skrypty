@@ -1,0 +1,68 @@
+; Biblioteka:   Ciecie cial
+; Autor:        Krowa
+; Data:         25.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+set %sztylet TSF
+set %lopatka WSF
+set %zwloki  YFM
+
+; Znajdz sztylet
+finditem %sztylet C_ , #BACKPACKID
+if findkind <> -1
+{
+ set %sztyletID #FINDID
+ event sysmessage Sztylet: %sztyletID
+}
+ 
+; Znajdz lopatke
+finditem %lopatka C_ , #BACKPACKID
+if findkind <> -1
+ set %lopatkaID #FINDID
+else
+ set %lopatkaID
+
+
+if #CHARGHOST = YES
+{
+ event sysmessage Cholera, nie zyje.
+ wait 5s
+ goto loop
+}
+if #ENEMYID = N/A
+{
+ finditem %zwloki G_2
+ if #FINDCNT > 0
+ {
+  if H in #charstatus
+  {
+  ; Jestesmy ukryci. Nie tniemy
+   event sysmessage Jestesmy ukryci. Nie TNIEMY!
+   wait 1s
+  }
+  else
+  {
+   ; ----------
+   ; Tnij Ciala
+   ; ----------
+   set #lobjectid %SztyletID ; sztylet w plecaku
+   event sysmessage Tne #findCNT cial
+   for #findindex 1 #findcnt
+   {
+    event sysmessage Tne cialo # #findindex
+    event Macro 17 ; Last Object
+    target
+    set #ltargetid #findID
+    set #LTargetKind 1
+    event Macro 22  ; Last Target
+   }
+  }
+ }
+ else
+ {
+
+ }
+}
+
+exit
