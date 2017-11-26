@@ -101,6 +101,16 @@ set %stajniaRuna 16
 set %runaStart 1
 set %runaKoniec 16
 
+; Ilosc ziol przy restocku.
+SET !perlyRestock       111
+SET !krwawnikRestock    111
+SET !czosnekRestock     222
+SET !zenshenRestock     222
+SET !mandragoraRestock  288
+SET !belladonaRestock   111
+SET !sieciRestock       222
+SET !siarkaRestock      111
+
 set %runaAktualna %runaStart - 1
 set %runaNastepna %runaStart - 1
 set %ksiegaAktualna %KsiegaRun1
@@ -181,6 +191,7 @@ menu text lbl_przerwa_po_gate 10 185 Przerwa po gate w sekundach
 menu Edit przerwa_po_gate 160 183 30 1
 menu button idzStajnia 195 181 100 25 Idz STAJNIA
 menu button sortujWPlecaku 195 211 100 25 Sortuj Plecak
+menu button restockBank 195 235 100 25 Restock BANK
 
 menu check odstawdostajni 10 165 130 15 #true Zwierzêta do stajni
 menu check leczenie 10 205 130 15 #true Leczenie Magia
@@ -372,6 +383,13 @@ sub ScriptIdletime
   gosub sortujWPlecaku
  }
 
+ if #menubutton = restockBank
+ {
+  event sysmessage Restock w Banku.
+  set #menubutton N/A
+  call libs\restockBank.euo
+ }
+
 return
 
 sub MenuUpdateStats
@@ -535,8 +553,6 @@ set %tameable OF_PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 return
 
 sub TamingIgnore
- menu set status Ignorowanie
- 
  if %1 = perm
  {
 	ignoreitem %2
@@ -1474,3 +1490,5 @@ sub sortujWPlecaku
  event sysmessage Posortowane Kamienie i Ziola.
 
 return
+
+

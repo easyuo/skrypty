@@ -1,0 +1,135 @@
+; Biblioteka:   Restockowanie ziol i kamieni do banku
+; Autor:        Krowa
+; Data:         26.11.2017
+; Shard:        Clair's Lair
+; ---------------------------
+
+event macro 1 0 Bankierze moja skrzynia
+
+if !pojemnikBank = N/A
+ set !pojemnikBank UABZOQE
+if !pojemnikBankZiola = N/A
+ set !pojemnikBankZiola VULVBQE
+if !pojemnikBankKamienie = N/A
+ set !pojemnikBankKamienie JPIZJQE
+
+if !perlyRestock = N/A
+ SET !perlyRestock       111
+if !krwawnikRestock = N/A
+ SET !krwawnikRestock    111
+if !czosnekRestock = N/A
+ SET !czosnekRestock     222
+if !zenshenRestock = N/A
+ SET !zenshenRestock     222
+if !mandragoraRestock = N/A
+ SET !mandragoraRestock  288
+if !belladonaRestock = N/A
+ SET !belladonaRestock   111
+if !sieciRestock = N/A
+ SET !sieciRestock       222
+if !siarkaRestock = N/A
+ SET !siarkaRestock      111
+ 
+; OKF pojemnik ziola
+; LKF pojemnik kamienie
+
+ finditem OKF C_ , #BACKPACKID
+ if #FINDCNT > 0
+ {
+  set !pojemnikZiolaID #FINDID
+  call libs\pojemnik.euo otworz !pojemnikZiolaID
+  event macro 1 0 .sortuj ziola
+  set #LTARGETKIND 1
+  target 10s
+  set #LTARGETID !pojemnikZiolaID
+  event macro 22 0 ; last target
+  finditem * C_ , !pojemnikZiolaID
+  repeat
+    call libs\przenies.euo przedmiot #FINDID !pojemnikBankZiola #FINDSTACK
+    finditem * C_ , !pojemnikZiolaID
+  until #FINDCNT = 0
+ }
+ else
+ {
+  ignoreitem !pojemnikBankZiola
+  finditem OKF C_ , !pojemnikBank
+  if #FINDCNT > 0
+  {
+   set !pojemnikZiolaID #FINDID
+   call libs\przenies.euo przedmiot #FINDID #BACKPACKID #FINDSTACK
+   event sysmessage Brakowalo nam pojemnika na ziola. Przenioslem z banku !pojemnikZiolaID
+   ignoreitem reset
+  }
+ }
+
+ finditem LKF C_ , #BACKPACKID
+ if #FINDCNT > 0
+ {
+  set !pojemnikKamienieID #FINDID
+  call libs\pojemnik.euo otworz !pojemnikKamienieID
+  event macro 1 0 .sortuj kamienie
+  set #LTARGETKIND 1
+  target 10s
+  set #LTARGETID !pojemnikKamienieID
+  event macro 22 0 ; last target
+  
+  finditem * C_ , !pojemnikKamienieID
+  repeat
+    call libs\przenies.euo przedmiot #FINDID !pojemnikBankKamienie #FINDSTACK
+    finditem * C_ , !pojemnikKamienieID
+  until #FINDCNT = 0
+ }
+ else
+ {
+  ignoreitem !pojemnikBankKamienie
+  finditem LKF C_ , !pojemnikBank
+  if #FINDCNT > 0
+  {
+   set !pojemnikKamienieID #FINDID
+   call libs\przenies.euo przedmiot #FINDID #BACKPACKID #FINDSTACK
+   event sysmessage Brakowalo nam pojemnika na kamienie. Przenioslem z banku !pojemnikKamienieID
+   ignoreitem reset
+  }
+ }
+
+call libs\pojemnik.euo otworz !pojemnikBankZiola
+
+FOR %i 1 9
+{
+        IF %i = 1 2
+                SET !przenoszonaIlosc !perlyRestock
+                SET !przenoszoneZiolo KUF
+        IF %i = 2 2
+                SET !przenoszonaIlosc !krwawnikRestock
+                SET !przenoszoneZiolo JUF
+        IF %i = 3 2
+                SET !przenoszonaIlosc !czosnekRestock
+                SET !przenoszoneZiolo KZF
+        IF %i = 4 2
+                SET !przenoszonaIlosc !zenshenRestock
+                SET !przenoszoneZiolo JZF
+        IF %i = 5 2
+                SET !przenoszonaIlosc !mandragoraRestock
+                SET !przenoszoneZiolo MZF
+        IF %i = 6 2
+                SET !przenoszonaIlosc !belladonaRestock
+                SET !przenoszoneZiolo WZF
+        IF %i = 7 2
+                SET !przenoszonaIlosc !sieciRestock
+                SET !przenoszoneZiolo RZF
+        IF %i = 8 2
+                SET !przenoszonaIlosc !siarkaRestock
+                SET !przenoszoneZiolo SZF
+        IF %i = 9 2
+                SET !przenoszonaIlosc %maxregs
+                SET !przenoszoneZiolo DPF
+ finditem !przenoszoneZiolo C_ , !pojemnikBankZiola
+ if #FINDCNT > 0
+  call libs\przenies.euo przedmiot #FINDID !pojemnikZiolaID !przenoszonaIlosc
+ else
+  event sysmessage Nie znalazlem !przenoszoneZiolo
+}
+
+call libs\pojemnik.euo otworz !pojemnikBankKamienie
+
+exit
