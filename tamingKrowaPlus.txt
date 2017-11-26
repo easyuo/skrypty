@@ -477,7 +477,7 @@ set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_
 if %tameskill >= 760 && %tameskill < 780
 set %tameable OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 780 && %tameskill < 796
-set %tameable YE_XE_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable YE_XE_JD_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
 set %tameable OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
