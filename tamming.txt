@@ -63,7 +63,7 @@ set %wersja "4.4"
 ; 73% - lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
 
 ; 69% - plomienna tarantula ??? - jeszcze nie wiadomo gdzie dokladnie :)
- ??? tarantula,
+;  ??? tarantula,
 ; 74% - pajak szablonogi
 ; 76% - wiekszy piekielny ogar
 ; 77% - smok bagienny, wargh
@@ -81,6 +81,7 @@ set %wersja "4.4"
 
 initevents
 
+event sysmessage Czyszczenie listy ignorowanych.
 ignoreitem reset
 ignoreitem #CHARID
 
@@ -179,6 +180,7 @@ menu button otworzPojemnikKamienie 150 155 160 25 Pojemnik KAMIENIE
 menu text lbl_przerwa_po_gate 10 185 Przerwa po gate w sekundach
 menu Edit przerwa_po_gate 160 183 30 1
 menu button idzStajnia 195 181 100 25 Idz STAJNIA
+menu button sortujWPlecaku 195 211 100 25 Sortuj Plecak
 
 menu check odstawdostajni 10 165 130 15 #true Zwierzêta do stajni
 menu check leczenie 10 205 130 15 #true Leczenie Magia
@@ -328,23 +330,28 @@ return
 sub ScriptIdletime
  if #menubutton = manualtame 2
  {
+  event sysmessage Reczne oswajanie.
   set #menubutton N/A
   gosub TamingManual
  }
  if #menubutton = resetignore 2
  {
+  event sysmessage Resetowanie ignorowanych.
   set #menubutton N/A
   ignoreitem reset
  }
  if #menubutton = resetstart 4
  {
+  event sysmessage Restowanie pozycji startowej.
   set #menubutton N/A
   set %charstartx #charposx
   set %charstarty #charposy
   set %charstartz #charposz
  }
+ 
  if #menubutton = otworzPojemnikKamienie 2
  {
+  event sysmessage Otwieranie pojemnika na kamienie.
   set #menubutton N/A
   gosub OtworzPojemnikNaKamienie
   gosub MenuUpdateStats
@@ -352,9 +359,17 @@ sub ScriptIdletime
 
  if #menubutton = idzStajnia
  {
+  event sysmessage Idz do stajni.
   set #menubutton N/A
   gosub OdstawDoStajni
   gosub MenuUpdateStats
+ }
+ 
+ if #menubutton = sortujWPlecaku
+ {
+  event sysmessage Sortowanie rzeczy w plecaku.
+  set #menubutton N/A
+  gosub sortujWPlecaku
  }
 
 return
@@ -392,6 +407,7 @@ sub Taming
  menu get leczenie
  if #menures = #true
   gosub Leczenie
+  
  gosub AutoAttack
  set %tamecount 0
  gosub MenuUpdateStats
@@ -461,7 +477,7 @@ set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_
 if %tameskill >= 760 && %tameskill < 780
 set %tameable OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 780 && %tameskill < 796
-set %tameable YE_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable YE_XE_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
 set %tameable OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
@@ -519,6 +535,8 @@ set %tameable OF_PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH
 return
 
 sub TamingIgnore
+ menu set status Ignorowanie
+ 
  if %1 = perm
  {
 	ignoreitem %2
@@ -532,7 +550,6 @@ sub TamingIgnore
  }
  if %1 = reset && #systime > %tameigtimer
  {
-
 	ignoreitem reset 1
 	return
  }
@@ -540,17 +557,16 @@ sub TamingIgnore
  {
 	ignoreitem %2 2
 	return
-}
-if %1 = gain
-{
-	ignoreitem reset 2
+ }
+ if %1 = gain
+ {
+  ignoreitem reset 2
 	return
-}
+ }
 return
 
 sub TameAnimal
-
- menu set status Zaczynam oswajac
+ event sysmessage Zaczynam oswajac
  TamingLoop:
   menu get leczenie
   if #menures = #true
@@ -609,6 +625,7 @@ sub TameAnimal
 		gosub TamingIgnore perm %tameid
 		return
    }
+   
    gosub ScriptIdletime
    goto TamingLoop
   }
@@ -769,6 +786,7 @@ sub TamingMonitor
   }
   if Nie_masz_szans_na in #journal
 	{
+   event sysmessage Nie mam szans na oswojenie.
    return skill
   }
  }
@@ -794,6 +812,7 @@ sub TamingMonitor
 return
 
 sub TamingRelease
+ menu set status Pozbywanie sie zwierzeta.
 
  menu get zabijOswojonymi
  if #menures = #true
@@ -1416,4 +1435,42 @@ return
 sub wypijMana
  event macro 1 0 .wypij mala mana
  event macro 1 0 .wypij duza mana
+return
+
+; Sortuje ziola do pojemnika na ziola / Kamienie do pojemnika na kamienie
+sub sortujWPlecaku
+
+ finditem OKF C_ , #BACKPACKID
+ if #FINDCNT > 0
+ {
+  set !pojemnikZiolaID #FINDID
+ }
+
+ finditem LKF C_ , #BACKPACKID
+ if #FINDCNT > 0
+ {
+  set !pojemnikKamienieID #FINDID
+ }
+ 
+ set #LTARGETKIND 1
+ ; Sortowanie ziol
+ event macro 1 0 .sortuj ziola
+ target 10s
+ if !pojemnikZiolaID <> N/A
+  set #LTARGETID !pojemnikZiolaID
+ else
+  set #LTARGETID #CHARID
+ event macro 22 0 ; last target
+
+ ; Sortowanie kamieni
+ event macro 1 0 .sortuj kamienie
+ target 10s
+ if !pojemnikKamienieID <> N/A
+  set #LTARGETID !pojemnikKamienieID
+ else
+  set #LTARGETID #CHARID
+ event macro 22 0 ; last target
+
+ event sysmessage Posortowane Kamienie i Ziola.
+
 return
