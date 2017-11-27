@@ -12,7 +12,7 @@
 initevents
 ;--------------------------- Change these to fit your needs
 set %ztolerance 3
-set %dtolerance 4
+set %dtolerance 10
 set %targetx_text ltargetx
 set %targety_text ltargety
 set %targetz_text ltargetz
@@ -73,8 +73,6 @@ str right #date 2
 set %date %date , / , #strres
 str left #date 2
 set %date %date , / , #strres
-execute %cmd /c echo #smc , * Created with CEOAutoRailWriter on , #spc , %date , #spc , * > %filename
-execute %cmd /c echo #smc , #spc >> %filename
 execute %cmd /c echo set % , endspot , #spc , %totalspots >> %filename
 menu text hs 10 30 Saving Spot:
 menu font color white
@@ -83,9 +81,10 @@ for %i 1 %totalspots
         menu delete ss
         menu text ss 85 30 %i
         wait 1
-        execute %cmd /c echo set % , X , %i , #spc , %railspotx . %i >> %filename
-        execute %cmd /c echo set % , Y , %i , #spc , %railspoty . %i >> %filename
-        execute %cmd /c echo set % , Z , %i , #spc , %railspotz . %i >> %filename
+        event sysmessage Punkt %i
+        execute %cmd /c echo set % , px , %i , #spc , %railspotx . %i >> %filename
+        execute %cmd /c echo set % , py , %i , #spc , %railspoty . %i >> %filename
+;        execute %cmd /c echo set % , pz , %i , #spc , %railspotz . %i >> %filename
         if %target . %i = #true
         {
                 execute %cmd /c echo set % , %targetx_text , %i , #spc , %ltargetx . %i >> %filename

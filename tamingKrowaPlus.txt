@@ -85,6 +85,10 @@ event sysmessage Czyszczenie listy ignorowanych.
 ignoreitem reset
 ignoreitem #CHARID
 
+
+set !kolorMenuOswajam green
+set !kolorMenuIdle    $E0E0E0
+
 set %followers 7
 set %tamming_odleglos 9
 set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
@@ -109,7 +113,7 @@ SET !zenshenRestock     222
 SET !mandragoraRestock  288
 SET !belladonaRestock   111
 SET !sieciRestock       222
-SET !siarkaRestock      111
+SET !siarkaRestock      222
 
 set %runaAktualna %runaStart - 1
 set %runaNastepna %runaStart - 1
@@ -137,7 +141,7 @@ loop:
   event exmsg #CHARID 3 30 Menu zamkniete. Makro zatrzymane!
   halt
  }
-
+ menu window color !kolorMenuIdle
  gosub Dispatch
 goto loop
 
@@ -145,7 +149,7 @@ sub InitMenu
 menu clear
 menu window title Krowa Tamer Plus %wersja
 menu window size 320 460
-menu window color $E0E0E0
+menu window color !kolorMenuIdle
 menu font bgcolor $E0E0E0
 menu font name MS Sans Serif
 menu font size 8
@@ -416,6 +420,7 @@ sub Taming
  finditem %1
  if #findkind = -1
  return
+ menu window color !kolorMenuOswajam
  set %tameid #findid
  set %tametype #findtype
  set %tamedist #finddist
@@ -495,9 +500,9 @@ set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_
 if %tameskill >= 760 && %tameskill < 780
 set %tameable OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 780 && %tameskill < 796
-set %tameable YE_XE_JD_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable MHB_YE_XE_JD_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 796 && %tameskill < 820
-set %tameable OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable MHB_OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -598,7 +603,8 @@ sub TameAnimal
   }
 
   event exmsg %tameid 3 30 Oswajam!
-
+  menu window color !kolorMenuOswajam
+  
   if #finddist > %tamming_odleglos
   {
    ; Tutaj czekamy jezeli postac ma sie nie ruszac
