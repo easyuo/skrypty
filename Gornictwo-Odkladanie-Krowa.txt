@@ -18,7 +18,7 @@ set %gornikID     FUCHAD
 
 ignoreitem reset *
 ignoreitem #CHARID
-ignoreitem STEOQD
+ignoreitem STEOQD_EHOYQD
 set %graczType IS_HS_ZE_
 
 set %zelazo       0
