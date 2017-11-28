@@ -40,11 +40,20 @@ sub SzukajPostaci
  {
   set %postacID #FINDID
   
+  if #FINDDIST < 2
+  {
+   event macro 1 0 .przewroc
+   target 3s
+   set #LTARGETID #FINDID
+   set #LTARGETKIND 1
+   event macro 22 0  ; LastTarget
+  }
+  
   if %postacID = BYWSQD
   {
-  ; event macro 1 0 Ty Kordzianie, judaszu, drzwi otworzysz sobie sam!
-  ; event macro 2 0 splunal na ziemie
-  ; wait 3s
+   event macro 1 0 Ty judaszu. Drzwi otworzysz sobie sam.
+   event macro 2 0 splunal na ziemie
+   wait 3s
    return
   }
   
@@ -68,8 +77,6 @@ sub SzukajPostaci
      set %licznik . %postacID %licznik . %postacID + 1
      event macro 2 0 rozglada sie uwaznie
      event macro 1 0 Witam ponownie!
-     wait 10
-     event macro 2 0 otwiera drzwi
      event exmsg %postacID 3 30 %postacID [ %licznik . %postacID ] [ %ostatnioWidziany , s ]
      wait 10
      if %licznik . %postacID > 5
@@ -79,9 +86,7 @@ sub SzukajPostaci
        event macro 1 0 Nie powiem, ale przydala by sie w koncu jakas zaplata za moja prace.
       }
 
-      event macro 1 0 Otworzylem te drzwi dla ciebie juz %licznik . %postacID razy.
-      event macro 1 0 Daj PROSZE troszke zlota!
-
+      event macro 1 0 Otworzylem te drzwi dla ciebie juz %licznik . %postacID razy. Daj PROSZE troszke zlota!
      }
      wait 3s
     }
