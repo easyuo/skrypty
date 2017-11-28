@@ -2,13 +2,13 @@
 ; Gornictwo z odkladaniem rudy do domku. Edytujesz wiersze ponizej:
 
 ; ==== EDYCJA ====
-set %sklad KVHLAOE ; Veis GIILMPE             ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
-set %kilofy KVHLAOE ; Veis GIILMPE            ; Pojemnik z kilofami
-set %dragPauza 4                              ; Pauza przy drag/drop
-set %dropPauza 8                              ; Pauza przy drag/drop
-set %ileZiol 6                                ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
-set %wagajes #MAXWEIGHT - 50                  ; Powyzej jakiej wagi mam odkladac
-set %ileRudyZelazaOdkladanie 20000           ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
+set %skladRuda KVHLAOE                      ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
+set %skladKilofy KVHLAOE                    ; Pojemnik z kilofami
+set %dragPauza 4                            ; Pauza przy drag/drop
+set %dropPauza 8                            ; Pauza przy drag/drop
+set %ileZiol 6                              ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
+set %wagajes #MAXWEIGHT - 50                ; Powyzej jakiej wagi mam odkladac
+set %ileRudyZelazaOdkladanie 20000          ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
 set %piec JBG_
 ; DWJ - Ruda
 ; ENK - Sztaby
@@ -123,12 +123,11 @@ start:
   finditem BUD_ZTD_HKF_UYD_GZD_CZD_OZD_IIF_HIF_KIF_JIF_IKF_RLL_CML_DHP_YGP_XGP_AHP_ZGP_KHP_JHP_MHP_LHP_GHP_CUD_KUD_ZJF_KKF G_2
   if #findid = x || #finddist > 2
   {
-   event sysmessage Musisz miec pojemnik w zasiegu przy starcie skryptu!
+   event sysmessage Musisz miec bezpieczny pojemnik w zasiegu przy starcie skryptu!
    goto pokaz_menu
   }
- set %pojemnik #FINDID
- set %sklad #FINDID
- event sysmessage Sklad i Pojemnik ustawiony: #FINDID
+ set %pojemnikBezpieczny #FINDID
+ event sysmessage Pojemnik bezpieczny: #FINDID
 }
 
  set %pozycja_startowa_x #charposx
@@ -439,31 +438,29 @@ sub odkladanie
   until #charposx = %pozycja_startowa_x && #charposy = %pozycja_startowa_y
  }
 
+ call libs\pojemnik.euo otworz %pojemnikBezpieczny
+ finditem %przedmioty_do_skladu C_ , #BACKPACKID
  repeat
-  if %afterCall <> 1
-   finditem %przedmioty_do_skladu C_ , #BACKPACKID
-
   if #FINDCNT > 0
   {
-   call libs\przenies.euo przedmiot #findid %sklad #findstack
-   set !afterCall 1
+   call libs\przenies.euo przedmiot #findid %skladRuda #findstack
    finditem %przedmioty_do_skladu C_ , #BACKPACKID
   }
  until #FINDCNT = 0
   
- event sysmessage Otwieranie pojemnika przed uzupelnianiem
- call libs\pojemnik.euo otworz %pojemnik
+ event sysmessage Otwieranie bezpiecznego pojemnika przed uzupelnianiem
+ call libs\pojemnik.euo otworz %pojemnikBezpieczny
  event sysmessage Uzupelnianie stuffu (bandaze, ziola)
 
   ; Bandaze
  finditem ZLF C_ , #BACKPACKID
  if #findstack < %ileBandazy
   {
-   set #lobjectid %pojemnik
+   set #lobjectid %pojemnikBezpieczny
    set #ltargetkind 1
    event macro 17 0
    wait 1s
-   finditem ZLF C_ , %pojemnik
+   finditem ZLF C_ , %pojemnikBezpieczny
    if #FINDCNT > 0
     call libs\przenies.euo przedmiot #findid #BACKPACKID 5
  }
@@ -474,8 +471,8 @@ sub odkladanie
  {
   set %ilePrzeniesc %ileZiol - #FINDSTACK
   event sysmessage Uzupe³niam belladone: %ilePrzeniesc
-  call libs\pojemnik.euo otworz %sklad
-  finditem WZF C_ , %pojemnik
+  call libs\pojemnik.euo otworz %skladRuda
+  finditem WZF C_ , %pojemnikBezpieczny
   if #FINDCNT > 0
    call libs\przenies.euo przedmiot #findid #BACKPACKID %ilePrzeniesc
  }
@@ -485,8 +482,8 @@ sub odkladanie
  {
   set %ilePrzeniesc %ileZiol - #FINDSTACK
   event sysmessage Uzupe³niam perly: %ilePrzeniesc
-  call libs\pojemnik.euo otworz %sklad
-  finditem KUF C_ , %pojemnik
+  call libs\pojemnik.euo otworz %skladRuda
+  finditem KUF C_ , %pojemnikBezpieczny
   if #FINDCNT > 0
    call libs\przenies.euo przedmiot #findid #BACKPACKID %ilePrzeniesc
  }
@@ -494,7 +491,7 @@ sub odkladanie
  ; XXXXX
 ; DWJ - Ruda
 ; ENK - Sztaby
- finditem DWJ C_ , %sklad
+ finditem DWJ C_ , %skladRuda
  for #FINDINDEX 1 #FINDCNT
  {
   event sysmessage %ruda_nazwa . #FINDCOL Ilosc: #FINDSTACK
@@ -536,14 +533,8 @@ sub ustaw_narzedzie
        sound C:\WINDOWS\Media\Kopia.wav
       goto dupa
      }
-     set #lobjectid %pojemnik
-     event macro 17 0
-     wait 1s
-     
-     set #lobjectid %kilofy
-     event macro 17 0
-     wait 1s
-
+     call libs\pojemnik.euo otworz %pojemnikBezpieczny
+     call libs\pojemnik.euo otworz %skladKilofy
      finditem NPF C
      if #FINDCNT > 0
       call libs\przenies.euo przedmiot #findid #BACKPACKID 1
@@ -744,7 +735,7 @@ sub corobic
   gosub gornik
  }
 
- finditem %sklad G_2
+ finditem %pojemnikBezpieczny G_2
  if #findCNT = 1
  {
   set !znalazlem 1
@@ -796,10 +787,8 @@ return
 sub dzialajSklad
  finditem %piec G_3
  if #FINDCNT > 0
-  gosub przetapiaj %sklad
-
- gosub przeniesZeSkladu %sklad
-
+  gosub przetapiaj %skladRuda
+ gosub przeniesZeSkladu %skladRuda
 return
 
 ; gosub przetapiaj %pojemnikID
@@ -867,15 +856,16 @@ return
 sub przeniesZeSkladu
 
  event sysmessage Przenosze przedmioty ze skladu do glownego plecaka.
- call libs\pojemnik.euo otworz %sklad
+ call libs\pojemnik.euo otworz %pojemnikBezpieczny
+ call libs\pojemnik.euo otworz %skladRuda
 
- finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
+ finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %skladRuda
  repeat
   if #FINDCNT > 0
   {
    call libs\przenies.euo przedmiot #findid #BACKPACKID #findstack
   }
-  finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %sklad
+  finditem %kamienieNaBramy , %przedmioty_ze_skladu C_ , %skladRuda
  until #FINDCNT = 0
 
 return
@@ -885,12 +875,12 @@ return
 ; ==========================
 ;gosub przeniesDoSkladu %pojemnikID
 sub przeniesDoSkladu
- call libs\pojemnik.euo otworz %sklad
+ call libs\pojemnik.euo otworz %pojemnikBezpieczny
  repeat
   finditem %przedmioty_do_skladu C_ , #BACKPACKID
   if #findid <> x
   {
-   call libs\przenies.euo przedmiot #findid %sklad #findstack
+   call libs\przenies.euo przedmiot #findid %skladRuda #findstack
    finditem %przedmioty_do_skladu C_ , #BACKPACKID
   }
  until #findid = x
