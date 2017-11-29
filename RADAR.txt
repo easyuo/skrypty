@@ -1,0 +1,279 @@
+;==========================================================
+; Universal Radar v1.6
+;----------------------------------------------------------
+; Original author: nilmer
+; Contributors: old_asm_programmer, the.WZA
+; Auto size mods by Kal
+;----------------------------------------------------------
+; copyleft (c) 2003 by nilmer
+;==========================================================
+
+; --Change %scanrange to increase/decrease radar range (MAX 25)
+  set %scanRange 18
+;-- Default Setting ---------------------------------------
+  linesPerCycle 100
+; time before refreshing char blip (0.1s increment)
+   set %charBlipRefresh 50
+; minimum time between each scan (0.1s increment)
+  set %scanFrequency 5
+; check that #findCnt remains constant during scan period
+  set %forceAccurateScan #false
+;-- Internal Settings -------------------------------------
+;   set %creatureType1 _IS_HS
+;   set %creatureType2 _WZA
+;   ...
+;   set %creature %monterType1 , %monterType2 , ...
+  set %creature IS_HS_QF_LD_XE_MB_SI_BD_TH_CJ_NI_GD_ID_YE_PD_ED_XH_I_UC
+  +_UD_RB_BJ_W_CBB_JD_WD_XC_DB_Y__DI_AB_ND_AI_BI_RI_KI_DJ_N_TI_OD_OJ_EF
+  +_AF_UF_WB_BB_JB_XF_FD_QE_GB_QD_IB_KD_TD_AE_DE_BE_IE_CD_WE_YFM
+;   +_VE_PE_ZC_YD
+  set %corpse _YFM
+  set %rep1 1 ; Innocent
+  set %rep2 2 ; Friend (Guild)
+  set %rep3 3 ; Grey
+  set %rep4 4 ; Criminal
+  set %rep5 5 ; Enemy (Guild)
+  set %rep6 6 ; Murderer
+  set %rep7 7 ; Shopkeeper
+  set %reputationFilter %rep1 , %rep2 , %rep3 , %rep4 , %rep5 , %rep6 , %rep7
+;-- Window definition -------------------------------------
+  set %xfac 7 ; scan window factor
+  set %mfac 8 ; menu size factor
+  set %scanWidth %scanrange * %xfac
+  set %scanLeft  ( ( %scanrange * %mfac ) - %scanwidth ) / 2
+  set %scanRight %scanLeft + %scanWidth
+  set %scanTop 5
+  set %scanHeight %scanrange * %xfac
+  set %scanBottom %scanTop + %scanHeight
+  set %scanCenterX %scanWidth / 2 + %scanLeft
+  set %scanCenterY %scanHeight / 2 + %scanTop
+;----------------------------------------------------------
+  menu HideEUO
+  set %mpos %scanheight + 10
+  menu Clear
+ set %x %scanrange * %mfac
+ set %y %scanrange * %mfac + 100
+  menu Window size %x %y
+  menu Window color black
+  menu Show
+  menu Font color green
+  menu Font bgcolor black
+  menu Font size 8
+  set %x %scanleft + 20
+  set %y %mpos
+  menu Text repFilterText1 %x %y Innocent
+  set %y %y + 12
+  menu Text repFilterText2 %x %y Friend (Guild)
+  set %y %y + 12
+  menu Text repFilterText3 %x %y Grey
+  set %y %y + 12
+  menu Text repFilterText4 %x %y Criminal
+  set %y %y + 12
+  menu Text repFilterText5 %x %y Enemy (Guild)
+  set %y %y + 12
+  menu Text repFilterText6 %x %y Murderer
+  set %y %y + 12
+  menu Text repFilterText7 %x %y Shopkeeper
+  set %y %y + 12
+  menu Text corpseFilterText %x %y Corpse
+  menu Font Name Wingdings
+  set %x %scanleft
+  set %y %mpos
+  menu Button 1 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button 2 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button 3 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button 4 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button 5 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button 6 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button 7 %x %y 12 12 ü
+  set %y %y + 12
+  menu Button corpse %x %y 12 12 ü
+  gosub charBlipRefresh
+;----------------------------------------------------------
+  ignoreItem reset
+  ignoreItem #charID
+  gosub setArray rep_color 1 blue green white white orange red yellow purple
+  set %currentNS 0
+  nameSpace Local %currentNS
+  nameSpace Clear
+  set %previousNS %currentNS
+  set %currentNS ( %currentNS + 1 ) % 2
+  set #menuButton N/A
+  set %scanSync #sCnt2 + %scanFrequency
+scan:
+  nameSpace Local %currentNS
+  nameSpace Clear
+  set !scan 0
+  set %scanList
+  findItem %creature 1 G_ , %scanRange
+  if #findCnt > 0
+  {
+    set %findCnt #findCnt
+    if #findRep in %reputationFilter || #findType in %corpse
+      gosub scan
+    if %findCnt > 1
+    {
+    set *123 Warning ; flag persistent variable for Kal's external alarm
+      for %i 2 %findCnt
+      {
+        findItem %creature %i G_ , %scanRange
+        if %forceAccurateScan && #findCnt <> %findCnt
+          goto scan
+        if #findRep in %reputationFilter || #findType in %corpse
+          gosub scan
+      }
+    }
+  }
+  nameSpace Local %previousNS
+  if !scan > 0
+  {
+    for %i 1 !scan
+    {
+      if !scan . %i notIn %scanList
+      {
+        nameSpace Local !scan . %i
+        nameSpace Clear
+        nameSpace Local %previousNS
+        menu delete !scan . %i
+      }
+    }
+  }
+  nameSpace Local %currentNS
+  if !scan > 0
+  {
+    for %i 1 !scan
+    {
+      nameSpace Local !scan . %i
+      if !redraw
+      {
+        menu delete #nsName
+        menu Shape #nsName !X !Y 5 5 1 1 0 red 7 !C
+      }
+      nameSpace Local %currentNS
+    }
+  }
+  set %previousNS %currentNS
+  set %currentNS ( %currentNS + 1 ) % 2
+scanSync:
+  if %nextRefresh < #sCnt2
+    gosub charBlipRefresh
+  if #menuButton = CLOSED
+    halt
+  if #menuButton in 1234567
+    gosub toggleRepFilter #menuButton
+;   if #menuButton > 10 ; Hook for creatures buttons 11, 12, ...
+;      gosub toggleCreatureFilter #menuButton
+  if #menuButton = CORPSE
+    gosub toggleCorpseFilter
+  if %scanSync > #sCnt2
+  {
+    sleep 50
+    set %10 %10 + 1
+    goto scanSync
+  }
+  set %scanSync #sCnt2 + %scanFrequency
+;   if #menuButton = N/A
+    goto scan
+;   display ok Illegal value for menuButton: #menuButton
+;halt
+
+sub setArray
+  for %_idx 3 %0
+  {
+    set % , %1 , %2 % . %_idx
+    set %2 %2 + 1
+  }
+return
+
+sub scan
+  set !X ( #findX - #charPosX ) * 3
+  set !Y ( #charPosY - #findY ) * 3
+  set %X %scanCenterX + !X + !Y
+  set %Y %scanCenterY + !X - !Y
+  if %X > %scanLeft && %X < %scanRight && %Y > %scanTop && %Y < %scanBottom
+  {
+    set !scan !scan + 1
+    set !scan . !scan #findID
+    nameSpace Local #findID
+    set !redraw !X <> %X || !Y <> %Y
+    if !redraw
+    {
+      set !X %X
+      set !Y %Y
+      if #findType in %corpse
+        set !C %rep_color . 8
+      else
+        set !C %rep_color . #findRep
+    }
+    nameSpace Local %currentNS
+    set %scanList %scanList , _ , #findID
+  }
+return
+
+sub charBlipRefresh
+  menu delete #charID
+  menu Shape #charID %scanCenterX %scanCenterY 5 5 1 1 0 red 7 yellow
+  menu delete radarFrame
+  menu Shape radarFrame %scanLeft %scanTop %scanWidth %scanHeight 4 7 1 green 2 green
+  set %nextRefresh #sCnt2 + %charBlipRefresh
+return
+
+sub toggleRepFilter ;     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  menu delete %1
+  set %X %mpos + 12 * %1 - 12
+  if %rep . %1 = %1
+  {
+    menu Button %1 %scanleft %X 12 12 u
+    set %rep . %1
+  }
+  else
+  {
+    menu Button %1 %scanleft %X 12 12  ü
+    set %rep . %1 %1
+  }
+  set %reputationFilter %rep1 , %rep2 , %rep3 , %rep4 , %rep5 , %rep6 , %rep7
+  set #menuButton N/A
+return
+
+;sub toggleCreatureFilter
+;   set %1 %1 - 10
+;   set %1 %creatureType . %1
+;   if %1 = N/A
+;   {
+;      display ok Illegal value for menuButton: #menuButton
+;      halt
+;   }
+;   str Pos %creature %1
+;   if #strRes > 0
+;   {
+;      set %0 #strRes
+;      str Len %1
+;      str Del %creature %0 #strRes
+;      set %creature #strRes
+;   }
+;   else
+;      set %creature %1 , %creature
+;   set #menuButton N/A
+;return
+
+sub toggleCorpseFilter
+  set %X %mpos + 85
+  menu delete corpse
+  if %corpse = X
+  {
+    menu Button corpse %scanleft %X 12 12 ü
+    set %corpse _YFM
+  }
+  else
+  {
+    menu Button corpse %scanleft %X 12 12 u
+    set %corpse X
+  }
+  set #menuButton N/A
+return

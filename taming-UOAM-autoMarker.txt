@@ -1,0 +1,54 @@
+;==================================
+; Script Name: Peragrins UOAM Orespot Marker
+; Author: Peragrin
+; Version: 3.3
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 3/6/05
+; Public Release: 31/10/04
+; Purpose: To make a .MAP file for UOAM to mark the types of ore in a 8x8 spot
+;============================================
+
+set %zwierzaki AF_AH_BG_BK_CB_CD_CG_CH_DF_DG_EG_EH_FN_GE_HD_HH_HHB_IH_JD_JJ_KD_KG_L_LD_M_MG_MHB_NC_OF_OH_PG_QE_QF_RF_SC_SD_SH_TC_TE_TJ_UB_UE_UF_VD_VF_W_WF_WJ_XE_XG_YE_YF_YG_ZD_ZE_ZI_
+set %zwierzaki IG_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE ; typ zwierzat do tame ( Orly )
+
+set %plik C:\Games\UOAM\stworzenia.map ; Plik UOAM z danymi
+if \ notin %plik
+	{
+	display OK Path and filename not set.
+	halt
+	}
+
+gosub getOSfilecmd filecmd
+MAIN_LOOP:
+ finditem %zwierzaki
+ if #FINDCNT > 0
+ {
+  gosub zapiszDoPliku #FINDTYPE #FINDX #FINDY
+  ignoreitem #FINDID
+ }
+ 
+goto main_loop
+halt
+
+sub GetOSFileCmd
+ str Left #osver 1
+ set % . %1 cmd.exe
+ if #strRes = 1
+  set % . %1 command.com
+return % . %1
+;===============================================================================
+
+sub zapiszDoPliku
+ set %zwierzeNazwa %1
+ set %x %2
+ set %x %x / 8
+ set %x %x * 8
+ set %x %x + 4
+ set %y %3
+ set %y %y / 8
+ set %y %y * 8
+ set %y %y + 4
+ execute %filecmd /c echo + , treasure , : , #spc , %x , #spc , %y , #spc , 1 , #spc , %zwierzeNazwa >> %plik
+return

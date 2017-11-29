@@ -9,11 +9,15 @@ set %lopatka WSF
 set %zwloki  YFM
 
 ; Znajdz sztylet
-finditem %sztylet C_ , #BACKPACKID
-if findkind <> -1
+
+if %sztyletID = N/A
 {
- set %sztyletID #FINDID
- event sysmessage Sztylet: %sztyletID
+ finditem %sztylet C_ , #BACKPACKID
+ if findkind <> -1
+ {
+  set %sztyletID #FINDID
+  event sysmessage Sztylet: %sztyletID
+ }
 }
  
 ; Znajdz lopatke

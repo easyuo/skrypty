@@ -4,19 +4,44 @@
 ; Shard:        Clair's Lair
 ; ---------------------------
 
-sub Lustro
+sub BlessLustro
 	event macro 15 35
 	wait 3s
 return
 
 sub BlessStr
 	event macro 15 15
-	target 3s
-	event macro 23 0
+	gosub TargetSelf
 return
 
 sub BlessInt
-	event macro 15 9
-	target 3s
-	event macro 23 0
+ event macro 15 9
+ gosub TargetSelf
+return
+
+sub BlessDex
+ event macro 15 8
+ gosub TargetSelf
+return
+
+sub BlessPancerz
+ event macro 15 14
+ gosub TargetSelf
+return
+
+sub BlessReactive
+return
+
+sub TargetSelf
+ set #LTARGETKIND 1
+ target 3s
+ event macro 23 0
+ wait 1
+return
+
+sub BlessAll
+
+ gosub BlessInt
+ gosub BlessStr
+ gosub
 return

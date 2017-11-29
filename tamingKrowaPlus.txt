@@ -1,4 +1,4 @@
-;=========================================
+                                ;=========================================
 ; Script Name: Krowa Tamer Plus 4.4
 ; Author: Based on Uncle Dave (mod by Krowa)
 ; Author: Krowa4.51.0
@@ -61,16 +61,15 @@ set %wersja "4.4"
 ; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
 ; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
 ; 73% - lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
-
-; 69% - plomienna tarantula ??? - jeszcze nie wiadomo gdzie dokladnie :)
-;  ??? tarantula,
 ; 74% - pajak szablonogi
 ; 76% - wiekszy piekielny ogar
+; 76.x - ksiezycowy armok
+; 76.5 lub .6% - plomienna tarantula
 ; 77% - smok bagienny, wargh
 ; 78% - drake, lodowy drake, morski drake, bagienny drake
 ; 80% - lodowa wyverna, wyverna, plomienna wyverna
 ; 81% - pancernik
-; 82% - opancerzony smok bagienny, koszmar
+; 82% - opancerzony smok bagienny, koszmar, tarantula
 ; 83% - olbrzymia tarantula, pajak wampir, wodny ostard
 ; 85% - prastara istota
 ; 86% - lodowy smok
@@ -90,15 +89,15 @@ set !kolorMenuOswajam green
 set !kolorMenuIdle    $E0E0E0
 
 set %followers 7
-set %tamming_odleglos 9
+set %tamming_odleglos 10
 set %tamming_odleglos_czekaj_po_prowokacji 8s           ; Ile czekac po sprowokowaniu stworzenia ktore bylo dalej niz %tamming_odleglosc
 set %sound D:\games\uo\easyuo\tada.wav
 
 set %leczRoznica 10
 
-set %KsiegaRun1 WIIFNQE
-set %KsiegaRun2 WIIFNQE
-; set %KsiegaRun2 SBFZOQE
+;set %KsiegaRun1 WIIFNQE   ; Yew Orly
+set %KsiegaRun1 PRGTUQE   ; Destard
+
 set %stajniaKsiegaID SBFZOQE
 set %stajniaRuna 16
 
@@ -208,6 +207,8 @@ menu text lbl_stajnia 10 246 Stajnia:
 menu Edit stajniaKsiegaID 90 243 55 %stajniaKsiegaID
 menu Edit stajniaNumerRuny 155 243 25 %stajniaRuna
 
+menu check tnijciala 10 265 130 15 #true Tnij Ciala
+
 ; --------
 ; Status
 ; --------
@@ -249,8 +250,14 @@ return
 
 sub Dispatch
 
- menu set status Idle
+ onhotkey F1
+  menu set autotame #FALSE
+ onhotkey F1 ALT
+  menu set autotame #TRUE
 
+ gosub szukajSmoczejZjawy
+
+ menu set status Idle
  gosub ScriptIdletime
  gosub TamingCheckSkill
  set %finditems N/A
@@ -363,7 +370,7 @@ sub ScriptIdletime
   set %charstarty #charposy
   set %charstartz #charposz
  }
- 
+
  if #menubutton = otworzPojemnikKamienie 2
  {
   event sysmessage Otwieranie pojemnika na kamienie.
@@ -379,7 +386,7 @@ sub ScriptIdletime
   gosub OdstawDoStajni
   gosub MenuUpdateStats
  }
- 
+
  if #menubutton = sortujWPlecaku
  {
   event sysmessage Sortowanie rzeczy w plecaku.
@@ -392,6 +399,14 @@ sub ScriptIdletime
   event sysmessage Restock w Banku.
   set #menubutton N/A
   call libs\restockBank.euo
+ }
+
+ menu get tnijciala
+ if #menures = #true
+ {
+  finditem YFM G_2
+  if #FINDCNT > 0
+   call libs\tnijciala.euo
  }
 
 return
@@ -430,7 +445,7 @@ sub Taming
  menu get leczenie
  if #menures = #true
   gosub Leczenie
-  
+
  gosub AutoAttack
  set %tamecount 0
  gosub MenuUpdateStats
@@ -500,9 +515,9 @@ set %tameable HD_AF_W_PG_FN_QF_TG_JD_KG_YG_XG_CB_TC_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_
 if %tameskill >= 760 && %tameskill < 780
 set %tameable OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
 if %tameskill >= 780 && %tameskill < 796
-set %tameable MHB_YE_XE_JD_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+set %tameable AF_AH_BG_CB_DG_EG_FN_GE_HD_IH_JD_JG_KG_L_M_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
 if %tameskill >= 796 && %tameskill < 820
-set %tameable MHB_OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_
+set %tameable AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
 ; YE_XE_ - DRAK
 ; TF_ - Prosiaki
 ; PF_ - Owce
@@ -522,37 +537,8 @@ set %tameable MHB_OF_JG_W_PG_FN_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_
 ; XX_ - Byk
 ; OF_ - kon / pegaz
 ; W_  - Imp
-
-; 65% - szalony ostard, armok3, mglisty armok, czarna pantera
-; 66% - imp, niedzwiedz grizzly
-; 67% - lampart sniezny
-; 68% - wsciekly wilk - Przywodca stada, jadowita ropucha
-; 70% - kosciany wierzchowiec, jaszczur gorski, zuk krwiopijca
-; 71% - olbrzymi zuk, olbrzymi skarabeusz, pelzacz skalny, piekielny ogar, mrozny wilk, bialy wilk
-; 73% - lodowa anakonda, bagienna wyverna, anakonda szara, scierwojad
-; 74% - pajak szablonogi
-; 76% - wiekszy piekielny ogar
-; 76.x - ksiezycowy armok
-; 76.5 lub .6% - plomienna tarantula
-
-; tarantula ???? :)
-
-; 77% - smok bagienny, wargh
-; 78% - drake, lodowy drake, morski drake, bagienny drake
-; 80% - lodowa wyverna, wyverna, plomienna wyverna
-; 81% - pancernik
-; 82% - opancerzony smok bagienny, koszmar
-; 83% - olbrzymia tarantula, pajak wampir, wodny ostard
-; 85% - prastara istota
-; 86% - lodowy smok
-; 88% - smok
-; 91% - jednorozec
-; 92% - skalny smok
-; 93% - ogar zgnilizny
-
-
 if %tameskill >= 820
-set %tameable OF_PG_FN_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_YE_XE_JD_QF_AF_IH_BK_HD_MG_UF_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_TC_CB_HH_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF_KD_KG_CB_EH_QF_HHB_CB_EH_QF_LD_W_WJ_YE_XE_UB_NC_CD_DF_JJ_CH_MHB_SH_TJ_SC_TE_CG_
+set %tameable AF_AH_BG_BK_CB_CD_CG_CH_DF_DG_EG_EH_FN_GE_HD_HH_HHB_IH_JD_JJ_KD_KG_L_LD_M_MG_MHB_NC_OF_OH_PG_QE_QF_RF_SC_SD_SH_TC_TE_TJ_UB_UE_UF_VD_VF_W_WF_WJ_XE_XG_YE_YF_YG_ZD_ZE_ZI_
 
  gosub TamingIgnore gain
 return
@@ -594,6 +580,7 @@ sub TameAnimal
    gosub Leczenie
 
   finditem %tameid
+  gosub szukajSmoczejZjawy
   if #findkind = -1
    return
   if #findrep = 1 || #findrep = 2 || #FINDREP = 0 ; 0 - paragon |  1  - blue  | 2 - green
@@ -604,7 +591,7 @@ sub TameAnimal
 
   event exmsg %tameid 3 30 Oswajam!
   menu window color !kolorMenuOswajam
-  
+
   if #finddist > %tamming_odleglos
   {
    ; Tutaj czekamy jezeli postac ma sie nie ruszac
@@ -647,7 +634,7 @@ sub TameAnimal
 		gosub TamingIgnore perm %tameid
 		return
    }
-   
+
    gosub ScriptIdletime
    goto TamingLoop
   }
@@ -1363,9 +1350,11 @@ sub Leczenie
    gosub LeczenieIVM
    wait 10
   }
-
-  if #HITS > 50 && #MANA > 22
-	{
+	if #MANA > 80
+   gosub Lustro
+ }
+ if #HITS > 50 && #MANA > 22
+ {
 	 if #STR <= 100
 		gosub BlessStr
 	 if #INT <= 100
@@ -1373,9 +1362,7 @@ sub Leczenie
 	 if C in #CHARSTATUS
 		gosub LeczenieOdtruj
 	}
-	if #MANA > 80
-   gosub Lustro
- }
+
 return
 
 sub LeczenieOdtruj
@@ -1473,7 +1460,7 @@ sub sortujWPlecaku
  {
   set !pojemnikKamienieID #FINDID
  }
- 
+
  set #LTARGETKIND 1
  ; Sortowanie ziol
  event macro 1 0 .sortuj ziola
@@ -1497,4 +1484,17 @@ sub sortujWPlecaku
 
 return
 
-
+gosub szukajSmoczejZjawy
+; Sprawdzamy czy znalezione stworzenie nie jest SMOCZA ZJAWA lub PARAGONEM! :)
+ event sysmessage Szukam smoczej zjawy
+ if #FINDTYPE = YE
+ {
+  if #FINDCOL = 17969 || #FINDCOL = 1792
+  {
+   set %tameid #FINDID
+   event exmsg %tameid 3 30 SMOCZA ZJAWA!
+   gosub zabijOswojonymiStworzeniami
+   gosub TamingMageryKill
+  }
+ }
+return

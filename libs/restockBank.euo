@@ -6,12 +6,22 @@
 
 event macro 1 0 Bankierze moja skrzynia
 
+set !reszta POF_PUD_VLK_WUF_NUF_ZUF_YLI_RWF_VRD_YUF_
+
 if !pojemnikBank = N/A
  set !pojemnikBank UABZOQE
+
 if !pojemnikBankZiola = N/A
  set !pojemnikBankZiola VULVBQE
+
 if !pojemnikBankKamienie = N/A
  set !pojemnikBankKamienie JPIZJQE
+
+if !pojemnikNaBilety = N/A
+ set !pojemnikNaBilety VVAKRPE
+ 
+if !pojemnikNaReszte = N/A ; W tym zloto
+ set !pojemnikNaReszte UBPQSQE
 
 if !perlyRestock = N/A
  SET !perlyRestock       111
@@ -32,6 +42,7 @@ if !siarkaRestock = N/A
  
 ; OKF pojemnik ziola
 ; LKF pojemnik kamienie
+; EWH bilety na zwierzaki
 
  finditem OKF C_ , #BACKPACKID
  if #FINDCNT > 0
@@ -130,6 +141,20 @@ FOR %i 1 9
   event sysmessage Nie znalazlem !przenoszoneZiolo
 }
 
-call libs\pojemnik.euo otworz !pojemnikBankKamienie
+ call libs\pojemnik.euo otworz !pojemnikBankKamienie
+
+ finditem EWH C_ , #BACKPACKID     ; Bilety na zwierzaki
+ repeat
+  call libs\przenies.euo przedmiot #FINDID !pojemnikNaBilety #FINDSTACK
+  finditem EWH C_ , #BACKPACKID
+ until #FINDCNT = 0
+
+ finditem !reszta C_ , #BACKPACKID     ; Zloto, piora, zeberka itd itd
+ repeat
+  call libs\przenies.euo przedmiot #FINDID !pojemnikNaReszte #FINDSTACK
+  finditem !reszta C_ , #BACKPACKID
+ until #FINDCNT = 0
+
+
 
 exit
