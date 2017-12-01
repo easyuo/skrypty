@@ -95,7 +95,7 @@ set %sound D:\games\uo\easyuo\tada.wav
 
 set %leczRoznica 10
 
-set %KsiegaRun1 WIIFNQE   ; Yew Orly
+set %KsiegaRun1 TRQMYQE   ; Yew Orly
 ;set %KsiegaRun1 PRGTUQE   ; Destard
 
 set %stajniaKsiegaID SBFZOQE
