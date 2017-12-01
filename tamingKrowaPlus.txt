@@ -69,8 +69,8 @@ set %wersja "4.4"
 ; 78% - drake, lodowy drake, morski drake, bagienny drake
 ; 80% - lodowa wyverna, wyverna, plomienna wyverna
 ; 81% - pancernik
-; 82% - opancerzony smok bagienny, koszmar, tarantula
-; 83% - olbrzymia tarantula, pajak wampir, wodny ostard
+; 82% - opancerzony smok bagienny, koszmar, wiekszy drake
+; 83% - olbrzymia tarantula, pajak wampir, wodny ostard, tarantula
 ; 85% - prastara istota
 ; 86% - lodowy smok
 ; 88% - smok
@@ -95,8 +95,8 @@ set %sound D:\games\uo\easyuo\tada.wav
 
 set %leczRoznica 10
 
-;set %KsiegaRun1 WIIFNQE   ; Yew Orly
-set %KsiegaRun1 PRGTUQE   ; Destard
+set %KsiegaRun1 WIIFNQE   ; Yew Orly
+;set %KsiegaRun1 PRGTUQE   ; Destard
 
 set %stajniaKsiegaID SBFZOQE
 set %stajniaRuna 16
@@ -105,14 +105,14 @@ set %runaStart 1
 set %runaKoniec 16
 
 ; Ilosc ziol przy restocku.
-SET !perlyRestock       111
-SET !krwawnikRestock    111
-SET !czosnekRestock     222
-SET !zenshenRestock     222
-SET !mandragoraRestock  288
-SET !belladonaRestock   111
-SET !sieciRestock       222
-SET !siarkaRestock      222
+SET !perlyRestock       222
+SET !krwawnikRestock    222
+SET !czosnekRestock     333
+SET !zenshenRestock     333
+SET !mandragoraRestock  333
+SET !belladonaRestock   222
+SET !sieciRestock       333
+SET !siarkaRestock      333
 
 set %runaAktualna %runaStart - 1
 set %runaNastepna %runaStart - 1
@@ -537,8 +537,11 @@ set %tameable AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_Q
 ; XX_ - Byk
 ; OF_ - kon / pegaz
 ; W_  - Imp
-if %tameskill >= 820
-set %tameable AF_AH_BG_BK_CB_CD_CG_CH_DF_DG_EG_EH_FN_GE_HD_HH_HHB_IH_JD_JJ_KD_KG_L_LD_M_MG_MHB_NC_OF_OH_PG_QE_QF_RF_SC_SD_SH_TC_TE_TJ_UB_UE_UF_VD_VF_W_WF_WJ_XE_XG_YE_YF_YG_ZD_ZE_ZI_
+; FJ_ - Olbrzymia tarantula
+if %tameskill >= 820 && %tameskill < 830
+set %tameable AF_AH_BG_BK_CB_CD_CG_CH_DF_DG_EG_EH_FN_GE_HD_HH_HHB_IH_JD_JG_JJ_KD_KG_L_LD_M_MG_MHB_NC_OF_OH_PG_QE_QF_RF_SC_SD_SH_TC_TE_TJ_UB_UE_UF_VD_VF_W_WF_WJ_XE_XG_YE_YF_YG_ZD_ZE_ZI_
+if %tameskill >= 830
+set %tameable AF_AH_BG_BK_CB_CD_CG_CH_DF_DG_EG_EH_FJ_FN_GE_HD_HH_HHB_IH_JD_JG_JJ_KD_KG_L_LD_M_MG_MHB_NC_OF_OH_PG_QE_QF_RF_SC_SD_SH_TC_TE_TJ_UB_UE_UF_VD_VF_W_WF_WJ_XE_XG_YE_YF_YG_ZD_ZE_ZI_
 
  gosub TamingIgnore gain
 return
