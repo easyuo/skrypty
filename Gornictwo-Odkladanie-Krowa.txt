@@ -7,7 +7,7 @@ set %skladKilofy XCINLPE                    ; Pojemnik z kilofami
 set %dragPauza 4                            ; Pauza przy drag/drop
 set %dropPauza 8                            ; Pauza przy drag/drop
 set %ileZiol 6                              ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)
-set %wagajes #MAXWEIGHT - 250                ; Powyzej jakiej wagi mam odkladac
+set %wagajes #MAXWEIGHT - 50                ; Powyzej jakiej wagi mam odkladac
 set %ileRudyZelazaOdkladanie 20000          ; Przy jakiej ilosci rudy zelaza mam obskoczyc gornika/sprzedawce
 set %piec JBG_
 ; DWJ - Ruda
@@ -19,7 +19,8 @@ set %gornikID     FUCHAD
 ignoreitem reset *
 ignoreitem #CHARID
 ignoreitem STEOQD
-ignoreitem EHOYQD
+;ignoreitem EHOYQD
+
 set %graczType IS_HS_ZE_
 
 set %zelazo       0

@@ -25,7 +25,7 @@ sub stealth
 
 if %aktywny = #true
 {
- if %lastUsed = N/A || #TIME - %lastUsed > 10
+ if %lastUsed = N/A || #SCNT2 - %lastUsed > 100
  {
  
   if #CHARGHOST = YES
@@ -35,7 +35,7 @@ if %aktywny = #true
 
   gosub goShadow
   
-  set %lastUsed #TIME
+  set %lastUsed #SCNT2
  }
 }
 

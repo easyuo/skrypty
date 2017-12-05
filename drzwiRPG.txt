@@ -10,7 +10,7 @@ set %delay 15 ;-The pause between each opening attempt, 20 = 1 second
 set %doorsRange 2  ;-The distance from a door to attempt opening
               ; default (and max) is 2
 set %szukajGraczaObszar 4
-set %ignorujPoczatkowoObszar 10
+set %ignorujPoczatkowoObszar 8
 
 ;;;;; ;;;;; ;;;;; ;;;;; ;;;;;
 set %doors PHI_UBD_SBD_GCD_ECD_MBD_WBD_YBD_KBD_EDD_YCD_CDD_SCD_WCD_QCD_KCD_UCD_KIB_IIB_YHB_WHB_AIB_CIB_OHB_
