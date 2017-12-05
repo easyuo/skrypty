@@ -1,0 +1,10 @@
+finditem KS G_2
+if #FINDCNT > 0
+{
+ event macro 15 58
+ target 10s
+ set #LTARGETID #FINDID
+ set #LTARGETKIND 1
+ event macro 22 0
+ wait 1s
+}

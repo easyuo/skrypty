@@ -208,6 +208,7 @@ menu Edit stajniaKsiegaID 90 243 55 %stajniaKsiegaID
 menu Edit stajniaNumerRuny 155 243 25 %stajniaRuna
 
 menu check tnijciala 10 265 130 15 #true Tnij Ciala
+menu check wskrzeszajduchy 10 285 130 15 #true Wskrzeszaj duchy
 
 ; --------
 ; Status
@@ -408,6 +409,20 @@ sub ScriptIdletime
   if #FINDCNT > 0
    call libs\tnijciala.euo
  }
+
+ menu get wskrzeszajduchy
+ if #menures = #true
+ finditem KS G_2
+ if #FINDCNT > 0
+ {
+  event macro 15 58
+  target 10s
+  set #LTARGETID #FINDID
+  set #LTARGETKIND 1
+  event macro 22 0
+  wait 1s
+ }
+ 
 
 return
 
