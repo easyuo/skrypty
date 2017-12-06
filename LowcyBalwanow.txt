@@ -37,14 +37,12 @@ if #FINDCNT > 0
     set #ltargetid #findID
     set #LTargetKind 1
     event Macro 22  ; Last Target
-    gosub zapiszDoPliku #FINDTYPE #FINDX #FINDY
    }
   }
   if #FINDTYPE = ZKN
   {
    set #LOBJECTID #FINDID
    event macro 17
-   gosub zapiszDoPliku #FINDTYPE #FINDX #FINDY
   }
  }
 }
