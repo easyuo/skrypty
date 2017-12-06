@@ -14,7 +14,7 @@ menu show
 set %target #LTARGETID
 set #MENUBUTTON N/A
 start:
-        onhotkey f alt
+        onhotkey g alt
                 goto target
         if #MENUBUTTON = CLOSED
                 halt

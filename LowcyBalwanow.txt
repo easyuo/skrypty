@@ -1,0 +1,56 @@
+                       ; Lowcy dusz
+; Krowa 22-10-2017
+; IJB - dusza
+; SEE - waza
+
+; Y   - balwan
+; YVH - lopata
+
+set %narzedzie YVH
+set %celType Y_ZKN_
+set %nextExMSGPause 2 ; 2s
+set %nextExMSG #SCNT
+
+finditem %narzedzie C_ , #BACKPACKID
+if findkind <> -1
+{
+ set %narzedzieID #FINDID
+ event sysmessage Narzedzie ID: %narzedzieID
+}
+
+loop:
+
+finditem %celType
+if #FINDCNT > 0
+{
+ if %nextExMSG < #SCNT
+ {
+  set %nextExMSG #SCNT + %nextExMSGPause
+  event exmsg #findID 3 30 NASZ CEL!
+ }
+ 
+ if #FINDDIST < 3
+ {
+  if #FINDTYPE = Y
+  {
+   set #lobjectid %narzedzieID
+   for #findindex 1 #findcnt
+   {
+    event exmsg #findID 3 30 BALWAN!
+    event Macro 17 ; Last Object
+    target
+    set #ltargetid #findID
+    set #LTargetKind 1
+    event Macro 22  ; Last Target
+   }
+  }
+  if #FINDTYPE = ZKN
+  {
+   set #LOBJECTID #FINDID
+   event macro 17
+  }
+ }
+ 
+}
+
+goto loop
