@@ -11,6 +11,15 @@ set %celType Y_ZKN_
 set %nextExMSGPause 2 ; 2s
 set %nextExMSG #SCNT
 
+set %plik C:\Games\UOAM\balwany.map ; Plik UOAM z danymi
+if \ notin %plik
+{
+ display OK Path and filename not set.
+ halt
+}
+
+gosub getOSfilecmd filecmd
+
 finditem %narzedzie C_ , #BACKPACKID
 if findkind <> -1
 {
@@ -29,7 +38,7 @@ if #FINDCNT > 0
   event exmsg #findID 3 30 NASZ CEL!
  }
  
- if #FINDDIST < 3
+ if #FINDDIST < 2
  {
   if #FINDTYPE = Y
   {
@@ -42,15 +51,38 @@ if #FINDCNT > 0
     set #ltargetid #findID
     set #LTargetKind 1
     event Macro 22  ; Last Target
+    gosub zapiszDoPliku #FINDTYPE #FINDX #FINDY
    }
   }
   if #FINDTYPE = ZKN
   {
    set #LOBJECTID #FINDID
    event macro 17
+   gosub zapiszDoPliku #FINDTYPE #FINDX #FINDY
   }
  }
- 
 }
 
+
+
 goto loop
+
+sub GetOSFileCmd
+ str Left #osver 1
+ set % . %1 cmd.exe
+ if #strRes = 1
+  set % . %1 command.com
+return % . %1
+
+sub zapiszDoPliku
+ set %zwierzeNazwa %1
+ set %x %2
+ set %x %x / 8
+ set %x %x * 8
+ set %x %x + 4
+ set %y %3
+ set %y %y / 8
+ set %y %y * 8
+ set %y %y + 4
+ execute %filecmd /c echo + , treasure , : , #spc , %x , #spc , %y , #spc , 1 , #spc , %zwierzeNazwa >> %plik
+return
