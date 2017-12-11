@@ -89,13 +89,13 @@ goto loop1
 sub LootStuff
   set %container %1
   gosub GrabItem %container CPF_GPF_POF_RVH ; Zloto + mapy
-  ;gosub GrabItem %container UPO_POH_CUH_AUO_NPO_OMH_YRH_WTH_KSF_LTF_ZRF_YTH_KTF_BUO_
-  ;+PMH_CQF_GUO_NSF_BPH_CUO_AUH_SMH_SRH_MPH_PPF_OPO_ZTO_ATF_URH_KPH_BSF_FUO_JOH_YSF_LSF_TSF_VRH_GFF_ ; BRONIE
+  gosub GrabItem %container UPO_POH_CUH_AUO_NPO_OMH_YRH_WTH_KSF_LTF_ZRF_YTH_KTF_BUO_
+  +PMH_CQF_GUO_NSF_BPH_CUO_AUH_SMH_SRH_MPH_PPF_OPO_ZTO_ATF_URH_KPH_BSF_FUO_JOH_YSF_LSF_TSF_VRH_GFF_ ; BRONIE
   gosub GrabItem %container CKF_IUD_ZJF_JIF_BUD_lkf_ztd_okf_cud ; pojemniki
-  ;gosub GrabItem %container HSH_LSH_MSH_ISH_NSH_MSK_ASH_ESH_CSH_GSH_OSH_AIK_CIK_FIK_MIK_NIK_GIK  ; plyta + HELMY+ TARCZE
-  ;gosub GrabItem %container RKO_LKO_NKO_DLO_PKO      ; smocza
-  ;gosub GrabItem %container LLH_MLH_YKH_ALH_XKH_NJL_QKH_VKH_PKH_JKH_KKH ; SKORKI
-  ;gosub GrabItem %container ZOH_APH_DPH_KMH_WLH_IMH_YLH     ; kolcza + ringmail
+  gosub GrabItem %container HSH_LSH_MSH_ISH_NSH_MSK_ASH_ESH_CSH_GSH_OSH_AIK_CIK_FIK_MIK_NIK_GIK  ; plyta + HELMY+ TARCZE
+  gosub GrabItem %container RKO_LKO_NKO_DLO_PKO      ; smocza
+  gosub GrabItem %container LLH_MLH_YKH_ALH_XKH_NJL_QKH_VKH_PKH_JKH_KKH ; SKORKI
+  gosub GrabItem %container ZOH_APH_DPH_KMH_WLH_IMH_YLH     ; kolcza + ringmail
   gosub GrabItem %container OZF_SZF_JUF_KUF_MZF_RZF_WZF_KZF_IUF_JZF_GUF_YZF_VZF_
   +DUF_QZF_XZF_FUF_EUF_PZF_HUF_NFZ_LZF_EAG_tzf_NZF_UZF      ; ziola
   gosub GrabItem %container VUF_MWF_FVF_HVF_GVF_EVF_OVF_RVF_BVF     ; kamienie
@@ -130,6 +130,7 @@ sub GrabItem
       repeat
        finditem %item C
       until #FINDBAGID = %plecak || #FINDKIND = -1
+      wait 1
       goto search_again1
     }
 return
