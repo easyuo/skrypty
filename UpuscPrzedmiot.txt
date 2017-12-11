@@ -1,5 +1,5 @@
 set %upuscID 0
-set %coUpuszczac NPF_ENK_WLH_KMH_ZLK
+set %coUpuszczac NPF_ENK_WLH_KMH_ZLK_DWJ
 ignoreItem reset *
 
 loop:

@@ -1,18 +1,19 @@
 ; Y   - balwan
 ; YVH - lopata
 
-set %narzedzie FKF
-set %celType IS_HS_
-set %snieg HCJ_
+set %narzedzie YVH
+set %celType Y_ZKN_
 set %nextExMSGPause 2 ; 2s
 set %nextExMSG #SCNT
 
-ignoreitem #CHARID
-
+finditem %narzedzie C_ , #BACKPACKID
+if findkind <> -1
+{
+ set %narzedzieID #FINDID
+ event sysmessage Narzedzie ID: %narzedzieID
+}
 
 loop:
-
-finditem %n
 
 finditem %celType
 if #FINDCNT > 0
@@ -22,24 +23,27 @@ if #FINDCNT > 0
   set %nextExMSG #SCNT + %nextExMSGPause
   event exmsg #findID 3 30 NASZ CEL!
  }
- 
- if #FINDDIST < 5
+
+ if #FINDDIST < 2
  {
- set %celID #FINDID
-
- finditem %narzedzie C_ , #BACKPACKID
- if findkind <> -1
-  set %narzedzieID #FINDID
-
+  if #FINDTYPE = Y
+  {
    set #lobjectid %narzedzieID
    for #findindex 1 #findcnt
    {
+    event exmsg #findID 3 30 BALWAN!
     event Macro 17 ; Last Object
-    target 5s
-    set #ltargetid %celID
+    target
+    set #ltargetid #findID
     set #LTargetKind 1
     event Macro 22  ; Last Target
    }
+  }
+  if #FINDTYPE = ZKN
+  {
+   set #LOBJECTID #FINDID
+   event macro 17
+  }
  }
 }
 

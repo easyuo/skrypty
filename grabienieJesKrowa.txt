@@ -1,0 +1,154 @@
+;============================================
+; Script Name: Jes Looter v. 1.0.0
+; Author: Jes
+; Version: 1.0
+; Client Tested with: 4.0.2a 60
+; EUO version tested with: 1.5 110
+; Shard: CL - Resurection
+; Revision Date:  13-07-2007
+; Public Release: 13-07-2007
+;
+;
+;   Tryb 1: Alt-F1 - Grabi wskazane cialo.  Twoj komputer bedzie *bonk* kiedy skonczy.
+;   Tryb 2: Alt-F2 - Grabi wszystkie ciala w okolicy 2 pol.
+;
+;   Jesli chcesz zmienic przedmioty ktore ma lotowac pozmieniaj parametry w GrabItem().
+;
+;   Note:  1. Jesli masz zajete skroty klawiszowe Alt-F1 lub Alt-F2 przez UO-client macro, bedziesz
+;   musial przeedytowac skrypt i zmienic: onhotkey.
+;          2. Wpisz ID plecaka do ktorego ma lotowac rzeczy. Jesli chcesz by byl to glowny plecak
+;   Twojej postaci wystarczy ze wpiszesz: #backpackid
+;
+;   Enjoy!  Jes
+;============================================
+
+gosub OpenPaperdoll
+
+set %ile_lootu 0
+set %plecak #BACKPACKID
+set %forgettime #SCNT
+set #NEXTCPOSX 15
+set #NEXTCPOSY 396
+
+loop1:
+  onhotkey F10 | ALT  ; loot targeted body
+  {
+    set #TARGCURS 1
+    targetloop:
+      if #TARGCURS = 1
+        goto targetloop
+    set #LOBJECTID #LTARGETID
+    set %body #LTARGETID
+    finditem %body G_2
+    if #FINDKIND <> -1
+    {
+      if #FINDTYPE = YFM
+      {
+        event macro 17 0           ; open container
+        gosub GumpWait container_gump NULL
+        gosub LootStuff %body
+        set #NEXTCPOSX 15
+        set #NEXTCPOSY 396
+      }
+    }
+    else
+    {
+      sound ; *bonk* when not in range!
+    }
+    event sysmessage Zgrabiles co Tylko sie dalo!
+      sound C:WINDOWSMediading.wav ; *ding* Kiedy skonczy!
+  }
+  onhotkey F2  ; lotuje w okolicy 2 pol
+  {
+    loop2:
+      finditem YFM G_2
+      if #FINDKIND <> -1
+      {
+        set %body #FINDID
+        set #LOBJECTID %body
+        event macro 17 0
+        gosub GumpWait container_gump NULL
+        gosub LootStuff %body
+        ignoreitem %body
+        set #NEXTCPOSX 15
+        set #NEXTCPOSY 396
+        goto loop2
+      }
+      event sysmessage Zgrabiles co Tylko sie dalo!
+      sound C:WINDOWSMediading.wav ; *ding* Kiedy skonczy!
+  }
+  if ( #SCNT > ( %forgettime + 120 ) )
+  {
+    set %forgettime #SCNT
+    ignoreitem reset
+  }
+goto loop1
+;-----------------------------------
+; %1 = %container
+; Jesli nie chcesz by czegos lotowal przed gosub wstaw: ;
+sub LootStuff
+  set %container %1
+  gosub GrabItem %container CPF_GPF_POF_RVH ; Zloto + mapy
+  ;gosub GrabItem %container UPO_POH_CUH_AUO_NPO_OMH_YRH_WTH_KSF_LTF_ZRF_YTH_KTF_BUO_
+  ;+PMH_CQF_GUO_NSF_BPH_CUO_AUH_SMH_SRH_MPH_PPF_OPO_ZTO_ATF_URH_KPH_BSF_FUO_JOH_YSF_LSF_TSF_VRH_GFF_ ; BRONIE
+  gosub GrabItem %container CKF_IUD_ZJF_JIF_BUD_lkf_ztd_okf_cud ; pojemniki
+  ;gosub GrabItem %container HSH_LSH_MSH_ISH_NSH_MSK_ASH_ESH_CSH_GSH_OSH_AIK_CIK_FIK_MIK_NIK_GIK  ; plyta + HELMY+ TARCZE
+  ;gosub GrabItem %container RKO_LKO_NKO_DLO_PKO      ; smocza
+  ;gosub GrabItem %container LLH_MLH_YKH_ALH_XKH_NJL_QKH_VKH_PKH_JKH_KKH ; SKORKI
+  ;gosub GrabItem %container ZOH_APH_DPH_KMH_WLH_IMH_YLH     ; kolcza + ringmail
+  gosub GrabItem %container OZF_SZF_JUF_KUF_MZF_RZF_WZF_KZF_IUF_JZF_GUF_YZF_VZF_
+  +DUF_QZF_XZF_FUF_EUF_PZF_HUF_NFZ_LZF_EAG_tzf_NZF_UZF      ; ziola
+  gosub GrabItem %container VUF_MWF_FVF_HVF_GVF_EVF_OVF_RVF_BVF     ; kamienie
+  gosub GrabItem %container GPF_UUF_XUF_YUF_NUF_MUF_TUF      ; butle
+  gosub GrabItem %container EEG      ; skory
+
+                            ; C   Z   A   R   Y   ;
+  ;gosub GrabItem %container NXL_QXL_PXL_AYL_ZXL_CYL_BYL_WXL      ; 1st circle
+  ;gosub GrabItem %container VXL_YXL_XXL_IYL_HYL_KYL_JYL_EYL      ; 2nd circle
+  ;gosub GrabItem %container DYL_GYL_FYL_STL_RTL_UTL_TTL_OTL      ; 3rd circle
+  ;gosub GrabItem %container NTL_QTL_PTL_AUL_ZTL_CUL_BUL_WTL      ; 4th circle
+  ;gosub GrabItem %container VTL_YTL_XTL_IUL_HUL_KUL_JUL_EUL      ; 5th circle
+  ;gosub GrabItem %container DUL_GUL_FUL_QUL_PUL_SUL_RUL_MUL      ; 6th circle
+  ;gosub GrabItem %container LUL_OUL_NUL_YUL_XUL_AVL_ZUL_UUL      ; 7th circle
+  ;gosub GrabItem %container TUL_WUL_VUL_GVL_FVL_IVL_HVL_CVL      ; 8th circle
+
+return
+;-----------------------------------
+; %1 = Body ID
+; %2 = Item type
+sub GrabItem
+  set %tempbody %1
+  set %item %2
+
+  search_again1:
+    finditem %item C_ , %tempbody  ; szukaj itemow.
+    if #findkind <> -1
+    {
+      exevent drag #FINDID #FINDSTACK
+      wait 1
+      exevent dropc %plecak
+      repeat
+       finditem %item C
+      until #FINDBAGID = %plecak || #FINDKIND = -1
+      goto search_again1
+    }
+return
+;-------------------------------------------------------------------------------
+; %1 = Gumpname 1
+; %2 = Gumpname 2
+sub GumpWait
+  wait 10
+  set %timedelay #SCNT
+  loopwait1:
+    if #CONTNAME = %1 || #CONTNAME = %2
+      return
+    if #SCNT > %timedelay + 7
+      return
+    goto loopwait1
+return
+;-------------------------------------------------------------------------------
+sub OpenPaperdoll
+  gosub GumpWait NULL paperdoll_gump NULL
+  contpos 750 0
+return
+
