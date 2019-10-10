@@ -552,7 +552,7 @@ sub TamingRelease
 
     TamingReleaseLoop:
       gosub exTamingRename
-      event macro 1 0 #CHARNAME Release
+      event macro 1 0 TameMe Release
       wait 1s
 
     ; Release Gump
@@ -627,7 +627,7 @@ sub TamingRename
     {
         key BACK
     }
-    msg #CHARNAME $
+    msg TameMe $
     click %screenx %screeny r
 return
 
