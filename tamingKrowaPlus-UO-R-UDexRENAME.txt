@@ -1,7 +1,7 @@
 ;=========================================
 ; Script Name: Uncle Dave's Tamer Plus
-; Author: Uncle Dave
-; Version: 4.2
+; Author: Uncle Dave && Krowa
+; Version: 4.3
 ; Client Tested with: 4.0.9b
 ; EUO version tested with: 1.42.00A3
 ; Shard OSI / FS: OSI Tested Only
@@ -146,7 +146,7 @@ goto loop
 
 sub InitMenu
     menu clear
-    menu window title Uncle Dave's Tamer Plus 4.2
+    menu window title Uncle Dave's and Krowa Tamer Plus 4.3
     menu window size 320 190
     menu window color $E0E0E0
     menu font bgcolor $E0E0E0
