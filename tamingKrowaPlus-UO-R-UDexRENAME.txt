@@ -205,13 +205,16 @@ gosub InitMenu
 gosub InitAnimalTaming
 gosub InitPickupRegs
 
+; Release NAME
+set %releaseName k
+
 loop:
 gosub Dispatch
 goto loop
 
 sub InitMenu
     menu clear
-    menu window title Uncle Dave's and Krowa Tamer Plus 4.3
+    menu window title Uncle Dave's Tamer Plus 4.2
     menu window size 320 190
     menu window color $E0E0E0
     menu font bgcolor $E0E0E0
@@ -423,23 +426,34 @@ sub TamingCheckSkill
         set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH
     if %tameskill >= 520 && %tameskill < 591
         set %tameable IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE
-if %tameskill >= 591 && %tameskill < 711
-set %tameable SD_AH_QE_BE_TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
-if %tameskill >= 711 && %tameskill < 771
-set %tameable BE_XD_AH_W_FN_JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
-if %tameskill >= 771 && %tameskill < 780
-set %tameable BE_AH_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
-if %tameskill >= 780 && %tameskill < 796
-set %tameable BE_AF_AH_BG_CB_DG_EG_FN_GE_HD_IH_JD_JG_KG_L_M_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
-if %tameskill >= 796 && %tameskill < 831
-set %tameable XF_BE_AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
-if %tameskill >= 831 && %tameskill < 1300
+    if %tameskill >= 591 && %tameskill < 711
+        set %tameable SD_AH_QE_BE_TF_IG_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M
+    if %tameskill >= 711 && %tameskill < 771
+       set %tameable BE_XD_AH_W_FN_JD_KG_PF_TF_IG_NG_YG_XG_CB_UF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE
+    if %tameskill >= 771 && %tameskill < 780
+        set %tameable BE_AH_OF_JG_HD_AF_W_PG_FN_QF_TG_JD_KG_CB_TC_BG_EG_VF_DG_ZI_ZE_IH_UF_UE_VD_YF_L_M_SD_AH_WF_QE_GE_ZD_OH_YG_XG_RF
+    if %tameskill >= 780 && %tameskill < 796
+        set %tameable BE_AF_AH_BG_CB_DG_EG_FN_GE_HD_IH_JD_JG_KG_L_M_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
+    if %tameskill >= 796 && %tameskill < 831
+       set %tameable XF_BE_AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
+    if %tameskill >= 831
 ; set %tameable LD_XF_BE_AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
 ; TG - hind usuniete
-set %tameable YE_YF_YG_XG_AF_AH_
+;    set %tameable YE_YF_YG_XG_AF_AH_HG_RD_NF_BE_GO_WC_RF_AG_KB_WG_IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_VF_DG_LD_BK_CB_FN_GE_HD_IH_JD_KD_KG_L_M_MHB_OH_QE_QF_SD_UE_UF_VD_W_WF_XE_ZD_ZE_ZI_XD_UB
 
+;    set %tameable AH_YG_XG_UF_RD_TF_PF_WF_FG_
+    set %tameable YG_XG
 
-    gosub TamingIgnore gain
+; ZOO Quest animals
+; Great Hart          59.1     64    1	04   N   AH
+; Bull                71.1     76    116   N   YG_XG
+; Alligator           47.1     52     92   N   UF
+; Gorilla            -18.9    -14     26   N   RD
+; Sheep               11.1     16     56   N   TF_PF_FG
+; Grizzly Bear        59.1     64    104   N   WF
+
+ gosub TamingIgnore gain
+
 return
 
 sub TamingIgnore
@@ -617,7 +631,7 @@ sub TamingRelease
 
     TamingReleaseLoop:
       gosub exTamingRename
-      event macro 1 0 TameMe Release
+      event macro 1 0 %releaseName Release
       wait 1s
 
     ; Release Gump
@@ -692,13 +706,13 @@ sub TamingRename
     {
         key BACK
     }
-    msg TameMe $
+    msg %releaseName $
     click %screenx %screeny r
 return
 
 sub exTamingRename
 
-    exevent RenamePet %tameid TameMe
+    exevent RenamePet %tameid %releaseName
 
 return
 
@@ -778,18 +792,6 @@ sub GetScreenXY
         set %offscreen #false
         ;click %screenx %screeny F
     }
-return
-
-; GetYDisplacementForAnimType by Roadkill
-; Mods by UncleDave
-sub GetAnimalDisplacement
-    set %screenydisp -32
-    if %tametype in GE_ZD_L_M_TF__IG_NG__ZF_PF_EG_CO_TG_PG_VD
-        set %screenydisp -25
-    if %tametype in AH
-        set %screenydisp -45
-    if %tametype in DG_AG_WC_RF_WG_TC
-        set %screenydisp -15
 return
 
 sub SetReagentContainer
