@@ -1,0 +1,69 @@
+; /----------EasyUO script----------
+; | Autor: krowa
+; | Data: 2017.05.17 22:50:05
+; \----------koniec----------
+
+event sysmessage F1 [pojedynczo] | ALT F1 [automat]
+set %aktywny #false
+
+loop:
+
+onhotkey F1 ALT
+  gosub toggleSub
+
+onhotkey F1
+  gosub goShadow
+
+gosub stealth
+
+goto loop
+
+
+; ===== SUBy ====
+
+sub stealth
+
+if %aktywny = #true
+{
+ if %lastUsed = N/A || #SCNT2 - %lastUsed > 100
+ {
+
+  if #CHARGHOST = YES
+  {
+    goto loop
+  }
+
+  gosub goShadow
+
+  set %lastUsed #SCNT2
+ }
+}
+
+return
+
+sub toggleSub
+
+ if %aktywny = #false
+ {
+  event sysmessage Stealth aktywowany.
+  set %aktywny #true
+ }
+ else
+ {
+  event sysmessage Stealth deaktywowany.
+  set %aktywny #false
+ }
+
+return
+
+
+sub goShadow
+if H in #charstatus
+  {
+   event macro 13 47
+  }
+  else
+  {
+   event macro 13 21
+  }
+return

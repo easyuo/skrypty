@@ -1,0 +1,7 @@
+event sysmessage Kursor jest w pozycji x: #CURSORX y: #CURSORY
+
+set %x #CURSORX - #CONTPOSX
+set %y #CURSORY - #CONTPOSY
+
+event sysmessage Wzgledem pojemnika jest w pozyjci x: %x y: %y
+wait 2s

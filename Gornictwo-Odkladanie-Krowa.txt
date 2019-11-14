@@ -2,8 +2,8 @@
 ; Gornictwo z odkladaniem rudy do domku. Edytujesz wiersze ponizej:
 
 ; ==== EDYCJA ====
-set %skladRuda XCINLPE                      ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
-set %skladKilofy XCINLPE                    ; Pojemnik z kilofami
+set %skladRuda ZIWMJOD                      ; Pojemnik do skladowania wydobytych rzeczy [w nim powinien zawierac sie pojemnik z kilofami]
+set %skladKilofy ZIWMJOD                    ; Pojemnik z kilofami
 set %dragPauza 4                            ; Pauza przy drag/drop
 set %dropPauza 8                            ; Pauza przy drag/drop
 set %ileZiol 6                              ; Ilosc ziol jaka postac ma dobierac (Corp Por - perly/belka)

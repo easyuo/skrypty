@@ -1,0 +1,3429 @@
+;------------------------------
+; RoadkillUltraTamer.txt (c)copyright 2004 Roadkill
+; ==HOW TO MAKE IT WORK:====
+;	1.  Read ALL release history and notes below down to MAIN PROGRAM
+;	2.  HAVE A CLUE about Taming before you try this. Go to www.tamingarchive.com and read what to tame.
+;	3.  Have your UO gamewindow in upper left corner of computer screen.
+;	4.  Set the variables in the config section correctly.
+;		BEGINNERS: leave everything alone and press play.
+;		ADVANCED: Hard-coded variables instead of 'menu' avoid the YES/NO questions, get you right to
+;		 running,and are probably less likely to cause you errors if you set them correctly.
+;		EXPERT and EUO-vets: Use my "RKCharacterSetup.txt", which this file calls if you have it,
+;			to set all variables for each of your chars, never change anything in this script.
+;	5.  Don't use all my other scripts or the full power of this one if you don't understand EUO,
+;		leave settings 'menu' and "#false"
+;	6.  RAILS: Read the thread about setting a GOOD rail!  You CAN avoid 99.9% of blockage by picking smart rail
+;		spots, consider that it must be able to go any direction from spot and get back to it, AND that if
+;		blocked the script will attempt pathfinding, then teleporting, then going back to last spot
+;               ...pick your sequences with this in mind. If you get blocked, pick new spots!
+;		NOTICE: the rails included in here are for examples only and you should expand/change them.
+;		-semi auto choices, NO RAIL used:  self/combo/savagecamp/woods
+;		-full auto rail choices, YOU MUST WRITE and supply the RailSpots file!: delucia/ice/ridgeback/custom
+;		-full auto rail, a small rail is provided: horsestable/jhelom/timber/moonglow/spirit.
+;		-read the sub SelectTgts to see what the rails are, what is set, etc.
+;	7.  To get the TYPES for animals, click CTRL+R on the EUO window to get the variables pane up,
+;		drag the animals healthbar, and look at the variable #CONTTYPE.  Also if you pick the targets yourself,
+;		the script will tell you what their type is for future reference.
+;	8.  You must be GUILDED! to kill animals in case the rename/release fails.
+;	9.  You CAN just click play and change all the config settings ON-THE-FLY by using my new interactive menu!!
+;	10. MY SETUP recommendations: At 30 use the Jhelom pens full auto rail. GET A BEETLE as your steed.
+;		Use the "KillWithSteed" option, release "some" but dont mess with their healthbars.
+;		Healthwatch/Defend false, messageMenu and DebugMsg true, avoidOtherTamers true.  At 43 go west of
+;		moonglow zoo and tame hinds/timberwolves. At 50 use the Horse stable, same. That will get you started.
+; v1.0 22 Nov 02
+; v1.1 23 Nov 02 ensure status bar open each loop
+; v1.2 25 Nov 02 added Monster Detection and Avoidance, and UnderAttack avoid and invis to break attack.
+; v1.3 25 Nov 02 Fixed a bug in 'release all' mode where it killed untamables
+; v1.4 26 Nov 02 added magery kill check if it is dead, casts fireball until dead. Fixed typo.
+; v1.5 10 Dec 02 added expandable self-chosen tames, journlscanner, HealthWatch
+;                Also and aggresive tames circle walk choice , though not active yet
+; v1.6 14 Dec 02 Added Ridgebacks and rail, improved the healthbar rename to be more reliable.
+;                Added options and hooks for using RoadkillsHealthWatch and RoadkillsDefend
+; v2.0 17 Dec 02 Simplified system by incorporating CallRenameRelease.txt and RailMove.txt as subs
+; v2.1 27 Dec 02 Improved standalone UltraTamer's enemy avoidance
+;                Improved Magery killing section. fixed bug of not retargeting tame when
+;                called off to use Defend during taming attempt. Added no_chance_to_tame logic
+;		 Added ability to call RoadkillsLooter to loot leather off corpses.
+;                REMOVED in 3.0--> 't' to tame instead of play arrow.
+;		 Fixed "you must wait" spamming while remounting steed
+;		 Added a choice for "Savage Ridgebacks, Don't release" in semi auto for taming in savage camp
+; v3.0 24 Jan 03 Added a CheckForTamers part, ignores potential tames if a person is following it
+;                Added a TamersList in globals hardstorage...it remembers past tamers and skips them
+;                Added a "menu" for conveying messages with pause button
+;		 Added "event macro whispering" for all speaking, STEALTH! Only someone next to you hears anything now
+;		 Improved the rename Release reliability
+;		 Added ability to tell between enemy animals and tamed enemy animals
+;		 Now ignores other tamers pets of your target type
+;		 Added "too_angry" to taming detection, finds whats attacking target and kills it if it's solo
+;		 Added menu ability to call your own custom rail file, RailSpotsCustom.txt
+;		 Added then REMOVED all ability to release pets via context menu...TOO RISKY for your steed!!!
+;		 Improved variable names for readability and to ensure no chance repeats in subs you may call
+; 		 Added FindEnemyArray to detect multiple enemies and single ones reliably
+;		 Added "reverse on rail" running away if you hit recall health in Ilshenar
+;		 Added ability to kill with magery instead of pet when savages about
+;		 Added/modded script to never fight a savage in ilshenar or get paint burned off by mistake
+;		 Added "no_chance" message in case you have tamables set too high for your skill
+; 		 Removed all event sysmessages--if you dont use the utmenu stealth you get no feedback
+;		 Removed using hotkey 't' to begin taming, I tried it, it suxxored. Went back to PLAY ARROW
+; v3.1 25 Jan 03 Fixed a typo bug that was making it kill everything after one tame attempt
+;		 Removed last sysmessage. Added  a one-spot rail for taming horses in SerpHold Stable,
+;		 for tamers from 35-50skill.
+; v3.2 27 Jan 03 Fixed typo bug that was keeping CheckForTamers from working (err, sub remarked out?)
+;		 Added Always run, looks more realistic I've been told
+;		 Removed un-needed %steed setting in config
+;		 Fixed "animal_is_too_angry" to check for lone non-savage disruptor and kill it
+;		 Added a %steedbu to reset %steed id each loop if problems
+;		 Added option to use RoadkillsBackTrack, which memorizes your recent path and BackTracks
+;			along it to rail if blocked. BackTrack will be released separately.
+;		 Re-did all inline comments to remove some potential bugs
+;		 Added 'always run' option and set it as default
+;		 Added an error flagging routine to help me hunt down reported bugs
+;		 Added a 'fail-safe' in steed remount in case the steed id gets lost
+;		 Removed %enemytypes from config section, now set only for rails auto
+;		 Reorganized all config section for better understandability and less user errors
+; v3.3 10 Feb 03 Modded steed setup to simplfy, thx to Victor Lacroix for some ideas on this
+;		 Fixed healthbar for new container id, fixed  event macros for spells changes
+;		 Fixed variable settings for BackTrack so it doesn't record forever
+; v3.4 16 Mar 03 Updated for AoS
+;		 new contkind healthbar
+;		 Revised script notes and comments in config section.
+; v3.5 20 May 03 Many thanks to VictorLacroix for ideas and testing for this version!!!
+;		 Reflowed logical tests using && and ||
+;		 rewrote UtMsgMenu to use %0 and not require more than one message
+;		 removed all reference to FlyingHigh's pathfinding script
+;		 removed circle of transp always on option in rename release
+;		 added new #clires and #clitop vars to rename release, removed all need to specify settings
+;		 added a DB lookup for short and tall animals to make clicking for healthbar more accurate
+;		 added a "raster scan" for getting healthbar, clicking slightly low and high on later attempts
+;		 modded railmove to use event pathfind when blocked
+;		 coded around need for healthbar type-- removed all reference to healthbar gump for reliability
+;		 Improved Felucca performance--now doesn't try to move/push to same spot as tame in 4 subs
+;		 Added ability to auto teleport to spot if blocked and close enough
+;		 Added sub CheckForEquipment to ensure needed stuff is with you or worn
+;		 Added Mask Of Orcish Kin ability for IceIsle
+;		 Modded the "spam release" so controller flag not set, so paint/orcmask wont burn if its attacked
+;		 Fixed it so single non-savage creatures attacking your tame while taming it will be killed
+;		 Improved Melee Kill, added WeaponReplacer in case your weapon breaks it replaces it same type
+;		 Added NecroAttack setup choice and attack
+;		 Added SkillCheck sub to check all required skill levels and locks
+;		 Added a Check for NPCs and Vendors, it now auto ignores them when searching for tamers
+;		 Changed the Tamers List from a permament global (*69) to normal variable
+;		 Replaced many yes/no vars with #true/#false instead
+;		 Modded AutoSteedSetup to make it fully auto if able
+;		 Modded %petid config values to allow fully-automated config for experts
+;		 Fixed conflict with HealthWatch that sometimes caused simultaneous heal/tame attempts
+;		 Fixed namespace conflict with Defend (for Attack3)
+;		 Added taming-timer: cycle is still fast, but waits 10 sec after last attempt to retry taming
+;		 moved reset ignore list from the fighting subs to the utmenu as a button
+;		 Fixed spell timing for KillMagery
+;		 Added %SendDebugMsg setting to toggle on debug messages in critical areas you might want to mod
+;		 Added check for underattack while steed is killing tame, if so KillMagery or NecroAttack attacker
+;		 Added check for underattack while renaming, if so KillMagery or NecroAttackattacker
+;		 Added a distance check to mage and necro attacks, it now waits to trigger attack until inrange
+;		 Modded the values for %killmethod, checks your choice against your skills and makes suggestions
+;		 Added config vars, menu choice, and ability to make tame follow savage to be killed if present
+; ver 4.1 23 May 03
+;		 added ability to issue a sound file warning when a player is seen near you
+;		 added ability to issue a sound file warning when under attack
+;		 added sub "checkMenuButtons" and release option on menu
+; ver 4.3 16Jun03 Added more menu buttons.
+;		Fixed Healthwatch/rail conflict.
+;		Fixed follow savage.
+;		Fixed bug in CheckForTamers that made stand dead still at script start
+;		Fixed bug in SUB CheckTgtBlockedOrTame that made miss tgts
+;		modded the FindTgts sub to include the FINDITEM G_X logic, removed my #finddist checks
+;		modded utmenu to correctly display single parameter messages
+;		Changed IceIsle rail to only search 10 tiles for tamables, to help housing problem
+;		Added nifty menu toggle buttons
+;		Added PetHealing and configuration toggle for it, %useVet
+;		Changed %useDebugMsg system, put more remarks as debug msgs so you can turn off
+;		Changed the Horse taming option to do ANY stable/spot where a horse spawns, no railspots file.
+;		Added Jhelom pens auto rail.
+;		Added numerous "newbie friendly" info boxes and taming info popups for skill progression
+;		Added check to only unignore ignored beasts if you are at a new spot
+;		Added a message telling you the animals type when you use select the tame types yourself, this
+;			can be used to help you build a customrailspots.txt file
+;		Modded the startup to show/hide the menu and EUO to make it easier to get it started
+;		Added %customRailFile in the config, you now specify your customRailspots file name here,
+;			this allows you to have a bunch and just pick the name, useful for diff shards.
+;		Added skill-gain and rate counters for Taming/Lore/Vet in the menu
+; ver 4.4 17Jun03 Added Moonglow zoo rail for brown bears,
+;		added Spirituality woods rail for grizzleys and unicorns
+;		changed CheckTgtBlockedOrTame to event pathfind, testing
+;		added music skill training
+;		added ability to change  or update your tamables type ON-THE-FLY via the menu
+;		Added blurbs for each rail on what skill its for and when to move to another
+;		Added a check to potential tame targets, if they are > 5 Zaxis off from you, they are ignored
+;		Added "too far" in the journal scan, if blocked following pet while taming you now pathfind it
+;		Made the menu show up lower left
+;		Added a check for a stuck #enemyid at startup, forces you to clear it
+;		Added a check for bogus #enemyid before calling up defense algorithms
+; ver 4.5 23Jun03 Added ability to change tag on the fly
+;		Added ability to change taming target types on the fly
+;		Added ability to change the selected DefenseRoutine if using RoadkillsDefend.txt, on the fly
+;		Made menu always show, but you can toggle off feedback for lag/speed problems
+;		Added Semi-Auto taming button to the menu
+;		Stopped menu flashing
+;		fixed a semi-auto bug that would ignore good targets
+;		Added "taming type xxx" message for more feedback while taming
+;		Hard coded it to always run now, to simplify
+;		Added an option and rail for timberwolves/hinds near moonglow zoo
+; ver 5.0 25Jun03 Published in compiled form for Win98 users
+; ver 5.1 26Jun03 Fixed bug in CheckForEquipment (thx the.WZA!)
+;		Added menu edit/button for %searchrange
+;		Added check in Rename/release to stop trying to grab bar if tame not found(dead)
+;		Increased delays in rename/release so your status bar gets put back if grabbed
+;		modded horsestable rail instructions for use as single point rail
+;		Modded findrep checks for taming targets to accept blue uni's and kirin
+; ver 5.2 28Jun03 Added variable %maxvertical so you may set the maximum vert Z distance to accept or
+;			ignore taming targets, keeps you from chasing stuff in cliffy regions
+;		modded the feedback message to now report vertical for rejected tgts to give you an idea
+;		Changed all ignores save tames to ignoreitem 1 list so they can be unignored concisely
+;		modded sub ignorelistreset and ignorelist to use string var instead of array for speed
+;		modded reset ignorelist likewise, removed all reference to %ignoretotal
+;		made skills update only after each complete tame cycle, for speed and no menu flashing
+;		added a HARD PAUSE button for full-auto, press to pause, you must use EUO pause key to restart
+;		added total tames, attempts, minutes taming to menu titlebar
+;		added current skill to select targets info box for reference
+;		redid Internal kill subs, extracted dismount/mount into subs
+;		changed KillWithSteed, now if you are attacked while killing tame, you target pet to enemy
+; ver 5.3 1Jul03 Reflowed journalscanner, removed bad gosub/goto exit
+;		reflowed main program loop, reduced variables, changed %gostart boolean, simplified
+;		Fixed bug in rename/release for MakeTamesFollowSavage, redid SteedMage to delete that
+;		Replaced the MOVE in checkTgtBlockedOrTame with pathfind within 1, deleted %accur check for fel
+;		Added code for ice isle to keep mask of orcish kin from exploding--use steedmage if wearing!
+;		Modded FindEnemyArray to ensure %enemytypes stays local to avoid overwrite of var
+;		Added %usePeace, if enabled you will try to peacemake tames you try to kill with steed
+;		Added %usePeace button
+;		Added "increasing radius tamable search", it now finds/tries closest tamables first, thx Vic
+;		Added check in railsystem to attempt to peacemake an attacker if stuck, if using peace
+;		Modified railsystem to use Z-coordinate if you have recorded these in your railspotsXXX.txt
+;			file, it will be used for pathfind AND TeleToSpot making the rail much more reliable.
+;		Modded TeleToSpot to increase the Wait times in case of lag
+;		Added "can't see" to journal check, now it pathfinds to tame
+;		Added an AttackWarning Wave file and toggle. It can be set separate from player warn, BUT if
+;			you update via the menu WarningSounds button, they both go on/off together
+;		Added check after calling railspots files, if you're an idiot and dont have it I tell you so
+;		Added scrolls to "invisabit" so you can invis with crappy mage char
+;		PUBLISHED 8JUL03
+; ver 5.4 13Jul03 fixed bug in release/ignore list where SET %ignorelist wasn't working as cheffe published
+;		modded some pop up instructions for better explanations
+;		re-added a move close to victim b4 dismount in killwithsteed
+;		changed the wav file playing to use SOUND command instead of execute. Requires euo 1.39
+;		added %orctypes to improve way enemies are found with orcmask/savage paint on
+; ver 5.5 3Jan04 Fixed the problem with your healthbar not snapping back into place if it got dragged.
+;		Clarified instructions if it doesn't find your custom rail file.
+;		Rewrote the Melee killing code, added ability to heal with aids while melee
+;		Added auto check for guilded and warning message
+;		Added an "all kill" control trigger if rename/release or spam release doesn't work, so you can
+;			kill with magery, melee, or necro.  This may very rarely allow burn paint/mask
+;		Added On-The-Fly menu changing of your kill method using a rotating button.
+;		Added my sub RotateButton, which came FAR before the new menu select! So now I release it.
+;		Added my 3 new Melee and Weapon subs: GetWeaponIDType, KillMelee, and WeaponReplacer
+; ver 5.6 9Jan04 Tweaked DismountAndTgt sub
+;		made the pet rename be all small letters
+;		added %avoidAllPCs
+;		added CheckNPC sub, improved the PC avoidance and NPC detection
+;		added ability to detect ridgebacks when added and pop up the follow savage button
+;		added check for DMC ON, EXEC allowed for scripts that need it, SOT
+;		added check for being guilded.
+; ver 5.7 25May04 rectified #skill displays to show xx.x format
+;		added %killWhileTame option to just kill it without releaseing
+;		redid menu to btnface, red/green buttons, black font, white squares
+;		changed menu to use #spc instead of _ between words
+;		added button for %killWhileTame
+;		moved PAUSE button
+;		modded Jhelom pen, now boars and llama auto added after 48 skill
+;		added #properties check after rename to see if it worked and retry once
+;		checks for %tag <> "all" after %tag changes, sends message, idiotproofing
+;		during rename/release, dropped healthbar to 0 30 to avoid menubar
+;		fixed a pet-controller flag problem so you can always kill guilded tames
+;		changed from "all kill" to "all guard me" to avoid steed attacking you ever
+;		added check for "are you sure you want to release" gump and click it
+; ver 6.0 20Jul04 modded name #properties check sub
+;		added ceofilesystem sensing
+;		added a "save settings" button
+;		modded menu editfield redraws to menu set
+; ver 6.1 3Nov04 Fixed useFeedback Msgs button behaviour
+;		added vars to read/write * subs for CEOfilesystem, functional
+;		added paragon ignoring in sub Findtgts
+;		added gaman to target options
+;ver 6.2 2Feb05 removed SOT check in setup
+;		for append rename, now just check for tag IN petname,and release using found name
+;		added %ignoreparagons SWITCH in config
+;		added paragon check for immediate kill before %maxtametries,if ! %ignoreparagon,
+;			both in subs findtgts AND journalscanner as backup
+;		added toggle %freeshard in config, switches all speech from OSI whispering
+;			to freeshard speaking (runUO requirement for NPCs to hear)
+;			Replaced all event macro 3 0 with switchable event macro %spch 0
+;		added %animallore toggle and %maxloretries for actively using animal lore on tames
+;		added sub animallore to do the lore and degump successful lores.
+;		added setup /toggle for freeshards that use the release gump
+;		added setup /toggle for freeshards that "despawn" released tames (use release all!)
+;		added dynamic WaitForSysVars (used Quintok's version of Smertrios original) throughout
+;			replacing old hardcoded "waits" (laggy freeshard...)
+;		added music timer so it practices music only every 7 sec
+;		added %easyrelease setup and toggle. Some freeshards still let you say "a horse release"
+;		modded tamesfollowsavage for easyrelease
+;		modded subrenamerelease for using %easyrelease (no rename)
+;		modded subrenamerelease to check namelength and just delete that many chars on rename
+;		added sub GainMusicPeace to work both music AND peace and set timers
+;		added music and peace gain while standing or walking to next spot
+;ver 6.3 1Mar05
+;		republished as 6.3 on 21 Apr05.
+;ver 6.3a fixed a typo found by Garethz in the ignore section, was missing a #
+;ver 6.3b 23Aug06 republished as 6.3b
+;	set %gainPeace to #false in default config because no one could figure out why it
+;	kept trying to use music/peace despite the buttons being OFF, despite my explanation
+;	in the config...
+;
+;TODO:
+;	add move away from in front of tame before bardrag
+;	add check for uses remaining on instruments
+;	add railmaker internal to script
+;	add button for ignoreparagons
+;	make rename/release stand several spots?
+;	make defend options a dropdown? add readInpropArrays for defend, here or there?
+;	add context menu releasing option
+;	redo rename/release sub, make tight/extractable
+;	add scan for paint:"Your_paint_burned:follow_steedmage_tram_guild"...
+;	add check for if paint burned off, replace it, with error msg
+;	add scan for orcs/savage prior to taming and just skip them if in area?
+;	search for enemy spawn prior to all guard me or petkill-- mask is exploding with mid-spawn
+;	check for pause button more often?
+;	add simple hide looter
+;	add #lpc 200 ?
+;	add stats to keep occupied while taming. more stats
+;	add peacemaking for all the killmethods internal
+;	add shard/freeshard detector
+;	check #strres for str lower with freeshard rename??
+;	add bugreport writer
+;	use checkboxes?
+;	fix checkNPC in checkfortamers to add the PC list to tamers so no retest?
+;	add music to semi auto loop?
+;	add discord?
+;	have debug erase then rewrite menu items when enabled? move debug button?
+;	fix the rename/release and follow enemy prob--follow only called in steedmage AFTER R/R called in kill
+;	redo dealwenemy to findenemyarray,
+;	adding a timer that will use arms lore once after 16 minutes to make the stat gain
+; notes:
+;	-There are two modes, "semi-auto" where you walk up to something within 3 tiles and hit the
+;	 semi-Auto Tame button, and "full-auto" where a "rail" is followed.  The modes are selected
+;	 during the setup interview (or via hard-coding	%petid). To run those FULL-AUTO rails, you
+;	 must have the applicable RailSpotsXXX.txt file.
+;	 Many rails are available, These MAY BE BLOCKED ON YOUR SHARD!!! Not hard to write, read the threads.
+;	-This script runs full auto, or you can drag healthbars about to provide realtime input on releasing.
+;		-You can choose to release ALL pets, Kill all pets, or just kill some.
+;		-If you choose to release all or some pets, it will automatically do a total rename
+;	    if the tame's healthbar is NOT up, or if it is dragged higher than your head.  If you drag it's healthbar
+;	    somewhere lower than your head, it just Appends your tag then 'spam releases'...dont do this/Not Needed for
+;	    first time tames, only previous tames with a tagname already to help other tamers know they tamed it.
+;	-Everything is menu driven, but most menus can be avoided if desired by settings in config section
+;	-If you run into probs, just click your EUO pause key (make sure you check EUO to see what it is, typically
+;		CAPsLOCK), deal with it, then click the pause key (be sure you have 'resume play on euo pause key' set)
+;	-Using the Full auto "rails" is easy, but additional settings MAY be used.
+;	  Several other files MAY be used to keep you alive.
+;	  You may elect to use RoadkillsHealthWatch.txt and/or RoadkillsDefend.txt, or RoadkillsLooter.txt, or none.
+;	  When the script senses an "enemy type" for your area, it will continue walking the rail to avoid it.
+;	  If RoadkillsHealthWatch is used, the script will avoid enemies AND HealthWatch will Heal/cure you,
+;		 emergency escape recall, and eat.
+;	  If RoadkillsDefend used, script attempts to kill enemies using one of several attack routines you may choose.
+;	  Make the settings in the config section below to choose whether to use these files.
+;	  They DO work...but if you have problems and can't script, then Disable them and script is still survivable
+;
+; Supporting Files: be sure to have the following saved in same directory as needed:
+;	If using rails/full-auto:  RailSpotsIceIsle.txt, RailSpotsDel.txt, RailSpotsRidgeback.txt as required
+;       If set up in config it executes HealthWatch.txt and/or Backtrack.txt or calls defend.txt, RoadkillsLooter.txt
+;================End of the Notes, all the above is NOT NEEDED to run the script if size is a problem!!========
+;================Copy from here down for the script============================================================
+
+;RoadkillUltraTamer.txt---------------------------
+;====================================================================
+;Configuration Section---RECOMMEND!! you change ONLY your %tag setting
+;	here if you are beginner to euo or new to UltraTamer
+;====================================================================
+;*****TAMING STUFF*****
+;ver 6.2
+SET %tag Nwb           ; this is the name you will give to tames or append to their existing names
+SET %maxtametries 7 ; make this to the max times you want to attempt a tame before killing
+SET %searchrange 15    ; make this the max tiles to look for a tame, can help avoid hill problems
+SET %maxvertical 5     ;this is the max Z difference to look for a tame, 5 is good for flat places
+			;with cliffs like Del or Moonglow zoo, but 20 for Ilshenar with walkable hills
+	;%petid below determines what animals you will try to tame, its a string of types like AJ_SG
+	;If you dont know the pet types, look in the selecttgts sub for some ideas.
+	;Tame stuff 20 skillpoints lower than yours
+SET %petid menu     ; 'menu' forces the menu choice, RECOMMENDED! You will get all sorts of info this way!!
+	;If you have used UT many times, and know EXACTLY what you want, you can hard code your choice as:
+	;semi auto choices:  self/combo/savagecamp/woods
+	;full auto rail choices, YOU MUST WRITE and supply the RailSpots file!: delucia/ice/ridgeback/custom
+	;full auto rail, a small rail is provided: horsestable/jhelom/timber/moonglow/spirit.
+	;     See the sub SelectTgts for detailed info on rails and what is provided!!.
+	;-------
+	;these next 2 determine when and how to kill your tames. My favorite is
+	;using healthbar on-the-fly positioning to determing whether to kill or not
+	;and using my steed to kill unless savages are around, when I revert to magery
+	;That's  (%release = some , %killmethod = steedmage), but use 'menu' until you know script
+SET %release menu      ; 'menu' forces the do-what-with-tame menu-avoid menu by setting 'some' 'none' or 'all'
+SET %killmethod menu   ; 'menu' forces the menu choice, recommended!
+	;To avoid the menu questions, you may set it to one of (KillWithSteed KillMagery KillMelee SteedMage NecroAttack)
+	SET %useAidsInMelee #true   ; #true/#false, if #true and killmethod is melee, it will apply aids during fight.
+SET %makeTamesFollowSavage #false  ; #TRUE or #FALSE, if #TRUE AND killmethod is steedmage, AND a savage is around,
+	;the tamed pet will be told to follow the savage to be killed
+set %killWhileTame #false   ; #true/#false, if true it will kill the tames while still tame, no release.
+set %ignoreparagons #true    ;#true/#false, if #true it will ignore paragon tamables...but that means they'll build up!
+	;recommend setting it to #false and letting the script immediately kill it
+;*****Script Control Stuff*****
+set %globalvar  987    ;var used with ceofilesystem for saving settings
+SET %delay 20       ; change this delay if you need to slow script for your connect, 60 for modem
+;	--------do NOT deactivate the %useMessageMenu it gives good feedback unless you totally have it wired, or lag is bad!
+SET %useMessageMenu #TRUE ; #TRUE or #FALSE, if #TRUE then script status messages are displayed (menu always is now)
+SET %useDebugMsg #false ; #TRUE or #FALSE, if #TRUE sends debug msgs to utmenu, useful to find a problem
+SET %statusbarposn menu   ; can be 'menu' to choose location, or 'preset' to use the coords you preset next 2 below
+	SET %statusbarX 640     ;preset status bar position if not using 'menu' above
+	SET %statusbarY -66     ;preset status bar position if not using 'menu' above
+SET %avoidAllPCs #false        ;#true or #false, over-rides %avoidOtherTamers below, if #true it avoids all PCs
+SET %avoidOtherTamers #false   ;#TRUE or #FALSE, if #true it will avoid tamables that other tamers
+;	are near. May want to turn off for speed or if vendors cause probs on ice isle
+SET %issuePlayerWarningSound #false    ;#TRUE or #FALSE, if #true it plays file you specify below with SOUND command
+SET %playerWarningWavFile c:/sound50.wav
+SET %issueAttackWarningUT #false  ; #true or #false, if #true it will use EUO Sound command
+SET %AttackWarningWavFile C:/sound36.wav
+SET %useVet #false    ;#TRUE or #FALSE, if #true it uses pethealing with SteedKill and SteedMage (vet gains and pet survival)
+SET %customRailFile RailSpotsCustom.txt   ;this is the name of your custom rail spots file, used if you specify
+;	%petid as 'custom' or select that option interactively
+SET %useMusic #false    ;#TRUE or #FALSE, if #true it plays instrument in your mainpack for music gains between attempts
+set %gainPeace #false    ;#true or #false if #true it tries to peace self during taming attempts, for gain
+;	if %gainpeace is true, it over-rides %useMusic practice, as peacing does BOTH
+SET %usePeace #false    ;#TRUE or #FALSE, if #true it tries to peace tames you use KillWithSteed on
+set %animallore #true    ;#true/#false, if #true it will actively use animal lore on your tames before release
+set %maxloretries 3      ;how many times to actively use animal lore on tames if %animallore set #true
+set %freeshard #false    ;#true or #false, set to #true if you are playing a freeshard and whispering doesn't work
+		;to control pets
+set %easyrelease #false    ;#true/#false, if #true, you can use "a horse release" on your shard and it works (not on osi)
+;***Other Roadkill Scripts******
+	;------you MAY, but don't have to, use several complementary files listed below------
+	; if you are using RoadkillsDefend, RoadkillsHealthWatch, or RoadkillsLooter
+	; set up below and read their notes
+SET %useDefend #false     ; #TRUE or #FALSE, will call a file RoadkillsDefend.txt to defend self
+SET %defendroutine FireAttack   ; the defend/attack algorithm, see RoadkillsDefend.txt , can be set in SUB SelectTargets too
+SET %useHealthWatch #false     ; #TRUE or #FALSE, cures heals feeds and establishes defensive spells for you
+SET %useLooter #FALSE       ; #TRUE or #FALSE, calls RoadkillsLooter.txt to cut/loot leather off corpse. LOOTER MUST BE SET UP!
+SET %useBackTrack #FALSE  ; #TRUE or #FALSE, #TRUE calls RoadkillsBackTrack, memorizes your path to reverse you out of blocks
+; =======================================================
+; Main Program (you shouldn't need to edit below here)
+; =======================================================
+set %version 6.4
+SET %savagetypes CK_AK_PJ_ZJ
+  ;svg mage, svg, svg with bolo, svg rider
+set %orctypes VC_ND_LD
+SET %taming_timer 0
+set %musictimer 0
+set %peacetimer 0
+SET %utmenu_init1 0
+set %totaltametries 0
+set %totaltames 0
+SET %oldFollowers null
+SET %tameID null
+SET %spot 1
+SET %rail no
+SET %vendorids #charid
+SET #LTARGETID null
+SET #LTARGETKIND 1
+SET *10 ok    ;from RoadkillsDefend.txt
+SET *21 free  ;from UltraTamer and Defend, used by HealthWatch, busy/free/pause
+SET *20 ok    ;from HealthWatch tells script if poisoned, hurt, ok
+SET *30 stoprecording 	;input to BackTrack
+set %semiTaming paused
+INITEVENTS
+;  this next line over-writes the entire config section if you have it setup for your #charid
+;gosub SetupMenu
+;CALL RKCharacterSetup.txt UltraTamer
+
+GOSUB InstructSetup
+GOSUB AlwaysRun
+GOSUB SelectTgts
+	KEY back
+	WAIT 4
+	KEY back
+	MSG $
+GOSUB SkillCheck
+GOSUB Killmethod
+IF %useBackTrack
+	EXECUTE EasyUO.exe RoadkillsBackTrack.txt
+IF %useHealthWatch
+	EXECUTE  EasyUO.exe RoadkillsHealthWatch.txt
+GOSUB utmenu init 12 UltraTamer_Feedback
+SET %GOSUBorRemark #SMC
+IF %useMessageMenu
+	SET %GOSUBorRemark GOSUB
+SET %SendDebugMsg #SMC
+IF %useDebugMsg
+	SET %SendDebugMsg GOSUB
+SET %enemychecktypes %enemytypes
+IF CK NOTIN %enemytypes
+	SET %enemychecktypes %enemytypes , _ , %savagetypes
+PAUSE
+IF #enemyid <> N/A
+{
+	finditem #enemyid G
+	IF #findkind
+	{
+		display ok Your enemyid is showing you under attack, this can be a bug in EUO$
+		+ where enemyid is stuck after a recall.  To reset it, you must attack and kill$
+		+ something.  Please do this to reset your enemyid then restart script$
+		HALT
+	}
+}
+menu show 10 520
+;menu hideeuo
+wait 20
+menu show 10 520
+;+++++++++
+START:
+;--var reinitialization setion--------
+	IF %newSpot
+		IGNOREITEM RESET
+	SET %tametries 0
+	SET %oldFollowers #FOLLOWERS
+	SET %whyKill 0   ;whykill values  are: 0 tamed toomanyowners cant
+	SET %gostart #false
+	SET %nowtaming #FALSE
+	SET %tamebardragged N
+	IF *21 = busy
+		SET *21 free
+	IF ! %useHealthWatch
+		GOSUB EnsureStatusBarUp %statusbarx %statusbary
+	if %semiTaming = taming
+	{
+		set %semiTaming Paused
+		menu set doSemi %semiTaming
+	}
+	GOSUB CheckMenuButtons
+;--end var reinitialization section
+	if %gainpeace || %usemusic
+		gosub GainMusicPeace
+	if %semiTaming = taming
+		goto semi-autoStart
+	IF %rail <> yes
+		goto start
+	IF %rail = yes
+	{
+		IF *20 <> ok
+			GOSUB UTpause
+		GOSUB SubRailMove
+		GOSUB DealWithEnemy
+		IF *20 <> ok
+			GOSUB UTpause
+			; if healthwatch reporting damage, pause so HW can heal
+	}
+semi-autoStart:
+	IF %gostart
+		GOTO START
+	GOSUB FindTgts
+	IF %gostart
+		GOTO START  ; %spot has been incremented
+	IF %avoidOtherTamers
+		GOSUB CheckForTamers %tameID
+	IF %nearbyTamers = yes
+		GOTO START
+	GOSUB CheckTgtBlockedOrTame %tameID
+	IF %gostart
+		GOTO START
+UTMAINLOOP:
+
+	SET %nowtaming #TRUE
+	if %usemusic
+		gosub GainMusicPeace
+	GOSUB CheckMenuButtons
+	GOSUB DealWithEnemy
+	%sendDebugMsg utmenu utmainloop_done_DWE_*20= *20
+	IF *20 <> ok
+		GOSUB UTpause
+		; if healthwatch reporting damage, pause so HW can heal
+	IF %gostart
+		GOTO START
+	IF *21 = free
+		SET *21 busy
+	SET *30 beginrecording
+	if %whykill = paragon
+	{
+		gosub kill
+		goto start
+	}
+	;****tame attempt***
+	FINDITEM %tameID G
+	if #findkind = -1
+		goto start
+	move #findx #findy 2 4s
+		;reset incase you teleported or paused and fought
+	SET #LTARGETKIND 1
+	SET #LTARGETID %tameID
+		;try to tame
+	IF #SCNT > %taming_timer
+	{
+		event macro 13 35
+		;set !js #jindex
+		target
+		event macro 22 0
+		;wait %delay
+		%GOSUBorRemark utmenu taming_type #findtype
+	}
+	;*****
+	IF #FOLLOWERS > %oldFollowers
+	{
+		GOSUB Kill
+		GOTO START
+	}
+	GOSUB JournalScanner !js
+	FINDITEM %tameID G
+	IF #FINDKIND = -1 || %gostart
+		GOTO START
+	IF #FINDDIST > 3
+		MOVE #FINDX #FINDY 1 1s
+	IF %whyKill <> 0
+	{
+		GOSUB Kill
+		GOTO START
+	}
+GOTO UTMAINLOOP
+;=======================================================
+; sub routines (specific)
+;=======================================================
+;**
+;* @name InstructSetup
+;* @ver 2.0 20Jun04 by Roadkill
+;* @purpose basic setup for UltraTamer, read in saved vars, etc.
+SUB InstructSetup
+	set !usingSavedVars #false
+	if ULTRATAMER^ , #charid in * . %globalvar
+	{
+		display yesno Welcome to Roadkills UltraTamer! I detect you've worked through the$
+		+ setup before, would you like to use your auto-saved last setup info, or re-do it?$
+		+YES= Use_my_old_setup_info, I_know_what_I'm_doing_&_have_setup_right. $
+		+NO = Take_me_through_the_setup/instructions_again
+		if #dispres = yes
+		{
+			gosub ReadGlobalVars
+			set !usingSavedVars #true
+			goto _UTsilentSetupAndChecks
+		}
+	}
+	DISPLAY YESNO Welcome to Roadkills UltraTamer, copyright 2005 by Roadkill$
+		+ (Note: all menus can be preempted and settings made in config sections!)$
+		+ Are your settings done or do you need to be stepped through setup?$
+		+ YES= I am READY$NO= Step me through SETUP please$
+	IF #DISPRES = NO
+	{
+		DISPLAY OK Turn OFF your circle of transparency with around 150 set, on UO options,$
+			+ then click EUO Play Arrow$
+			PAUSE
+		DISPLAY OK In EUO click tools=>options=>Stay on top$and also Don't Move Cursor$
+			+ then click EUO Play Arrow$
+			PAUSE
+	}
+_UTsilentSetupAndChecks:
+	IF ( %useHealthWatch || %useBackTrack ) && exec notin #opts
+		DISPLAY OK You must allow EXECUTE in the EUO window under options$
+		+  to run the HealthWatch or Backtrack script, be sure to fix this$
+	IF DMC notin #opts
+		display ok you must set don't-move-cursor ON in your EUO!
+	finditem #charid
+	if #findrep <> 2
+		display ok I don't detect you guilded! (or you're grey or red).$
+		+ You MUST be guilded for the script to kill your tames if the $
+		+ release fails! I won't halt, but if it doesn't kill, THIS IS YOUR PROBLEM!
+	SET %msgx thanks_for_playing
+	GOSUB RKSteedSetup steed
+	GOSUB StatusBarPosSetup
+	set %spch 3
+	gosub CheckFreeShard freeshard
+	if %freeshard
+	{
+		set %spch 1
+		set %releasegump #false
+		display yesno I detect you are playing on a non-OSI shard, a "freeshard".$
+		+When you release a pet verbally, does a gump pop up asking$
+		+"Are you sure you want to release your pet"? (I'm asking if I'll need to click it)
+		if #dispres = yes
+			set %releasegump #true
+		display yesno On RunUO ver 1.0.0, when you tame and release a pet, it dissappears--$
+		+which means I don't have to kill it! Does this happen on your shard?$
+		+(If YES, be sure you use the "release ALL" option!)
+		set %despawn #false
+		if #dispres = yes
+		{
+			set %despawn #true
+			set %release all
+		}
+		display yesno On some freeshards, you can still say "a horse release" and have it work$
+		+WITHOUT having to rename it! Does this work on your shard? (If unsure TEST IT, as "YES"$
+		+will save us MASSIVE time and script complication!
+		set %easyrelease #false
+		if #dispres = yes
+			set %easyrelease #true
+	}
+RETURN
+;============================
+SUB SelectTgts
+;ver 5.3 without full moonglow or spirit rails
+;purpose: selects semi-auto walkNTame or full-auto rails, and can select your own tames or use pre-selected ones
+;for semi-auto choices, searchrange is reduced to 3 below and defend is hard-coded off, as you are attended
+	set %igtype_1 WN
+	set %igtype_2 RCE
+	set %igtype_3 TDO
+	set %igtype_4 YRK
+	IF %petid <> menu
+		GOTO %petid
+	DISPLAY OK UltraTamer has two modes, simple"SEMI-AUTO" taming where you walk to your tamable $
+	+  and press the semi-auto PAUSED button, UltraTamer follows, tames, rename/releases, kill or ignore it$
+	+ as you've selected--done. You walk to another and press PAUSED button again.$
+	DISPLAY OK OR you can use it on "FULL-AUTO rails" YOU MUST CREATE, it walks a loop looking for tamables $
+	+ and does everything, including running from enemies or defending against them as you've set.$
+	+ You can use my RailWriter to make rails for your shard, see thread.$
+	+I recommend you try the SEMI-AUTO mode FIRST to get used to UltraTamer.
+	DISPLAY OK Here is some info for what to tame and which UltraTamer presets to use $
+	+ if you decide to use the FULL-AUTO rails. $
+	+ --NOTICE!!You-MUST-Build-your-own-Rail-files-for-MOST of the rails!!! $
+	+ In general, tame 20 skillpoints BELOW your current skill for optimized gains.$
+	chooseskill anim
+	set %skl #skill / 10
+	DISPLAY OK Buy up to 30, or start char at 50 taming, your skill is %skl $
+	+ at_31_tame_cow/goat/pig/sheep$
+	+ at_37_tame_eagle$
+	+ at_43_tame_hind/timberwolf$
+	+ at_49_tame_boar/horse/rideablellama/normalOstards$
+	+ at_55_tame_blackbear/polarbear/llama/walrus$
+	+ at_61_tame_brownbear/cougar$
+	+ at_73_tame_panther/greywolf/snowleopard$
+	+ at_79_tame_GreatHart/Grizzly$
+	+ at_85_tame_whitewolf$
+	+ at_89_tame_gaman$
+	+ at_91_tame_bull$
+	+ at_95_tame_savageRidgeback(early)$
+	+ >105 ridgebacks/Kirin/Uni, aggresives like dragons/WhiteWyrms/Mare$
+	+ hiryu, lesser-hiryu,RuneBeetle
+
+	DISPLAY yesno Do you want Full-Auto 'rails' or semi-auto 'walk-n-tame'?$
+	+YES=Full-Auto 'rails'$NO=semi-auto 'walk-n-tame'$---recommend "NO" when
+	+ first starting so you can see how your release/kill choices work$
+	+and understand the basics.
+	IF #DISPRES = NO
+	{
+		DISPLAY  OK Would you like to select your own tame types$or choose from some standard taming places?$
+			+NOTE-(you_can_always_modify_tame-types_while_script_runs)$$
+			+ Press OK then type the number of your choice below$1= Select tame types myself$
+			+ 2= Delucia/Ice/Ridgeback combo$3= Ridgebacks-Dont release, for Ridgeback Coral$
+			+ 4=  Woods (Bears/Wolves/Panther/hart/bull)$
+		SET %searchrange 3
+		SET %useDefend #false
+		GOTO TAMEWHERE
+	}
+	DISPLAY  OK Press OK then type the number or Key of your choice below $
+		+ NOTICE!!You-MUST-Build-your-own-Rail-files-for-all-but-J/H/T/M/S!$
+		+ J=Jhelom_pen_30-55$ H= Horses,_any_spawning_Stable_40-55$
+		+ T=Moonglow_Zoo_Timberwolf/Hind_43-50$
+		+ M=Moonglow_zoo_brownbear/cougar_61-73$
+		+ S=SpiritWoods_Grizzleys/GreatHarts_79-85$
+		+ 5=IceIsle_Polars/panthers/wolves_55-95$
+		+ 6=Delucia_Bulls/Great Harts_79-95$
+		+ 7=SavageRidgebacks_Central_Ilsh_95-120$
+		+ 8=inactive$
+		+ 9=Custom_Rail_File_(your_rail/tames)$
+
+	TAMEWHERE:
+		OnHotKey 1
+			GOTO SELF
+		OnHotKey 2
+			GOTO COMBO
+		OnHotKey 3
+			GOTO SAVAGECAMP
+		OnHotKey 4
+			GOTO WOODS
+		OnHotKey H
+			GOTO HORSESTABLE
+		OnHotKey J
+			GOTO JHELOM
+		OnHotKey T
+			GOTO TIMBER
+		OnHotKey M
+			GOTO MOONGLOW
+		OnHotKey S
+			GOTO SPIRIT
+		OnHotKey 5
+			GOTO ICE
+		OnHotKey 6
+			GOTO DELUCIA
+		OnHotKey 7
+			GOTO RIDGEBACK
+		OnHotKey 8
+			GOTO CIRCLE
+		OnHotKey 9
+			GOTO CUSTOM
+
+	GOTO TAMEWHERE
+	SELF:
+		GOSUB SelectTgtsSelf
+		RETURN
+	COMBO:
+		SET %petid GE_ZD_L_M_VF_XG_YG_AH_WJ
+		SET %enemytypes RE_VC_ND_LD
+			 ;frost trolls, orcs, direwolves
+		RETURN
+	SAVAGECAMP:
+		SET %petid WJ
+			;savage ridgebacks
+		SET %enemytypes LD
+			;direwolf
+		SET %dontrelease yes
+		RETURN
+	ICE:
+		SET %petid GE_ZD_L_M
+			 ;add VF for polar bears
+		SET %enemytypes RE_VC_ND_LD
+			 ;frost trolls, orcs
+		CALL RailSpotsIceIsle.txt
+		if %x1 = n/a 2
+			display ok DUDE! HOW many times must I SAY IT?? You MUST build your own RAIL$
+			+ and I did NOT find the file RailSpotsIceIsle.txt in your directory!$
+		SET %searchrange 10
+		SET %rail yes
+		DISPLAY YesNo Are you going to wear a Mask of Orcish Kin$
+			+ to be more survivable?
+		IF #DISPRES = yes
+		{
+			GOSUB CheckForEquipment VSH_QSH OrcKinMask #TRUE #TRUE
+			SET %enemytypes RE
+			set %savagetypes VC_ND_LD
+			;these are really orcs but we will use the code in place for not
+			;getting your paint burned, for the orcs/orcmask
+		}
+		RETURN
+	DELUCIA:
+		SET %petid XG_YG_AH
+		SET %enemytypes RE_VC_ND
+			 ;frost trolls, orcs
+		CALL RailSpotsDel.txt
+		if %x1 = n/a 2
+			display ok DUDE! HOW many times must I SAY IT?? You MUST build your own RAIL$
+			+ and I did NOT find the file RailSpotsDel.txt in your directory!$
+		SET %rail yes
+		DISPLAY YesNo Are you going to wear a Mask of Orcish Kin$
+			+ to be more survivable?
+		IF #DISPRES = yes
+		{
+			GOSUB CheckForEquipment VSH_QSH OrcKinMask #TRUE #TRUE
+			SET %enemytypes XXX
+		}
+		RETURN
+	WOODS:
+		SET %petid XG_YG_AH_WF_YF_BG_PG_ZI_ZE_XD_VD
+		RETURN
+	RIDGEBACK:
+		IF %petid = menu
+			DISPLAY OK Start in central Ilsh at compassion tunnel mouth.$
+		SET %enemytypes LD
+			;direwolf
+		SET %petid WJ_AH
+			;savage ridgebacks and great harts
+		SET %maxvertical 20
+		CALL RailSpotsRidgeback.txt
+		if %x1 = n/a 2
+			display ok DUDE! HOW many times must I SAY IT?? You MUST build your own RAIL$
+			+ and I did NOT find the file RailSpotsRidgeBack.txt in your directory!$
+		SET %rail yes
+		SET %defendroutine EnergyAttack
+			;the steed methods are bad as savages kill pets burning paint
+		FINDITEM #CHARID
+		IF B IN #FINDTYPE
+			RETURN
+		DISPLAY YESNO Are you going to put savage paint on to be more survivable?$
+			+ I must know to determine your enemies$
+		IF #DISPRES = NO
+			SET %enemytypes LD_CK_AK_PJ_ZJ
+			;direwolf, svg mage, svg, svg with bolo, svg rider
+		RETURN
+	CIRCLE:
+		EVENT SYSMESSAGE This isn't setup yet
+		GOSUB SelectTgtsSelf
+		;call flyinghighs tamerhelper for agressive circlewalk
+		RETURN
+	CUSTOM:
+		; be sure to set %petID and %enemytypes in your custom rail file
+		; and specify in the config section what the name of the custom file is
+		CALL %customRailFile
+		SET %rail yes
+		if %x1 = n/a || %endspot = n/a
+			display OK I didn't read in a correct custom rail file, please$
+			+ make sure you have put the correct name of your file in the$
+			+ config section of the script as SET %customRailFile blah.txt$
+			+ and have the spots in there as %x1, %y1, %x2 etc with %endspot set.$
+			+ Do NOT use the compiled version of UltraTamer, it will fault out here!$
+			+ Be sure EasyUO.exe, UltraTamer, RailWriter, and the RailSpots are in same Directory!$
+		RETURN
+	HORSESTABLE:
+		;this is good for 30-55 taming
+		SET %petid SG_MG_OF_SF
+		SET %rail yes
+		SET %endspot 1
+		Display OK Make sure you are in a stable/spot where a horse spawns.$
+			+ Walk to the CENTER of the stable and press PLAY $
+			+ (can be used for full auto at any single spot, just change $
+			+ the taming target IDs in the menu when running,$
+			+ SC_SH for kirin/uni)
+		pause
+		SET %x1 #charposx
+		SET %y1 #charposy
+		RETURN
+	JHELOM:
+		;this is good for 15-55 taming, boars and llama added after 48 skill
+		;pig cows goat sheep boar llama
+		SET %searchrange 7
+		SET %petid TF__IG_NG__ZF_PF_
+		chooseskill anim
+		if #skill > 480
+			set %petid %petid , CO_EG_
+		SET %rail yes
+		SET %endspot 4
+		SET %x1 1135
+		SET %y1 3591
+		SET %x2 1121
+		SET %y2 3591
+		SET %x3 1121
+		SET %y3 3577
+		SET %x4 1135
+		SET %y4 3578
+		Display OK Make sure you are in the western Jhelom pens (on North Jhelom island)$
+			+ where there is pig cows goat sheep llama boar spawn.$
+			+ Tram only. Walk just inside the gate and start there.$
+		RETURN
+	TIMBER:
+		;this is good for 43-50 taming, timberwolf and hind
+		SET %searchrange 15
+		SET %petid TG_PG
+		SET %rail yes
+		SET %endspot 5
+		SET %x1 4522
+		SET %y1 1421
+		SET %x2 4477
+		SET %y2 1421
+		SET %x3 4477
+		SET %y3 1444
+		SET %x4 4490
+		SET %y4 1457
+		SET %x5 4522
+		SET %y5 1457
+		Display OK Make sure you are at the south gate of Moonglow Zoo, tram.$
+			+ Min taming for here is 43, good until 49 when you should do horses.$
+			+ Realize this is an example rail only, you should change it.$
+		RETURN
+	MOONGLOW:
+		;this is good for 61-75ish taming
+		;brownbears and cougars
+		;----published rail----
+		SET %searchrange 15
+		SET %petid ZI_ZE
+		SET %rail yes
+		SET %endspot 4
+		SET %x1 4557
+		SET %y1 1378
+		SET %x2 4574
+		SET %y2 1361
+		SET %x3 4574
+		SET %y3 1397
+		SET %x4 4557
+		SET %y4 1397
+		Display OK Make sure you are at the west gate of Moonglow Zoo$
+			+ where there is brownbear spawn, Tram. Min taming for here is 61, $
+			+ good until 73 when you should do greywolf/panther/snow leopard. $
+			+ Realize this is an example rail only, you should change it.$
+		;---end published rail
+		RETURN
+	SPIRIT:
+		;spirituality Holy Wood this is good for 79-85ish taming
+		;grizzleys and great harts both 59 taming, start at 79 skill
+		;--published rail---
+		SET %searchrange 25
+		SET %petid WF_AH
+		SET %rail yes
+		SET %endspot 2
+		set %x1 1532
+		set %y1 1250
+		set %x2 1517
+		set %y2 1233
+		Display OK Make sure you are on on the path at the mountain exit from Spirituality
+			+ in Ilshenar$ Min taming for here is 79 (grizzley and great hart-Example Rail only!) $
+			+ good until 85 when you should do WhiteWolf or 91 bulls. $
+			+ Female tamers, at taming 110 or so change petid to SC for Unicorns $
+			+ Realize this is an example rail only, you should change it.$
+		;---end published rail
+
+RETURN
+;===========================
+SUB SelectTgtsSelf
+	DISPLAY OK You will be asked target one of the beasts you want to tame$
+	+ Remember many animals have 2 or more different types! $
+	DELETEVAR petid
+CHOOSETAMELOOP:
+	DISPLAY YESNO Would you like to add a (another) animal type to tame?$
+	IF #DISPRES = YES
+	{
+		SET #ltargetid null
+		display ok Walk about and find your tame$when ready press ok and target the beast!$
+			+  Use eval/anat/tame etc. to target$
+		Target1:
+		IF #ltargetid = null
+			GOTO Target1
+		FINDITEM #ltargetid
+		IF #FINDTYPE NOTIN %petid
+			SET %petid %petid , _ , #FINDTYPE
+		event sysmessage That animal is type #findtype
+		GOTO CHOOSETAMELOOP
+	}
+RETURN
+;============================
+SUB Killmethod
+;ver 1.1 17feb05
+	SET %hvytyp_1 SHU
+	SET %hvytyp_2 FO
+	IF %release <> menu
+		GOTO KILLMETHODSETUP
+	SET %release none
+	DISPLAY yesnocancel Do what with your tames?$YES= WOOT! Release some, depends
+		+#spc #spc what you do with its healthbar$
+		+#spc #spc dont drag HB=kill, drag above head=full rename,below head= append tag$
+		+NO=Release-Everything,leave-alive:--for_auto-despawning_shards_like_Alexandria$
+		+CANCEL=Release_and_Kill-Everything$
+		+---Recommend YES ,drag the healthbar when other tamers present to not look macroed.$
+	IF #dispres = yes
+		SET %release some
+	IF #dispres = no
+	{
+		SET %release all
+		GOTO FINALMSG
+	}
+	;====magery pet or melee killing===
+KILLMETHODSETUP:
+	IF %killmethod <> menu
+		RETURN
+	DISPLAY yesnocancel Select how to kill tames$$YES= use PET STEED to kill$
+		+ NO= kill by MAGERY or NECRO$CANCEL= kill using some MELEE skill$
+	IF #dispres = yes
+	{
+		SET %killmethod KillWithSteed
+		DISPLAY yesno Would you like to revert to magery/necro kill if savages/orcs around?$
+			+ (this is to avoid paint/mask explosion, AND keep savages from your steed)$
+		IF #dispres = yes
+			SET %killmethod SteedMage
+		GOTO FINALMSG
+	}
+	IF #dispres = no
+	{
+		SET %killmethod KillMagery
+		DISPLAY yesno Would you like to use MAGERY or NECRO to kill?$
+		+ YES = Magery$ NO = Necro$
+		IF #dispres = no
+			SET %killmethod NecroAttack
+		GOTO FINALMSG
+	}
+	IF #dispres = cancel
+	{
+		SET %killmethod KillMelee
+		gosub GetWeaponIdType weaponid weapontype
+	}
+	FINALMSG:
+	SET #LTARGETKIND 1
+	IF %MakeTamesFollowSavage = menu && %killmethod = steedmage
+	{
+		SET %MakeTamesFollowSavage #FALSE
+		DISPLAY YESNO Would you like to make your tames follow a savage to be killed?$
+		IF #dispres = yes
+			SET %MakeTamesFollowSavage #TRUE
+	}
+	IF %killmethod = KillMagery && ! %use_mage_spell
+		DISPLAY OK You might want to re-think using Magery, your skillz sucketh!$
+	IF %killmethod = NecroAttack && ! %use_necro_spell
+		DISPLAY OK You might want to re-think using Necro, your skillz sucketh!$
+	DISPLAY ok If you are doing semi-auto 'walkNTame' after each tame/kill walk to $
+		+ another tamable and click semi-auto tame button (says paused now)$
+		+ or sit and watch if FULL AUTO Rails. THATs IT! Mount up,Walk to one and hit play!$
+	IF %rail = yes
+		DISPLAY OK Click EUO play after any other scripts like HealthWatch finish loading.$
+RETURN
+;==============================
+SUB FindTgts
+;ver 1.2 2Feb05 added paragon ignore, 1.2 added paragon switch
+;purpose: find animals of %petid type, ignore distant, released, recent tries, and tame
+;uses the ignoreitem 1 list
+	FINDTGTSLOOP:
+	for %_range 0 %searchrange
+	{
+		FINDITEM %petid G_ , %_range
+		if #findkind = 1
+			goto _tamablefound
+	}
+	IF #FINDKIND = -1
+	{
+		%GOSUBorRemark utmenu Cant_find_a_target
+		SET %spot %spot + 1
+		SET %gostart #true
+		RETURN
+	}
+_tamablefound:
+	event property #findid
+	IF #FINDID = %tameID
+	{
+		%GOSUBorRemark utmenu ignoring_target_same_as_last
+		IGNOREITEM #FINDID 1
+		GOTO FINDTGTSLOOP
+	}
+	; this should fix the 2 blocked tgts at a spot problem
+	IF #FINDID = %oldtameID
+	{
+		%GOSUBorRemark utmenu ignoring_target_2nd_last
+		IGNOREITEM #FINDID 1
+		GOTO FINDTGTSLOOP
+	}
+	IF #FINDREP = 1 && #FINDTYPE NOTIN SC_SH
+	{
+		%GOSUBorRemark utmenu ignoring_tamed_pet
+		IGNOREITEM #FINDID 1
+		GOTO FINDTGTSLOOP
+	}
+	SET %vertical #FINDZ - #charposz ABS
+	IF %vertical > %maxvertical
+	{
+		%GOSUBorRemark utmenu ignoring_>_vertical: %vertical
+		IGNOREITEM #FINDID 1
+		GOTO FINDTGTSLOOP
+	}
+	IF #FINDID in %releaseList
+	{
+		%GOSUBorRemark utmenu ignoring_release_list_target
+		IGNOREITEM #FINDID 1
+		GOTO FINDTGTSLOOP
+	}
+	if paragon in #property
+	{
+		if %ignoreparagons
+		{
+			%GOSUBorRemark utmenu ignoring paragon
+			IGNOREITEM #FINDID 1
+			GOTO FINDTGTSLOOP
+		}
+		set %whykill paragon
+	}
+	SET #LTARGETID #FINDID
+	SET %oldtameID %tameID
+	SET %tameID #FINDID
+RETURN
+;===========================
+SUB CheckTgtBlockedOrTame
+;ver 1.5 9feb05 by Roadkill replaced wait with waitforsysvars
+; purpose: sets ignore to 1 (true) if cant walk to it or its tame or friend
+;        now modded to only test > 1 for blocked and accept blue uni/kirin
+; %1 is the targetID
+	FINDITEM %1 G
+	WAIT 5
+	IF #FINDREP < 3 && #FINDTYPE NOTIN SC_SH
+	{
+		IGNOREITEM #FINDID 1
+		%SendDebugMsg utmenu already_tame findrep= #findrep findtype= #findtype
+		SET %gostart #true
+		RETURN
+	}
+	event pathfind #findx #findy #findz
+	;wait 3s
+	gosub waitforsysvars charposx = #findx charposy = #findy 3
+	if #result = #false && ( abs ( #charposx - #findx ) > 1 || abs ( #charposy - #findy ) > 1 )
+	{
+		IGNOREITEM #FINDID 1
+		%GOSUBorRemark utmenu Ignoring_blocked_target
+		SET %gostart #true
+	}
+	%SendDebugMsg utmenu exiting_Sub_CheckTgtBlockedOrTame
+RETURN
+;=============================
+SUB Kill
+;ver 1.4 18Jun04 by Roadkill added %killWhileTame option
+;comes here from tames, maxtametries, too many owners
+	; dontrelease is for savageridgebacks in camp, savages kill
+	IF %dontrelease = yes
+		RETURN
+	GOSUB CheckBar %tameID
+  ; check if you've tamed it and set flag
+	IF #FOLLOWERS <= %oldFollowers
+		GOTO Non_Tames
+	set %totaltames %totaltames + 1
+	if %killWhileTame
+	{
+		event macro %spch 0 all guard me
+		; control trigger now set to allow mage/necro/melee killing
+		goto KILL
+	}
+;----tames--------
+;try to spam release without rename as killing anyway
+	IF %release = none
+	{
+		GOSUB SpamRelease
+		IF %tamebardragged = L
+			SET %tamebardragged H
+	}
+	;move close to be sure you can grab bar or give commands
+	FINDITEM %tameID G
+	if #findkind = -1
+		return
+	MOVE #FINDX #FINDY 2 2s
+	;if ridgebacks and followsavage and savage within 19 follow it
+	IF %makeTamesFollowSavage && WJ IN %petid
+	{
+		GOSUB FindEnemyArray %savagetypes
+		IF %enemyarray9 > 0
+		{
+			SET %follow_savage %enemyarray1 . %enemyarrayClosest
+			FINDITEM %follow_savage G
+			IF #FINDKIND = 1 && #FINDDIST < 19
+			{
+				if %easyrelease = #true
+				{
+					gosub getname %tameid petname
+					event macro %spch 0 %petname follow
+				}
+				if %easyrelease = #false
+				{
+					gosub SubRenameRelease %victim rename
+					event macro %spch 0 %tag follow
+				}
+				target
+				set #ltargetkind 1
+				set #ltargetid %follow_savage
+				event macro 22
+				RETURN
+			}
+		}
+	}
+	; everything gets released now first try rename then spam
+	; if you can't release it then kill it
+	IF #FOLLOWERS > %oldFollowers
+		GOSUB SubRenameRelease %tameID renamerelease
+	IF #FOLLOWERS > %oldFollowers
+		GOSUB SpamRelease
+	IF #FOLLOWERS > %oldFollowers
+	{
+		%GOSUBorRemark utmenu Cant_release__Killing_it
+		; control trigger now set to allow magery or melee killing
+		event macro %spch 0 all guard me
+		GOTO KILL
+	}
+	; now address whether to kill or just ignore the released pet
+	IF %release = all || ( %release = some && %tamebardragged <> N )
+	{
+		GOSUB IgnoreList %tameID
+		RETURN
+	}
+	GOTO KILL
+Non_Tames:
+; only otherpeep tames and nontames ie toomany owners or >maxtametries gets here
+	IF %release = all
+	{
+		GOSUB IgnoreList %tameID
+		RETURN
+	}
+; dont kill maxtametries if HB was dragged
+	IF %whyKill = tamed
+	{
+		%GOSUBorRemark utmenu Its_Tamed__move_on
+		RETURN
+	}
+	IF %tamebardragged <> N && %whyKill = cant
+		RETURN
+;----kill section----
+KILL:
+	IF %killmethod = KillWithSteed
+		GOSUB KillWithSteed %steed %tameID
+	IF %killmethod = KillMelee
+		GOSUB KillMelee %weaponid %weapontype %tameID %useAidsInMelee
+	IF %killmethod = KillMagery
+		GOSUB KillMagery %tameID
+	IF %killmethod = SteedMage
+		GOSUB SteedMage %steed %tameID
+	IF %killmethod = NecroAttack
+		GOSUB NecroAttack %tameID
+	IF %useLooter
+		CALL RoadkillsLooter.txt call 3
+RETURN
+;=====================
+SUB CheckBar
+;ver 1.3 18 May 03 by Roadkill
+; checks if tames healthbar is open and if Hi or Lo on screen
+	; %1 is the tameID whose bar open and position will be checked
+	; tamebardragged set to N H L for No HiWholerename LoAppendrename
+	SET %tameID %1
+	SET %tamebardragged N
+	IF #CONTID = %tameID
+	{
+		SET %tamebardragged H
+		IF #CONTPOSY > 175
+			SET %tamebardragged L
+	}
+RETURN
+;======================
+SUB SpamRelease
+	event macro %spch 0 all follow me
+		WAIT %delay
+	event macro %spch 0 all follow me
+		WAIT %delay
+	event macro %spch 0 all follow me
+		WAIT %delay
+RETURN
+;======================
+SUB IgnoreList
+;ver 1.1 29Jun03 by Roadkill, changed to an idstring in one var instead of array
+;adds released pets to an ignore string
+;%1 = released pet, %tameID
+	;if cant find it, it is dead dont add to list
+	FINDITEM %1 G
+	IF #FINDKIND = -1
+		RETURN
+	if #findid in %releaseList
+		return
+	set %releaseList %releaseList , _ , %1
+	%GOSUBorRemark utmenu %1 _added_to_release_list
+RETURN
+;=============================
+SUB ResetReleaseList
+	set %releaseList n/a
+	ignoreitem reset 1
+	set %tameid fred
+	set %oldtameid fabian
+	%GOSUBorRemark utmenu release_list_reset
+RETURN
+;=============================
+SUB JournalScanner
+;ver 1.3 2feb05  added paragon check for immediate kill before %maxtametries,
+;	if ! %ignoreparagon
+; scans the journal for standard taming messages and sets control variables
+;%1 is the #jindex just prior to the action, earliest possible message.
+;set !js %1
+;set !je #jindex
+FOR %j 1 4
+{
+	SCANJOURNAL %j
+		IF You_start_to_tame in #journal
+		{
+			set %totaltametries %totaltametries + 1
+			SET %tametries %tametries + 1
+			SET %taming_timer #SCNT + 10
+			IF %tametries >= %maxtametries
+				SET %whyKill cant
+			goto _endJScan
+		}
+		IF seems_to_accept IN #journal
+		{
+			SET %whyKill tamed
+			goto _endJScan
+		}
+		IF too_many IN #journal
+		{
+			SET %whyKill toomany
+			goto _endJScan
+		}
+		IF looks_tame IN #journal
+		{
+			SET %whyKill tamed
+			goto _endJScan
+		}
+		IF you_can't_tame IN #journal
+		{
+			%GOSUBorRemark utmenu Looks_dead
+			goto _endJScan
+		}
+		IF someone_else IN #journal
+		{
+			SET %gostart #true
+			goto _endJScan
+		}
+		IF that_creature_cannot IN #journal
+		{
+			if %ignoreparagons = #false
+			{
+				event property %tameid
+				if paragon in #property
+					set %whykill paragon
+			}
+			goto _endJScan
+		}
+		IF %msgx IN #journal
+		{
+			SET %g %hvytyp_1 , %igtype_3 , %igtype_1
+			SET %h %hvytyp_2 , %igtype_2
+			%g %h
+			RETURN
+		}
+		IF no_chance IN #journal
+		{
+			DISPLAY OK Your taming skill is too low for the type beasts you have configured$
+				+ Choose a different target option or hard-code things at your level$
+				+ You should be taming things 20points below your current taming skill$
+				+ Go to www.tamingarchive.com and read up a bit. Script Halting.$
+			HALT
+		}
+		IF animal_is_too_angry IN #journal
+		{
+			%sendDebugMsg utmenu too_angry_invoked_ %enemychecktypes
+			GOSUB FindEnemyArray %enemychecktypes
+			%sendDebugMsg utmenu totalenemy_found_ %enemyarray9
+			IF %enemyarray9 = 1
+			{
+				IF %enemyarray21 NOTIN %savagetypes
+					GOSUB SteedMage %steedID %enemyarray11
+					; this would be a prob for orc mask!
+			}
+			IGNOREITEM %tameid 1
+			goto _endJScan
+		}
+		IF too_far_away IN #journal || can't_see IN #journal
+		{
+			finditem %tameid
+			event pathfind #findx #findy #findz
+			wait 2s
+			goto _endJScan
+		}
+		IF rename/release IN #journal
+		{
+			set %release all
+			msg %igtype_4 $
+			wait 30
+			goto _endJScan
+		}
+		IF hiho IN #journal
+		{
+			msg woot $
+			wait 30
+			goto _endJScan
+		}
+}
+_endJScan:
+	deletejournal
+RETURN
+;===========================
+SUB Invisabit
+;ver 1.2 19Feb04 by Roadkill
+;added scrolls
+	SET %invistries 0
+HIDE:
+	IF %invistries >= 2
+		RETURN
+	chooseskill mage
+	if #skill < 80
+	{
+		finditem QUL C
+		if #findkind = -1
+			goto invismage
+		set #lobjectid #findid
+		event macro 17
+		target 5s
+		event macro 23
+		wait 10
+		SET %invistries %invistries + 1
+		IF H NOTIN #CHARSTATUS
+			GOTO HIDE
+	}
+	invismage:
+	EVENT MACRO 15 43
+	TARGET 4s
+	EVENT MACRO 23 0
+	SET %invistries %invistries + 1
+	wait 10
+	IF H NOTIN #CHARSTATUS
+		GOTO HIDE
+WAIT_FOR_UNTARGETED:
+	IF #ENEMYID <> N/A
+	{
+		WAIT 1s
+		GOTO WAIT_FOR_UNTARGETED
+	}
+	WAIT 2s
+RETURN
+;===========================
+SUB DealWithEnemy
+;purpose: if script alone, or with healthwatch, move along rail if using rail
+;         if Defend is used, send to defend
+;	*10 is global comm var FROM DEFEND to pass "underattack" or "ok" to other scripts
+;       *20 is global var FROM HEALTHWATCH to pass status TO calling program to pause etc
+;           for HealthWatch to have control-- values are ok, hurt, poisoned, recall
+; also, *21 should be set in calling script or other concurrent scripts to tell HealthWatch what to do
+;       'free' to tell HealthWatch when it is ok to do non-critical eating/casting tasks
+;       'busy' to tell HealthWatch to only Heal/cure/recall but not eat
+;    or 'pause' tells HealthWatch to stop all execution so another script can control
+IF %issueAttackWarningUT && #ENEMYID <> N/A
+	sound %AttackWarningWavFile
+IF %nowtaming && #ENEMYID <> N/A
+{
+		finditem #enemyid
+		if #findkind
+			return
+		IF %useDefend
+		{
+			%GOSUBorRemark utmenu xxx!!Under_Attack!!xxx
+			GOSUB FindEnemyArray %enemychecktypes
+			%sendDebugMsg utmenu totalenemy_found_ %enemyarray9
+			IF %enemyarray9 = 1 && %enemyarray21 NOTIN %savagetypes
+			{
+				GOSUB SteedMage %steedID %enemyarray11
+				goto DWE1
+			}
+			ELSE
+				CALL RoadkillsDefend.txt %steed %defendroutine %weaponid %weapontype
+			DWE1:
+			SET #LTARGETID %tameID
+			%SendDebugMsg utmenu exiting_Sub_DealWithEnemy
+			RETURN
+		}
+		IF ! %useDefend
+		{
+			%GOSUBorRemark utmenu Under_Attack_Moving_on
+			SET %gostart #true
+			RETURN
+		}
+}
+;deal with attackers first
+IF ! %nowtaming
+{
+	IF #ENEMYID <> N/A
+	{
+		finditem #enemyid
+		if #findkind
+			return
+		IF %useDefend
+		{
+			CALL RoadkillsDefend.txt %steed %defendroutine %weaponid %weapontype
+			SET #LTARGETID %tameID
+		}
+		IF ! %useDefend && ! %usePeace
+			GOSUB Invisabit
+		IF ! %useDefend && %usePeace
+			GOSUB PeaceMake #enemyid
+
+	}
+	IF ! %useDefend
+	{
+		SET %index 0
+		FINDENEMYTYPE:
+		SET %index %index + 1
+		FINDITEM %enemytypes %index
+		IF #FINDKIND = 1
+		{
+			IF #FINDREP = 1
+				GOTO FINDENEMYTYPE
+			SET %spot %spot + 1
+			SET %gostart #true
+			%GOSUBorRemark utmenu Enemy_nearby_moving_on
+			RETURN
+		}
+		;check if healthwatch reporting hurt poisoned or recall
+		IF *20 <> ok
+		{
+			SET %spot %spot + 1
+			%GOSUBorRemark utmenu Moving_on_HealthWatch_reports *20
+			SET %gostart #true
+			RETURN
+		}
+	}
+}
+RETURN
+;========================
+SUB KillWithSteed
+;ver 1.7 11Nov04
+;purpose: move close, dismount, whisper all killx2,  pause Healthwatch, use peace
+;	petheal if %useVet,if underattack retarget steed to attacker; start HW, Remount.
+;%1 is the steedID   %2 is the victimID
+ 	SET %steed %1
+ 	SET %victim %2
+ 	FINDITEM %victim G
+ 	%sendDebugMsg utmenu KillWithSteed 1: %1 2: %2 v: %victim FK #findkind
+if #findkind
+	return
+;move close to be sure you can target or give commands
+	if #finddist > 2
+		event pathfind #FINDX #FINDY #findz
+	gosub DismountAndTarget %steed %victim
+		set %petaid_timer 0
+		SET %old21 *21
+		SET *21 pause
+isdeadloop:
+	IF %usePeace
+		gosub PeaceMake %victim
+	IF %useVet
+		GOSUB PetHeal aids %steed 3
+	FINDITEM %victim G
+	if #findkind = 1
+	{
+		IF #enemyid = N/A
+			goto isdeadloop
+		;---kill #enemyid with steed---------
+		set #ltargetid #enemyid
+		event macro %spch 0 all kill
+		target
+		event macro 22 0
+		; maybe do invis here to break target?
+		isDead2:
+		if #enemyid <> N/A
+			goto isDead2
+		;---retarget the victim---
+		set #ltargetid %victim
+		event macro %spch 0 all kill
+		target
+		event macro 22
+		goto isdeadloop
+	}
+	SET *21 %old21
+;------remount section----28Jan03
+	IF %steed <> %steedbu 2
+		%sendDebugMsg utmenu steed!=steedBU %steed %steedbu
+		SET %steed %steedbu
+	gosub Remount %steed
+RETURN
+;===============================
+;* @Name PetHeal
+;* @ver	1.8 5Nov04
+;* 	--added no-move near for magery to deal with aura monsters,
+;*	1.6= %3  added optional
+;*	1.8 removed vars to %1, removed req to init petaid_timer
+;* @author  Roadkill
+;* @purpose: heals pets by vet/aids or magery. Avoids vetting too quickly.
+;* @param   %1 is the pethealmethod, aids or magery
+;*	%2 is the petid
+;*	%3 is the healing delay in seconds for pets (optional, default 4s)
+;* @returns
+;* @changes
+;* @example call rksubs.txt Petheal aids %dragon 3
+;* @dependencies
+;* @status
+SUB PetHeal
+	if %0 < 3 || %3 = N/A
+		set %3 4
+;move close to be sure you can heal
+	findItem %2 G
+	IF #findkind = -1
+		return
+	IF %1 = aids && #finddist > 1
+		event pathfind #findx #findy #charposz
+		wait 30
+	IF %1 = magery && #finddist > 7
+		MOVE #FINDX #FINDY 4 2s
+	set #ltargetkind 1
+	SET #LTARGETID %2
+	if %petaid_timer = n/a
+		set %petaid_timer 0
+	IF %1 = aids && #SCNT > %petaid_timer
+	{
+		FINDITEM ZLF C
+		SET %_NoAids #TRUE
+		IF #FINDKIND = 0
+		{
+			SET %_NoAids #FALSE
+			SET #LOBJECTID #FINDID
+			EVENT MACRO 17 0
+			TARGET
+			EVENT MACRO 22 0
+			SET %petaid_timer #SCNT + %3
+		}
+	}
+	IF %1 = magery || %_NoAids
+	{
+		EVENT Macro 15 28
+		TARGET 5s
+		EVENT Macro 22 0
+		WAIT 30
+	}
+RETURN
+;==========================
+SUB KillMagery
+;ver 1.5 2Jul03 by Roadkill
+;purpose: attack explode or ebolt/fireball etc
+;%1 is the victimID
+	finditem %1 G
+	IF #findkind
+		return
+	SET %old21 *21
+	SET *21 pause
+ 	SET %_EFvictim %1
+	SET #LTARGETID %_EFvictim
+	IF #enemyid = N/A
+		Event Macro 15 42 ;explosion
+	ELSE
+		event Macro 15 41  ;ebolt
+	target 5s
+	GOSUB WaitForInRange %_EFvictim  10
+	Event Macro 22 0
+	wait 30
+	FIREBALL1:
+	IF #MANA < 30
+		GOSUB Invisabit
+	Event Macro 15 17 ;fireball
+		target 5s
+		Event Macro 22 0
+		wait 30
+	;check if dead loop
+	FINDITEM %_EFvictim
+	IF #FINDKIND = 1
+		GOTO FIREBALL1
+	SET *21 %old21
+RETURN
+;========================
+SUB SteedMage
+;purpose: attack w/steed if no enemytype or savages sensed else explode/fireball etc
+;%1 is the steedID   %2 is the victimID
+;dependencies: %use_necro_spell, %MakeTamesFollowSavage %enemyarray
+ SET %steed %1
+ SET %victim %2
+	GOSUB FindEnemyArray %savagetypes
+	%sendDebugMsg utmenu %enemyarray9 _savages/orcs_found_inSteedMage
+	IF %enemyarray9 = 0
+	{
+		GOSUB KillWithSteed %steed %victim
+		RETURN
+	}
+	IF %use_necro_spell
+		GOSUB NecroAttack %victim
+	IF ! %use_necro_spell
+		GOSUB KillMagery %victim
+
+RETURN
+;======================
+SUB FindEnemyArray
+;ver 1.2 3Jul3 made enemytypes local, Added enemyArrayClosest index
+;purpose: find creatures of %enemytypes and arrange data into array
+;%1 = %enemytypes
+;returns: %enemyarrayClosest holds the index of closest enemy
+;array is %enemyarray, indexes are: 1=enemyid 2=enemytype 3=finddist 4=findrep 9=totalfound
+	SET %_enemytypes %1
+	SET %index 0
+	SET %enemyarrayClosest 1
+FINDENEMYARRAY:
+	SET %index %index + 1
+	FINDITEM %_enemytypes %index
+	IF #FINDKIND = 1
+	{
+		SET %enemyarray1 . %index #FINDID
+		SET %enemyarray2 . %index #FINDTYPE
+		SET %enemyarray3 . %index #FINDDIST
+		SET %enemyarray4 . %index #FINDREP
+		IF #FINDDIST < %enemyarray3 . %enemyarrayClosest
+			SET %enemyarrayClosest %index
+		GOTO FINDENEMYARRAY
+	}
+	 ;put a 0 after valid spots
+	SET %enemyarray1 . %index 0
+	 ;puts total found enemy position 9
+	SET %enemyarray9 %index - 1
+RETURN
+;========================
+SUB NecroAttack
+;ver 1.1 13 Jun03 by VictorLacroix/Roadkill
+;purpose: attack with necro pain spike and poison strike
+;%1 is the victimID
+	SET %old21 *21
+	SET *21 pause
+ 	SET %_NAvictim %1
+ 	SET #LTARGETID %_NAvictim
+	Event Macro 15 109 ;pain spike
+		target 5s
+		GOSUB WaitForInRange %_NAvictim  10
+		Event Macro 22 0
+		WAIT 30
+NecroAttackLoop:
+	Event Macro 15 110 ;poison strike
+		target 5s
+		Event Macro 22 0
+		WAIT 30
+	;check if dead loop
+	FINDITEM %_NAvictim
+	IF #FINDKIND = 1
+		GOTO NecroAttackLoop
+	SET *21 %old21
+RETURN
+;===================
+;**
+;* @Name: KillMelee
+;*	ensures weapon or replacement in hand, attacks passed in victim until dead,
+;*	heals with aids if requested. Delays 1st aid by 3s to not waste it. During
+;*	loop, continually checks war mode and weapon in hand/unbroken or replaced.
+;* @ver	1.2 3Jan04
+;* @author  Roadkill
+;* @purpose Arms/replaces weapon, warmode, melee victim until dead, heal w/ aids
+;* @param   %1  weaponid  	req
+;*          %2  weapontype    	req
+;*	    %3  victimid 	req  is the thing to be killed
+;*	    %4 #true/#false     opt  heal with aids? Defaults to #false
+;* @return  --
+;* @changes %weaponID
+;* @example call rksubs.txt Killmelee %weaponid %weapontype %_victim
+;* @status  tested, works well
+SUB KillMelee
+	set !_victim %3
+	set !_useAids #false
+	if %0 >= 4
+		set !_useAids %4
+	set !aid_timer 0
+	set !1st_aid_delay #SCNT + 3
+	set !aid_delay ( 5 - ( #dex / 20 ) ) + 6
+
+_RKMeleeLoop:
+	IF G NOTIN #CHARSTATUS
+		event macro 6
+	finditem !_victim
+	if #findkind
+	{
+		event macro 6
+		return
+	}
+	GOSUB WeaponReplacer %1 %2 weaponID
+	set #ltargetkind 1
+	SET #LTARGETID !_victim
+	EVENT MACRO 27
+	IF !_useAids && #SCNT > !aid_timer && #SCNT > !1st_aid_delay
+	{
+		FINDITEM ZLF C
+		IF #FINDKIND = 0
+		{
+			SET #LOBJECTID #FINDID
+			EVENT MACRO 17 0
+			TARGET
+			EVENT MACRO 23 0
+			SET !aid_timer #SCNT + !aid_delay
+		}
+	}
+GOTO _RKMeleeLoop
+;========================
+;**
+;* @Name: WeaponReplacer
+;* @ver	1.2 3Jan04
+;* @author  Roadkill
+;* @purpose Checks for and keeps weapon in your hand, replace it from an open pack if it breaks
+;* @param   %1  weaponid  	req
+;*          %2  weapontype    	req
+;*	    %3  var holding ID  req
+;* @return  @%3 var may be changed, it is always assigned with new weapon
+;* @changes %weaponid may be modified when weapon is replaced, for legacy
+;* @example call rksubs.txt WeaponReplacer %weaponid %weapontype weaponid
+;* @status  tested
+SUB WeaponReplacer
+	SET !_weaponid %1
+	SET !_weapontype %2
+_WRCheckForInHand:
+	FINDITEM !_weaponid C
+	if #findkind = 0 && #findbagid = #charid
+		return
+	IF #FINDKIND = 0
+	{
+		event macro 15 0
+		target
+		key esc
+		WAIT 5
+		GOTO _rearm
+		;this section casts bogus spell to empty hands to prep for rearm
+	}
+; weaponID not found, find a new weapon of %weapontype in any open pack and set to new ID
+	FINDITEM !_weapontype C
+	IF #FINDKIND = -1
+	{
+		display OK cant find any of your weapons, pausing$
+		pause
+		return
+	}
+	SET !_weaponid #FINDID
+	IF %0 >= 3
+		set % . %3 !_weaponid
+	else
+		set %weaponid #findid
+_rearm:
+	SET #LHANDID !_weaponid
+	SET #RHANDID !_weaponid
+	WAIT 5
+	event macro 24 2
+	WAIT 3s
+	event macro 24 1
+	WAIT 3s
+	goto _WRCheckForInHand
+;=====================================
+;**
+;* @Name: GetWeaponIdType
+;* 	setup routine to get a weaponid and type for replacement. If you know
+;*	type of weapon it should be, you can pass that in to doublecheck
+;* @ver 1.1 3Jan04
+;* @author  Roadkill
+;* @purpose set up a weaponID and a WeaponType for script, opt check of allowed type
+;* @param   %1  weaponid  	req	var name to pass back the weaponID in
+;*          %2  weapontype    	req	var name to pass back the weaponType in
+;*	    %3  allowable wpns  opt     allowable weapontypes to check for, default no check
+;* @return  @%1 and @%2 are set, default with no params is %weaponID and %weapontype, legacy
+;* @changes %weaponid and %weapontype maybe if no params passed in
+;* @example call rksubs.txt GetWeaponIdType weaponid weapontype WOH_JSF_LMH_PPO
+;* @status  tested good with and without params passed, good legacy
+SUB GetWeaponIdType
+_dragwep:
+	display ok Drag one of the weapons now and put it in your hand$
+     +  Even if it is already there, drag it OFF then back into hand,$
+     +  you have 5 seconds$
+	WAIT 5s
+	SET !weaponid #LLIFTEDID
+	FINDITEM !weaponid C_ , #charid
+	SET !weapontype #FINDTYPE
+	if ( %0 = 3 && !weapontype NOTIN %3 ) || #findkind = -1
+	{
+		DISPLAY OK I didn't see correct weapon type, lets try again$
+		GOTO _dragwep
+	}
+	if %0 = 0
+		set %weaponid !weaponid
+		else
+			set % . %1 !weaponid
+	if %0 < 2
+		set %weapontype !weapontype
+		else
+			set % . %2 !weapontype
+RETURN
+;=======================
+SUB UTpause
+;purpose: pause UltraTamer when *20 is not 'ok'
+	%sendDebugMsg utmenu entered_sub_UTPause_*20= *20
+	UTpause:
+	IF *20 = ok
+		RETURN
+	WAIT 5
+	GOTO UTpause
+RETURN
+;======================
+SUB CheckForTamers
+;ver 1.3 24Jan04
+;purpose: check for nearby chars, ignore tame if yes and add to a tamer list
+;         Also now checks for NPC vendors, keeps a list to check, and ignores them
+;%1 is the ID of potential tame
+;returns: %nearbyTamers yes or no , and %tamerids and %vendorids are lists
+	SET %tameID %1
+	SET %nearbyTamers no
+	SET %index 0
+SEARCH1:
+
+	SET %index %index + 1
+	FINDITEM NAB_OAB_HS_IS_SAB %index
+	IF #FINDKIND = -1
+		RETURN ;only exit with no tamers
+	%SendDebugMsg utmenu SubCheckForTamers findkind= #findkind findid= #findid vendorids= %vendorids
+	if #findid = #charid || #findid IN %vendorids
+		GOTO SEARCH1
+	IF #FINDREP = 7
+	{
+		SET %vendorids %vendorids , _ , #FINDID
+		GOTO SEARCH1
+	}
+	SET %dude #FINDID
+	IF %dude IN %tamerIDs
+		GOTO TAMERNEARBY
+	call rksubs.txt CheckNPC %dude npcResult vendorids pcids
+	if NPC IN %npcResult
+		return
+	if %avoidAllPCs && NPC NOTIN %npcResult
+		goto TAMERNEARBY
+	;analyze PC to see if he's taming--
+	GOSUB DistBetweenItems %tameID %dude
+	IF %distbetween <= 5
+	{
+		IF %issuePlayerWarningSound
+			sound %playerWarningWavFile
+		IF %dude IN %tamerIDs
+			GOTO TAMERNEARBY
+		%GOSUBorRemark utmenu dude_notin_TamersList_analyzing
+		WAIT 5s
+		GOSUB DistBetweenItems %tameID %dude
+		IF %distbetween <= 3
+			GOTO TAMERNEARBY
+	}
+	; first pass > 5 or 2nd pass >=4
+	GOTO SEARCH1
+	TAMERNEARBY:
+		SET %nearbyTamers yes
+		IGNOREITEM #tameID 1
+		GOSUB AddToTamersList %dude
+		%GOSUBorRemark utmenu tamer_nearby_ %dude
+RETURN
+;=========================
+SUB DistBetweenItems
+; ver 1.1 12 May 03 by Roadkill
+;purpose: find the distance between 2 items on the ground
+;%1 item 1   %2 item 2
+;return answer as %distbetween, returns notfound if an item not found
+	SET %distbetween NotFound
+	FINDITEM %1 G
+	IF #FINDKIND = -1
+		RETURN
+	SET %_xDist #FINDX
+	SET %_yDist #FINDY
+	FINDITEM %2 G
+	IF #FINDKIND = -1
+		RETURN
+	SET %_xDist %_xDist - #findX abs
+	SET %_yDist %_yDist - #findY abs
+	SET %distbetween %_ydist
+	IF %_xdist > %_ydist
+		SET %distbetween %_xdist
+RETURN
+;===========================
+SUB AddToTamersList
+;purpose: check if a charid is in tamers list and add if not
+;%1 is the %dude to add to list
+;%tamerIDs is the var containging tamers list
+	SET %dude %1
+	IF %tamerIDs = N/A
+	{
+		SET %tamerIDs %dude
+		RETURN
+	}
+	IF %dude IN %tamerIDs
+		RETURN
+	SET %tamerIDs %tamerIDs , _ , %dude
+	%GOSUBorRemark utmenu %dude _added_to_TamersList
+RETURN
+;==================================
+;@name: SubRenameRelease
+;@ver 13 8Feb05
+;@author Roadkill
+;@purpose drags pets healthbar and renames it
+;@status works well but not rigorous for vars/namespace
+;v9 reorganized in FOR loop, compressed, used new clickscreenxyz,
+;     and steps left of tame if unable to get bar (blocking)
+;v12 added single name prop check/redo, dropped healthbar to 0 30 for menubar
+;vars that must exist. You can ensure they exist in calling program, or set it here.
+; %1 = tameID, passed in, the pet you want to rename and release
+;	%tamebardragged if 'L' name is just appended instead of erased
+;		this indicates a Low position on screen, below your head
+; %2 = rename or renamerelease , tells this sub what to do
+SUB SubRenameRelease
+	SET %tameID %1
+	SET %_limited_action %2
+	set !namePropchecked #false
+	if %easyrelease
+		goto _release
+_subrenametop:
+	event macro %spch 0 all stay
+	EVENT MACRO 29 0   ;turn circle of trans on to grab bar in case buildings
+	IF #CONTID = %tameID
+	{
+		event macro %spch 0 all follow me
+		WAIT 5
+		GOTO RENAME
+	}
+	GOSUB GetYDisplacementForAnimType %tameID
+	FOR %tries 1 5
+	{
+		FINDITEM %tameID
+		IF #FINDDIST > 2
+			MOVE #FINDX #FINDY 2 1s
+		IF %tries >= 3
+		{
+			%GOSUBorRemark utmenu moving_left_of_it
+			FINDITEM %tameID
+			SET %xx #FINDX - 1
+			SET %yy #FINDY + 1
+			MOVE %xx %yy 0 2s
+		}
+		IF %tries = 4
+			SET %yDisplacement %yDisplacement - 7
+		IF %tries = 5
+			SET %yDisplacement %yDisplacement + 14
+		FINDITEM %tameID
+		IF #findkind = -1 2
+			%GOSUBorRemark utmenu Cant_find_the_tame
+			RETURN
+		GOSUB clickScreenXYZ #FINDX #FINDY #FINDZ 0 %yDisplacement
+		IF %outsidescreen = #true
+			display ok that is outside screen
+		click %_cursorx %_cursory g
+			wait 10
+		click %_cursorx %_cursory p
+			wait 10
+		IF #CONTID = %tameID
+			GOTO RENAME
+		IF #CONTID = #CHARID
+		{
+			WAIT 10
+			CONTPOS %statusbarX %statusbarY
+			WAIT 1s
+		}
+	}
+	EVENT MACRO 29 0
+	%GOSUBorRemark utmenu Cant_get_healthbar
+	RETURN
+RENAME:
+	EVENT MACRO 29 0
+	CONTPOS 0 30
+	gosub waitforsysvars contposx = 0 contposy = 30 5
+	IF #ENEMYID <> N/A && %use_necro_spell
+		GOSUB NecroAttack #ENEMYID
+	IF #ENEMYID <> N/A && ! %use_necro_spell
+		GOSUB KillMagery #ENEMYID
+		;need to look at stopping HealthWatch so you dont tgt self
+	CLICK 130 55 d
+	WAIT 5
+	gosub Getname %tameid petname
+	str len %petname
+	IF %tamebardragged <> L
+	{
+		FOR %cnt 1 #strres
+		{
+			KEY back
+			WAIT 1
+		}
+	}
+	str lower %tag
+	msg #strres $
+	WAIT 11
+	CLICK 130 55 r
+	gosub waitforsysvars contid <> %tameid 3
+_release:
+	gosub Getname %tameid petname
+	if %easyrelease = #false && %tag notin %petname && ! !namePropchecked
+	{
+		set !namePropchecked #true
+		goto _subrenametop
+	}
+	if %animallore
+		gosub animallore %maxloretries
+	IF %_limited_action <> renamerelease
+		goto _exitrenamerelease
+	event macro %spch 0 %petname release
+	WAIT 11
+	;check for the freeshard gump "are you sure you want to release?"
+	if %releasegump
+	{
+		gosub waitforsysvars contsize = 270_120 contname = generic_gump 5
+		set !gx #contposx + 30
+		set !gy #contposy + 90
+		click !gx !gy f
+		gosub waitforsysvars contsize <> 270_120 followers = %oldfollowers 4
+	}
+_exitrenamerelease:
+RETURN
+
+;===========================================================
+; Name: clickScreenXYZ
+; Author: ScriptFellow
+;modded by RK, remarked out F click, just using the vars
+; Parameters: %1 = world x-coordinate
+;             %2 = world y-coordinate
+;             %3 = world z-coordinate
+;             %4 = x displacement (to be added to the screen coordinate)
+;             %5 = y displacement (to be added to the screen coordinate)
+; Purpose: Clicks on the screen given by world coordinates (with displacement)
+;          initialize the following variables:
+;          %_cursorX, %_cursorY
+; Return: %outsideScreen (#true or #false )
+;-----------------------------------------------------------
+sub clickScreenXYZ
+	set %1 ( %1 - #charPosX ) * 22
+	set %2 ( #charPosY - %2 ) * 22
+	set %3 ( %3 - #charPosZ ) * 4
+	if %0 < 4 || %4 = N/A
+		set %4 0
+	if %0 < 5 || %5 = N/A
+		set %5 35
+	set %_cursorX #cliLeft + #cliXRes / 2 + %1 + %2 + %4
+	set %_cursorY #cliTop + #cliYRes / 2 + %1 - %2 - %3 + %5
+	set %outsideScreen #true
+	if %_cursorX > #cliLeft &&
+		+ %_cursorY > #cliTop &&
+		+ %_cursorX < ( #cliLeft + #cliXRes ) &&
+		+ %_cursorY < ( #cliTop + #cliYRes )
+	{
+		set %outsideScreen #false
+		;click %_cursorX %_cursorY F
+	}
+return
+;====================================
+SUB GetYDisplacementForAnimType
+;ver 1.0 21 Apr 03 by Roadkill
+;purpose: look up animals by type to get a height displacement for screen clicking
+;%1 = %tameID
+;returns: %yDisplacement as a y pixel value to be added to #FINDY (near feet)
+;             to click center of mass
+	SET %_shortanimals GE_ZD_L_M_TF__IG_NG__ZF_PF_EG_CO_TG_PG_VD
+	SET %_tallanimals AH
+	set %_realshortanimals DG
+	SET %yDisplacement -32
+	FINDITEM %1
+	IF #FINDTYPE IN %_shortanimals
+		SET %yDisplacement -25
+	IF #FINDTYPE IN %_tallanimals
+		SET %yDisplacement -45
+	IF #findtype IN %_realshortanimals
+		SET %yDisplacement -15
+RETURN
+;=====================================
+SUB SubRailMove
+;ver 1.4 11Nov04 by Roadkill
+;purpose: use a Roadkill style RailSpotsXXX.txt file (previously read in via call) to
+;   move along rail.  Decisions about which spot to go to made outside by using %spot
+;   or incrementing %spot + 1 to return to last rail spot or move along rail.
+; RailSpots file can by X/Y coords only, OR can be X/Y/Z which adds reliability
+	SET %cnt 0
+	IF %spot > %endspot
+		SET %spot 1
+ 	;for counterflow defense
+	IF %spot = 0
+		SET %spot %endspot
+CALCSPOT:
+	;check for underattack during movement problems
+	if #hits < #maxhits - 20 && #enemyID <> N/A && %usePeace
+		gosub PeaceMake #enemyID
+	;concatenate x and y to make them = x1 y1 etc
+	SET %x %x . %spot
+	SET %y %y . %spot
+	SET %z %z . %spot
+	%GOSUBorRemark utmenu Walking_to_spot_ %spot
+	MOVE %x %y 1 6s  ;6 seconds may not be enough for long rail legs
+	IF #CURSKIND <> 0
+		MOVE %x %y 0 1s
+	GOSUB CheckLocation
+	IF ! %blocked
+		RETURN
+	if %z = N/A
+		event pathfind %x %y #charposz
+	else
+		event pathfind %x %y %z
+	wait 4s
+	GOSUB CheckLocation
+	IF %blocked
+	{
+	     GOSUB TeleToSpot %x %y %z
+	     key esc
+	}
+	GOSUB CheckLocation
+	IF ! %blocked
+		RETURN
+	%GOSUBorRemark utmenu Cant_get_to_next_spot_Returning_previous
+	SET %spot %spot - 1
+	IF %spot = 0
+		SET %spot %endspot
+	SET %cnt %cnt + 1
+	IF %cnt < 2
+		GOTO CALCSPOT
+	%GOSUBorRemark utmenu %cnt _tries_couldnt_reach_spot
+	IF %useBackTrack
+	{
+		%GOSUBorRemark utmenu backtrack_invoked
+		SET *30 backtrack
+		;SET *20 blocked
+		GOSUB UTPause
+	}
+RETURN
+;///////////////
+SUB CheckLocation
+;ver 1.1 26 Apr 03 by Roadkill
+;purpose: check within 1 tile
+	SET %blocked #TRUE
+	SET %xcheck #CHARPOSX - %x abs
+	SET %ycheck #CHARPOSY - %y abs
+	IF %xcheck > 1 || %ycheck > 1
+		RETURN
+	SET %blocked #FALSE
+	%GOSUBorRemark utmenu Arrived_at_spot_ %spot
+	SET %newSpot #true
+	IF %oldspot = %spot
+		SET %newSpot #FALSE
+	SET %oldspot %spot
+	;tell BackTrack we are at spot, stop recording
+	SET *30 stoprecording
+	set *70 #true
+	set *71 %spot
+	set *72 %endspot
+RETURN
+;+++++++END of SubRailMove+++++++
+;=============================
+;**
+;* @Name: StatusBarPosSetup
+;* Finds sets up the position of your status bar via drag, if not preset or not open
+;* @ver 2.1 18Jun04
+;* @author  Roadkill
+;* @purpose Finds sets up the position of your status bar if not preset or not open
+;* @param   %1  %statusbarposn     req 'menu' or 'preset', determines if this is configed already
+;*          %2  @return varname for statusbarx position  opt , default is %statusbarx
+;*          %3  @return varname for statusbary position  opt , default is %statusbary
+;* @return  varnames passed as %2 and %3 are loaded and returned, AND %statusbarx %statusbary (legacy)
+;* @example call rksubs.txt StatusBarPosSetup %statusbarposn statusbarx statusbary
+;	---place next 3 lines in your config section-------
+;	SET %statusbarposn menu   ; can be 'menu' to choose location, or 'preset' to use the coords you preset next 2 below
+;	SET %statusbarX 750     ;preset status bar position if not using 'menu' above
+;	SET %statusbarY 0	;preset status bar position if not using 'menu' above
+;* @status: tested
+SUB StatusBarPosSetup
+	IF %1  = menu || #charname = n/a
+	{
+		EVENT MACRO 8 2
+		WAIT 1s
+		if % . %2 <> n/a && % . %3 <> n/a
+			contpos % . %2 % . %3
+		DISPLAY OK Drag your status bar to where you want it on your screen$ You have 5 seconds$
+		WAIT 5s
+		SET %statusbarX #CONTPOSX
+		SET %statusbarY #CONTPOSY
+		if %0 >= 2
+			set % . %2 #contposx
+		if %0 = 3
+			set % . %3 #contposy
+	}
+RETURN
+;===========================
+SUB EnsureStatusBarUp
+;version 1
+;purpose: make sure your status bar is open at position %1 %2
+;%1 X-coord for status bar
+;%2 Y-coord for status bar
+;----------------------------------------------------
+;call this sub from a mainprogram loop
+;----------------------------------------------------
+	IF #CHARNAME = N/A
+	{
+		EVENT MACRO 8 2
+		WAIT %delay
+		CONTPOS %1 %2
+		WAIT %delay
+	}
+RETURN
+;***********************
+; UltraTamer Menu utmenu.txt
+; v1.8 19Jun04 by Roadkill
+; %1, %2, %3 etc. are message parts (one required, no upper limit that fits)
+; ; call this the first time as "GOSUB utmenu init NumberOfMessageLinesDisplayed Title_Text"
+;	to generate a menu of desired length and title
+;	1.8 changed to btnface, spaces in msg, no init bogus msg, shapes, colors
+;***********************
+SUB utmenu
+	IF ! %useMessageMenu
+		RETURN
+	IF %utmenu_init1 <> 1
+	{
+		GOSUB utmenu_init
+		return
+	}
+	IF %0 >= 2
+	{
+		FOR %_i 2 %0
+		{
+			SET %_m % . %_i
+			SET %1 %1 , #spc , %_m
+		}
+	}
+	;rewrite the last msg in normal color
+	menu font bgcolor white
+	menu font color blue
+	IF %curmenuitem <> 0
+		menu text %curmenuitem 4 %ymenu %oldmenumsg
+	;write the new next message
+	SET %curmenuitem %curmenuitem + 1
+	IF %curmenuitem = %numberOfMessagesDisplayed
+		SET %curmenuitem 1
+	SET %ymenu 15 * %curmenuitem
+	menu delete %curmenuitem
+	menu font color red
+	menu text %curmenuitem 4 %ymenu %1
+	SET %oldmenumsg %1
+	menu font bgcolor btnface
+	menu font color black
+RETURN
+;==subroutines====
+SUB utmenu_init
+	IF %1 = init
+	{
+		SET %numberOfMessagesDisplayed %2
+		SET %Ymenusize %numberOfMessagesDisplayed * 15
+		SET %railtitledisplay %3
+	}
+	;***main window setup***
+	menu clear
+	menu window size 500 %Ymenusize
+	menu window title Roadkills UltraTamer Version %version __
+		+ tames: %totaltames __Attempts: %totaltametries
+	menu window color btnface
+	menu Shape msgshape 0 0  199 %Ymenusize 3 7 1 white 7 white
+	menu Shape skillshape 400 135 100 45 3 7 1 aqua 7 aqua
+	;menu hideeuo
+	;menu show
+
+	;***set font color***
+	;menu font bgcolor BLACK
+	menu font color black
+	;menu font size 9
+	;menu font style bu
+
+	;***display Titles***
+	;menu text railtitle 0 0 %3
+	menu font size 7
+	menu font style n
+	;-----first column-------
+	menu button dorelease 200 0 58 15 %release
+	menu text doreleasetxt 260 0 Release Option
+
+	gosub ToggleButton doavoid avoidOtherTamers 200 15 58 15 draw
+	menu text doavoidtxt 260 15 Avoid Tamers
+
+	gosub ToggleButton doVet useVet 200 30 58 15 draw
+	menu text doVettxt 260 30 Use Vet
+
+	gosub ToggleButton doWarn issuePlayerWarningSound 200 45 58 15 draw
+	menu text doWarntxt 260 45 Use WarningSound
+
+	gosub ToggleButton doDefend useDefend 200 60 58 15 draw
+	menu text doDefendtxt 260 60 Use Defend.txt
+
+	gosub ToggleButton dodebug useDebugMsg 200 75 58 15 draw
+	menu text dodebugtxt 260 75 Use Debug Msgs
+
+	gosub ToggleButton doMusic useMusic 200 90 58 15 draw
+	menu text doMusictxt 260 90 Gain music skill
+
+	gosub ToggleButton doMessage useMessageMenu 200 105 58 15 draw
+	menu text doMessagetxt 260 105 Use Feedback Msgs
+
+	gosub ToggleButton doPeace usePeace 200 120 58 15 draw
+	menu text doPeacetxt 260 120 Use PeaceMaking
+
+	if WJ IN %petid
+	{
+		gosub ToggleButton dofollow makeTamesFollowSavage 200 135 58 15 draw
+		menu text dofollowtxt 260 135 Tames Follow Savage
+	}
+
+	gosub ToggleButton doKillTame killWhileTame 200 150 58 15 draw
+	menu text doKillTametxt 260 150 Kill w/o releasing
+
+	menu button doSave 200 165 58 15 save settings
+	menu text dosavetxt 260 165 Save Settings
+
+	if %rail <> yes
+	{
+		menu button doSemi 0 0 100 15 %semiTaming
+		menu text sktxt 105 0 <-Press to Tame
+	}
+	else
+	{
+		menu button doSemi 0 0 100 15 Press to Pause
+		menu text sktxt 105 0 <-Press To PAUSE
+	}
+
+	;-------second column at 350 to 500---
+	menu button doPets 350 0 75 20 Update tame tgts
+	menu button doTag 350 20 75 20 Update Tag
+	menu button doRange 350 40 75 20 Set SearchRange
+	menu button doDefRoutine 350 60 75 20 Update defense
+	menu button doKillMethod 350 80 75 20 %killmethod
+	menu text doKilltxt 427 85 New Kill-Method
+	menu button doreset 350 100 75 15 reset_ignorelist
+
+	menu font bgcolor white
+	menu edit edPets 425 0 75 %petid
+	menu edit edTag 425 20 75 %tag
+	menu edit edRange 425 40 75 %searchrange
+	menu edit edDefRoutine 425 60 75 %defendRoutine
+	menu font bgcolor btnface
+	;***skillgain section***
+	menu font style bu
+	menu font size 9
+	menu text sktxt 350 120 (tenths) skill   gains     rate/hr
+	menu text sktxt 350 135 Tame
+	menu text sktxt 350 150 Lore
+	menu text sktxt 350 165 Vet
+
+	menu font style n
+;	menu font color blue
+	menu font size 7
+
+
+	SET %curmenuitem 0
+	SET %utmenu_init1 1
+	set %0 1
+RETURN
+;===================
+SUB CheckMenuButtons
+;ver 1.0 15Jun03 by Roadkill
+;perpose: scan through the menubutton options to see if pressed and act accordingly
+	IF #MENUBUTTON = dorelease
+	{
+		SET #MENUBUTTON N/A
+		if %release = some
+		{
+			set %release all
+			;menu font bgcolor white
+			%GOSUBorRemark utmenu release_option_now %release
+			%GOSUBorRemark utmenu drag_healthbar_to_release
+			%GOSUBorRemark utmenu HIGH=tag_rename,LOW=full rename
+			;menu font bgcolor black
+			goto redrawDorelease
+		}
+		if %release = all 2
+			set %release none
+			goto redrawDorelease
+		if %release = none
+			set %release some
+		redrawDorelease:
+		menu delete dorelease
+		menu button dorelease 200 0 58 15 %release
+		return
+	}
+	IF #MENUBUTTON = doavoid
+		gosub ToggleButton doavoid avoidOtherTamers 200 15 58 15 toggle
+	IF #menubutton = doVet
+		gosub ToggleButton doVet useVet 200 30 58 15 toggle
+	IF #menubutton = doWarn
+	{
+		gosub ToggleButton doWarn issuePlayerWarningSound 200 45 58 15 toggle
+		SET %issueAttackWarningUT #false
+		IF %issuePlayerWarningSound
+			SET %issueAttackWarningUT #true
+	}
+	IF #menubutton = doDefend
+		gosub ToggleButton doDefend useDefend 200 60 58 15 toggle
+	IF #menubutton = dodebug
+		gosub ToggleButton dodebug useDebugMsg 200 75 58 15 toggle
+	SET %sendDebugMsg #SMC
+	IF %useDebugMsg
+		SET %sendDebugMsg GOSUB
+	IF #menubutton = doMusic
+	{
+		gosub ToggleButton doMusic useMusic 200 90 58 15 toggle
+		if %useMusic
+			%GOSUBorRemark utmenu Music:_Be_sure_instrument_in_pack
+	}
+	IF #menubutton = doMessage
+	{
+		gosub ToggleButton doMessage useMessageMenu 200 105 58 15 toggle
+		SET %GOSUBorRemark #SMC
+		IF %useMessageMenu
+			SET %GOSUBorRemark GOSUB
+	}
+	IF #menubutton = doPeace
+		gosub ToggleButton doPeace usePeace 200 120 58 15 toggle
+	IF #MENUBUTTON = dofollow
+		gosub ToggleButton dofollow makeTamesFollowSavage 200 135 58 15 toggle
+	if #menubutton = doKillTame
+	{
+		gosub ToggleButton doKillTame killWhileTame 200 150 58 15 toggle
+		if %KillWhileTame
+			%GOSUBorRemark utmenu Now killing without releasing!
+	}
+	if #menubutton = doSave
+	{
+		set #menubutton n/a
+		gosub WriteGlobalVars
+		%GOSUBorRemark utmenu Saving your settings
+		return
+	}
+	IF #MENUBUTTON = doreset
+	{
+		SET #MENUBUTTON N/A
+		GOSUB ResetReleaseList
+		return
+	}
+	IF #menubutton = doSemi && %rail <> yes
+	{
+		SET #MENUBUTTON N/A
+		menu delete doSemi
+		set %semiTaming Taming
+		menu button doSemi 0 0 100 15 %semiTaming
+	}
+	IF #menubutton = doSemi && %rail = yes
+	{
+		SET #MENUBUTTON N/A
+		%GOSUBorRemark utmenu use_EUO_Pause_Key_to_Resume
+		pause
+	}
+	IF #menubutton = doPets
+	{
+		SET #MENUBUTTON N/A
+		menu get edPets
+		set %petid #menures
+		;menu delete edPets
+		;menu edit edPets 425 0 75 %petid
+		menu set edpets %petid
+		%GOSUBorRemark utmenu tabables_now %petid
+		if WJ IN %petid
+		{
+			gosub ToggleButton dofollow makeTamesFollowSavage 200 135 58 15 draw
+			menu text dofollowtxt 260 135 Tames Follow Savage
+		}
+	}
+	IF #menubutton = doTag
+	{
+		SET #MENUBUTTON N/A
+		menu get edTag
+		set %tag #menures
+		;menu delete edTag
+		;menu edit edTag 425 20 75 %tag
+		menu set edtag %tag
+		%GOSUBorRemark utmenu rename_tag_now %tag
+		if %tag = all
+			%GOSUBorRemark utmenu that name invalid! Change it!
+	}
+	IF #menubutton = doRange
+	{
+		SET #MENUBUTTON N/A
+		menu getnum edRange
+		set %searchrange #menures
+		;menu delete edRange
+		;menu edit edRange 425 40 75 %searchrange
+		menu set edRange %searchrange
+		%GOSUBorRemark utmenu Search_Range_now %searchrange
+	}
+	IF #menubutton = doDefRoutine
+	{
+		SET #MENUBUTTON N/A
+		menu get edDefRoutine
+		set %defendroutine #menures
+		;menu delete edDefRoutine
+		;menu edit edDefRoutine 425 60 75 %defendRoutine
+		menu set edDefRoutine %defendRoutine
+		%GOSUBorRemark utmenu defend_routine_now %defendroutine
+	}
+	IF #menubutton = doKillMethod
+	{
+		gosub RotateButton doKillMethod 350 80 75 20 killmethod KillWithSteed
+		+ KillMagery KillMelee SteedMage NecroAttack
+		if %killmethod = KillMelee && %weaponid = n/a
+			gosub GetWeaponIdType weaponid weapontype
+		%GOSUBorRemark utmenu Kill_Method_now %killmethod
+	}
+doneButtonChks:
+	;---skillgainsection---
+	if %semiTaming = paused && %rail <> yes
+		RETURN
+	if %nowTaming
+		RETURN
+	set %minutes ( #SCNT - %scriptstart ) / 60
+	menu window title Roadkills UltraTamer Version %version
+		+  tames: %totaltames    Attempts: %totaltametries    minutes: %minutes
+	menu font bgcolor aqua
+	menu font size 9
+	menu delete tametxt
+	menu delete loretxt
+	menu delete vettext
+	chooseskill anim
+	gosub RectifySkill #skill
+	set %gain #skill - %TamingSkillStart
+	set %rate %gain * 3600 / ( #SCNT - %scriptstart )
+	menu text tametxt 400 135 #result ---- %gain ---- %rate
+	chooseskill anil
+	gosub RectifySkill #skill
+	set %gain #skill - %LoreSkillStart
+	set %rate %gain * 3600 / ( #SCNT - %scriptstart )
+	menu text loretxt 400 150 #result ---- %gain ---- %rate
+	chooseskill vete
+	gosub RectifySkill #skill
+	set %gain #skill - %VetSkillStart
+	set %rate %gain * 3600 / ( #SCNT - %scriptstart )
+	menu text vettxt 400 165 #result ---- %gain ---- %rate
+	menu font size 7
+	menu font bgcolor btnface
+RETURN
+;==================
+sub RectifySkill
+;%1 is #skill
+;@returns #result with skill converted to xx.x format
+	str len %1
+	;set !dotspot #strres - 1
+	;str Ins %1 #dot !dotspot
+	str Ins %1 #dot #strres
+return #strres
+;==============
+SUB ToggleButton
+;ver 1.0 15Jun03 by Roadkill, SPECIAL TEST VERSION FOR COLORED BUTTONS
+;purpose: toggle a menu button from Disabled to Enabled and back, and change the associated
+;	variable from #true/#false.
+;	Additionally, if you pass in last param as "draw" it will draw the button first time
+;%1= #menubutton name
+;%2= the variable, without the %, ie %useDebugMsgs would be useDebugMsgs
+;%3= button x position
+;%4= button y position
+;%5= button width
+;%6= button height
+;%7= draw or toggle. Draw draws the button first time, toggle changes button and var
+	SET #MENUBUTTON N/A
+	SET %buttonMsg DISABLED
+	if % . %2
+		SET %buttonMsg ENABLED
+	if %7 = draw
+		goto _drawButton
+
+	if % . %2
+	{
+		set % . %2 #FALSE
+		SET %buttonMsg DISABLED
+	}
+	ELSE
+	{
+		set % . %2 #TRUE
+		SET %buttonMsg ENABLED
+	}
+	menu delete %1
+_drawButton:
+	;menu font color black
+	if %buttonMsg = enabled
+		menu Font BGColor lime
+	if %buttonMsg = disabled
+		menu Font BGColor red
+	menu button %1 %3 %4 %5 %6 %buttonMsg
+	;menu font color red
+	menu font bgcolor btnface
+return
+;==================
+sub rotateButton
+;ver 1.0 26Jun03 by Roadkill and the.WZA
+;purpose: for a variable (%6) that has multiple possible string values, rotate through
+;	those values when a button %1 is pressed, and display the button with new value as label
+;example usage:  IF #menubutton = doRelease
+;			gosub RotateButton doRelease 200 60 58 15 release some all none
+;	this would change the variable %release to some/all/none in rotation
+;	and make the button doRelease on your menu change its label as appropriate
+;%1= #menubutton name
+;%2= button X position
+;%3= button Y position
+;%4= button Width
+;%5= button Height
+;%6= the variable, without the %, ie %release would be release
+;%7 %8 %9 etc. are possible string values for the variable in %6
+	for %__ 7 %0
+	{
+		if % . %6 = % . %__
+		{
+			if %__ < %0
+				set %__ %__ + 1
+			else
+				set %__ 7
+			set % . %6 % . %__
+		}
+	}
+	set #menubutton N/A
+	menu delete %1
+	menu button %1 %2 %3 %4 %5 % . %6
+return
+;==================
+SUB AlwaysRun
+;purpose: ensure that always run is toggled on
+	event macro %spch2 0
+	WAIT 2
+	IF now_on IN #SYSMSG
+		RETURN
+	event macro %spch2 0
+RETURN
+;==============
+;**
+;* @Name RKSteedSetup
+;	find your steed's ID if you are riding one, first looking at common steeds
+;	to see if you are MOUNTED, THEN asking you and auto finding, lastly having you
+; 	target the thing yourself.  This sub uses event sysmessages in your journal, disable if concerned
+;steedtypes= mares kirin  beetle horses ridgeback frenzied llama swampie uni fire hiryu/lesserhiryu
+;	firebeetle(jj)
+;* @ver 1.7 27Jan05 1.6 added CA beetlepackfinding, 1.7 added freeshard kud packs
+;* @author  Roadkill
+;* @purpose find your steed's ID if you are riding one
+;* @param   %1  @return varname for steed ID, optional (default %steed and %steedbu, legacy)
+;*	%2 @varname for beetlepackid (optional, default %beetlepackid if present)
+;* @returns  varnames passed as %1 & #result, with steed ID AND %steed and %steedbu, legacy
+;*	also returns @%2 and %beetlepackid if present
+;* @example call rksubs.txt RKSteedSetup steed
+;* @status tested good, replace RK_AutoSteedSetup with this
+SUB RKSteedSetup
+	set !beetletype zgb
+	set !backpacktype zjf_kud
+	SET !steedtypes EC_UJ_TJ__SH__ZGB__SG_MG_OF_SF__WJ_KG_EG_MHB__SC__YJ__HH__JJ
+	;look for a mounted steed first for total autofind, findkind 0 mounted is quirky though
+RKAutoSteedMountedFindLoop:
+	FINDITEM !steedtypes C_ , #charid
+	IF #FINDKIND = 0
+		goto _foundSteed
+	;didn't find mounted steed, auto dismount/find/mount
+	SET #LOBJECTID #CHARID
+	EVENT MACRO 17
+	WAIT 1s
+RKAutoSteedFindLoop:
+	FINDITEM !steedtypes G_1
+	IF #findkind = 1
+		goto _foundSteed
+	;didn't autofind a steed, do it manually then
+	DISPLAY YESNO Do you have a steed with you?$
+	IF #DISPRES = NO
+		RETURN nomount
+	DISPLAY OK TARGET your steed now$
+	SET #LTARGETID null
+	SET  #TARGCURS 1
+_steedTarg:
+	wait 3
+	IF #LTARGETID = null
+		GOTO _steedTarg
+	finditem #ltargetid
+_foundSteed:
+	SET %steed #findid
+	SET %steedbu %steed
+	if %0 >= 1
+		set % . %1 #findid
+	if #findtype = !beetletype
+	{
+		finditem !backpacktype CA_ , %steed
+		if %0 = 2 && %2 <> n/a
+			set % . %2 #findid
+		set %beetlepackid #findid
+	}
+	SET #LOBJECTID %steed
+	EVENT MACRO 17 0
+	WAIT 1s
+	event sysmessage steed is %steed findkind= #findkind
+RETURN %steed
+;===============================
+SUB TeleToSpot
+;ver 1.2 7jul03 by Roadkill
+;purpose: check distance within teleport range <=11 tiles, teleport to a passed in spot
+;%1 = X tile coord
+;%2 = Y tile coord
+;%3 = Z tile coord, optional
+ 	IF %0 < 3 || %3 = N/A
+ 		SET %3 #CHARPOSZ
+ 	SET %_xDist #CHARPOSX - %1 abs
+	SET %_yDist #CHARPOSY - %2 abs
+	IF %_xdist > 11 || %_ydist > 11
+		RETURN
+	SET #LTARGETX %1
+	SET #LTARGETY %2
+	SET #LTARGETZ %3
+	SET #LTARGETKIND 2
+	event Macro 15 21
+	target 4s
+	event macro 22
+	WAIT 30
+	key esc
+RETURN
+;===========================
+;* @Name CheckForEquipment
+;	detect if needed equipment is present and equipped if required, autoset variables
+;* @ver 1.3 25 Sep04
+;* @author  Roadkill
+;* @purpose detect if needed equipment is present and equipped if required, autoset variables
+;* @param   %1 is the equipment type or ID
+;*	%2 variable name of the equipment without %, %scissors would be scissors, required
+;*	%3 #true =force them to get equip to continue
+;*	   #FALSE = script can continue (optional, default #TRUE)
+;*	%4 #TRUE if the item needs to be equipped (optional, default #FALSE)
+;*	%5 #true if it must be in the mainpack, (optional, default #false)
+;*	%6 ID of mainpack, required if %5 used, script attempts to use #backpackid
+;* @returns @%2 holds the #findid, %return and #result hold #true if item found, #false if not
+;* @example call rksubs.txt CheckForEquipment TSF knife #true #false #true %mainpack
+SUB CheckForEquipment
+	IF %0 < 3 || %3 = n/a
+		SET %3 #TRUE
+	IF %0 < 4 || %4 = n/a
+		SET %4 #FALSE
+	if %0 < 5 || %5 = n/a
+		set %5 #false
+	if %0 >= 5 && #backpackid <> n/a
+		set %6 #backpackid
+	SET %return #FALSE
+	SET % . %2 N/A
+	_CheckForEquipment:
+	FINDITEM %1 C
+	IF #FINDKIND = -1
+	{
+		IF %3 = #FALSE
+			goto exitCheckForEquipment
+		DISPLAY OK I did not detect any %2 , make sure you have it in an open $
+			+ pack(recommend mainpack) or on your paperdoll and hit play$
+		PAUSE
+		GOTO _CheckForEquipment
+	}
+	IF %4 && #FINDBAGID <> #CHARID
+	{
+		FINDITEM %1 C_ , #charid
+		IF #FINDKIND
+		{
+			DISPLAY OK You must have the %2 equipped, do so now and hit play$
+			+ if you have a different one, make sure it's not visible$
+			+ in an open pack, so I dont find it instead by mistake$
+			PAUSE
+			GOTO _CheckForEquipment
+		}
+	}
+	if %5 && %0 >= 6 && %6 <> n/a && #findbagid <> %6
+	{
+		display OK The %2 MUST be in your mainpack, put it there now and hit play$
+		pause
+	}
+	SET % . %2 #FINDID
+	SET %return #TRUE
+exitCheckForEquipment:
+RETURN %return
+;===========================
+Sub SkillCheck
+;ver 1.0 13 May 03 by VictorLacroix and Roadkill
+;purpose: check required skill levels and locks, using 80 skill as threshold
+;	if you want to use a skill with less, modify it below
+	set %magery_enabled #false
+	set %eval_enabled #false
+	set %necro_enabled #false
+	set %spirit_enabled #false
+	chooseskill anim
+	IF #SKILLLOCK <> UP
+	{
+		DISPLAY OK It looks like your animal taming skill is NOT set to raise$
+			+ Please change it to UP then hit play
+		PAUSE
+	}
+	set %TamingSkillStart #skill
+	set %scriptStart #scnt
+	chooseskill anil
+	IF #SKILLLOCK <> UP && #skill < #skillcap
+	{
+		DISPLAY OK It looks like your animal lore is NOT set to raise$
+			+ Please set it as you desire.
+	}
+	set %LoreSkillStart #skill
+	chooseskill veter
+	IF #SKILLLOCK <> UP && #skill < #skillcap
+	{
+		DISPLAY OK It looks like your Veterinary skill is NOT set to raise$
+			+ Please set it as you desire.
+	}
+	set %VetSkillStart #skill
+	chooseskill magery
+	if #skill > 800
+		set %magery_enabled #true
+	chooseskill eval
+	if #skill > 800
+		set %eval_enabled #true
+	if %magery_enabled = #true && %eval_enabled = #true
+		set %use_mage_spell #true
+	chooseskill necro
+	if #skill > 800
+		set %necro_enabled #true
+	chooseskill spirit
+	if #skill > 800
+		set %spirit_enabled #true
+	if %necro_enabled = #true && %spirit_enabled = #true
+		set %use_necro_spell #true
+RETURN
+;=========================
+SUB WaitForInRange
+;ver 1.1 9Feb05 by Roadkill
+;purpose: wait until a victim is inrange then return. Used to delay triggering attacks.
+;%1= victimID %2=desired range to be <=
+_WaitForInRange:
+	wait 5
+	FINDITEM %1 G
+	IF #FINDKIND = -1 || #FINDDIST <= %2
+		RETURN
+	GOTO _WaitForInRange
+;========================
+SUB Dismount
+;ver 1.2 9Jan04 by Roadkill
+;purpose: get off steed
+;%1 is the ID of your steed
+;dependencies: %shortdelay, %sendDebugMsg
+	set !_steed %1
+	IF %0 < 1 || %1 = N/A
+		%sendDebugMsg utmenu SubDismount_no_steedID_passed_in
+_dismount:
+	SET #LOBJECTID #CHARID
+ 	EVENT MACRO 17
+	WAIT %shortdelay
+	FINDITEM !_steed
+	IF #FINDKIND = 0
+		goto _dismount
+	if #findkind
+		%sendDebugMsg utmenu subDismount_no_steed_found
+RETURN
+;=========================
+SUB DismountAndTarget
+;ver 1.1 9Jan04 by Roadkill
+;purpose: dismount steed and target him with 2 whispered all kill to a victim
+;%1= the ID of your steed
+;%2= the ID of your victim
+	set %steed %1
+	set %victim %2
+	%sendDebugMsg utmenu DismAndTgt_S: %1 v: %2
+	gosub Dismount %steed
+	SET #LTARGETKIND 1
+	SET #LTARGETID %victim
+	event macro %spch 0 all kill
+		TARGET
+		EVENT MACRO 22 0
+		WAIT %delay
+	event macro %spch 0 all kill
+		TARGET
+		EVENT MACRO 22 0
+		WAIT %delay
+RETURN
+;============================
+SUB Remount
+;ver 1.2 29Jun03
+;purpose: end up on steed whether you were on or off at call
+;%1 is the ID of your steed
+	FINDITEM %1 G
+	if #findkind
+		return
+_remountLoop:
+	event macro %spch 0 all follow me
+	WAIT 1s
+	FINDITEM %1
+	WAIT 3
+	IF #FINDKIND <> -1 && #FINDDIST = N/A
+		RETURN
+	IF #FINDDIST > 1
+		goto _remountLoop
+	SET #LOBJECTID %1
+	event macro 17
+	WAIT 5
+RETURN
+;=============================
+sub PeaceMake
+;ver 1.2 7feb05 by Roadkill, this is ut specific version
+;purpose: peacemake tgt, if fail follow/stop/stay pets, set timers and retry flag
+;%1 = peace target
+;returns: %retryPeace, %_peaceTgt, %peacetimer
+;must have %peacetimer init to 0 outside
+	set %_peaceTgt %1
+	set %retryPeace #false
+makepeace:
+	findItem %_peaceTgt G
+	if #findkind = -1 || #scnt < %peacetimer
+		return
+	set #ltargetkind 1
+	set #ltargetid %_peaceTgt
+	event Macro 13 9
+	target 3s
+	event Macro 22 0
+	wait 15
+	if hypnotic in #sysmsg
+	{
+		set %peacetimer #scnt + 6
+		%sendDebugMsg utmenu #scnt %peacetimer hypnotic
+		return
+	}
+	if creature_is_already in #sysmsg
+	{
+		set %peacetimer #scnt + 6
+		%sendDebugMsg utmenu #scnt %peacetimer already
+		deletejournal
+		return
+	}
+	if fail in #sysmsg || poorly in #sysmsg
+	{
+		set %peacetimer #scnt + 11
+		;event macro %spch 0 all follow me
+		;wait 5
+		;event macro %spch 0 all stop
+		;wait 5
+		;event macro %spch 0 all stay
+		set %retryPeace #true
+	}
+return
+;=========
+;**
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.1 20Jul04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*	@%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+	finditem %1
+	if #findkind = -1
+		return error-cant_find
+	event property #findid
+	str pos #property $
+	set !strlength #strres - 2
+	str left #property !strlength
+	str del #strres 1 1
+	set % . %2 #strres
+return % . %2
+;==================
+sub ReadGlobalVars
+	gosub getGlobalVar %globalvar UltraTamer #charid tag nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid maxtametries nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid searchrange nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid maxvertical nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid petid nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid release nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid killmethod nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useAidsInMelee nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid makeTamesFollowSavage nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid killWhileTame nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid delay nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useMessageMenu nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useDebugMsg nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid statusbarposn nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid statusbarx nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid statusbary nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid avoidAllPCs nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid avoidOtherTamers nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid issuePlayerWarningSound nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid playerWarningWavFile nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid issueAttackWarningUT nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid AttackWarningWavFile nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useVet nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid customRailFile nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useMusic nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid usePeace nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid usedefend nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid defendroutine nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useHealthWatch nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useLooter nolock
+	gosub getGlobalVar %globalvar UltraTamer #charid useBackTrack nolock
+return
+;==========
+sub WriteGlobalVars
+	gosub putGlobalVar %globalvar UltraTamer #charid tag
+	gosub putGlobalVar %globalvar UltraTamer #charid maxtametries
+	gosub putGlobalVar %globalvar UltraTamer #charid searchrange
+	gosub putGlobalVar %globalvar UltraTamer #charid maxvertical
+	gosub putGlobalVar %globalvar UltraTamer #charid petid
+	gosub putGlobalVar %globalvar UltraTamer #charid release
+	gosub putGlobalVar %globalvar UltraTamer #charid killmethod
+	gosub putGlobalVar %globalvar UltraTamer #charid useAidsInMelee
+	gosub putGlobalVar %globalvar UltraTamer #charid makeTamesFollowSavage
+	gosub putGlobalVar %globalvar UltraTamer #charid killWhileTame
+	gosub putGlobalVar %globalvar UltraTamer #charid delay
+	gosub putGlobalVar %globalvar UltraTamer #charid useMessageMenu
+	gosub putGlobalVar %globalvar UltraTamer #charid useDebugMsg
+	gosub putGlobalVar %globalvar UltraTamer #charid statusbarposn
+	gosub putGlobalVar %globalvar UltraTamer #charid statusbarx
+	gosub putGlobalVar %globalvar UltraTamer #charid statusbary
+	gosub putGlobalVar %globalvar UltraTamer #charid avoidAllPCs
+	gosub putGlobalVar %globalvar UltraTamer #charid avoidOtherTamers
+	gosub putGlobalVar %globalvar UltraTamer #charid issuePlayerWarningSound
+	gosub putGlobalVar %globalvar UltraTamer #charid playerWarningWavFile
+	gosub putGlobalVar %globalvar UltraTamer #charid issueAttackWarningUT
+	gosub putGlobalVar %globalvar UltraTamer #charid AttackWarningWavFile
+	gosub putGlobalVar %globalvar UltraTamer #charid useVet
+	gosub putGlobalVar %globalvar UltraTamer #charid customRailFile
+	gosub putGlobalVar %globalvar UltraTamer #charid useMusic
+	gosub putGlobalVar %globalvar UltraTamer #charid usePeace
+	gosub putGlobalVar %globalvar UltraTamer #charid usedefend
+	gosub putGlobalVar %globalvar UltraTamer #charid defendroutine
+	gosub putGlobalVar %globalvar UltraTamer #charid useHealthWatch
+	gosub putGlobalVar %globalvar UltraTamer #charid useLooter
+	gosub putGlobalVar %globalvar UltraTamer #charid useBackTrack
+return
+
+;==================================
+; Script Name:  CEO's * variable management subs (pseudo filesystem)
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.1b
+; EUO version tested with: 1_41_103
+; Shard OSI / FS: OSI
+; Revision Date: 040219
+; Public Release: 040219
+; Globals Used: User specified (2 total)
+; Purpose: Allows you to use a * variable as a pseudo-filesystem
+;=======================================
+; CEO's global variable management subs:
+;      getGlobalVar  . putGlobalVar  . delGlobalVar
+;=======================================
+Sub getGlobalVar
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to store multiple variables in one global variable unique to
+;             each player and script. getGlobaVar retrieves a value from a global variable.
+;@returns: #result = #false if variable not found, #true if found
+;            % . %3 contains variable value
+;%1 is the global/persistant variable to use ( %1 + 1 is used for locking)
+;%2 is the script identifer or pseudo filename
+;%3 is #charid or pseudo filename
+;%4 is the variable to search for and return in %. %3
+;%5 is for lock control. By default getGlobalVar uses a lock to return a value. In some cases you may want to
+;       retrieve a variable (mostly for speed) without needing a lock as long as you are aware of
+;      any potentional conflicts, that very rarely may occur. Set this param to NOLOCK to access
+ ;     global storage without a lock.
+;sample usage:
+;               gosub getGlobalVar 50 MyScript #charid backpackid
+; Using global var *50 finds the variable labeled MyScript#charidbackpackid and returns it in %backpackid
+;
+;               gosub getGlobalVar 50 MyScript #charid clothstat NOLOCK
+; Using global var *50 find the variable labeled MyScript#charidclothstat and returns it in %clothstat without using a lock
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+nameSpace push
+nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , GET
+set !lpc #lpc
+set #lpc 1000
+set !lock %1 + 1
+if ( %0 = 5 ) && ( %5 = NOLOCK )
+   goto getGlobalVar_skiplock
+set !lockcount 0
+getGlobalVar_waitforlock:
+if * . !lock <> N/A && * . !lock <> #nsname
+{
+   wait 1 4
+   set !lockcount !lockcount + 1
+   if !lockcount < 10
+      goto getGlobalVar_waitforlock
+   if * . !lock <> N/A
+   {
+      set !currentlock * . !lock
+      if !currentlock = N/A
+         goto getGlobalVar_waitforlock
+      str pos !currentlock _
+      set !strres #strres - 1
+      str left !currentlock !strres
+      set !systime #systime - #strres
+      if !systime < 10000 ; if over 10 seconds assume a broken lock and take it
+      {
+         set !lockcount 0
+         goto getGlobalVar_waitforlock
+      }
+   }
+}
+set * . !lock #nsname
+wait 3 2
+if  * . !lock <> #nsname
+{
+   set !lockcount 0
+   goto getGlobalVar_waitforlock
+}
+getGlobalVar_skiplock:
+set !global * . %1
+set !varName %2 , ^ , %3 , ^ , %4 , |
+str pos !global !varName
+set #result #strres <> 0
+if #result
+{
+   set !varNamePos #strres
+   str len !varName
+   set !delString !varNamePos + #strres - 1
+   str del !global 1 !delString
+   set !global #strres
+   str pos !global |
+   set !varNamePos #strres - 1
+   str left !global !varNamePos
+   set % . %4 #strres
+}
+if ( %0 < 5 || %5 <> NOLOCK ) && * . !lock = #nsname
+   set * . !lock N/A
+set #lpc !lpc
+nameSpace Clear
+nameSpace Pop
+return #result
+;===========================
+Sub putGlobalVar
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to store multiple variables in one global variable unique to
+;             each player and script. putGlobaVar stores a value into a global variable.
+
+;@returns: #result = #false if variable not found, #true if found
+;            % . %3 contains variable
+;%1 is the global/persistant variable to use
+;%2 is the script identifer or pseudo filename
+;%3 #charid or other identifier
+;%4 is the variable name of the variable to save into the* variable identified in %1
+;sample usage:
+;               gosub putGlovalVar 50 MyScript #chardid backpackid
+; Using global var *50 stores/updates the variable labeled MyScript#charidbackpackid  with %backpackid
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+nameSpace push
+nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _  , PUT
+set !lpc #lpc
+set #lpc 1000
+set !lock %1 + 1
+set !lockcount 0
+putGlobalVar_waitforlock:
+if * . !lock <> N/A && * . !lock <> #nsname
+{
+   wait 1 4
+   set !lockcount !lockcount + 1
+   if !lockcount < 10
+      goto putGlobalVar_waitforlock
+   if * . !lock <> N/A
+   {
+      set !currentlock * . !lock
+      if !currentlock = N/A
+         goto putGlobalVar_waitforlock
+      str pos !currentlock _
+      set !strres #strres - 1
+      str left !currentlock !strres
+      set !systime #systime - #strres
+      if !systime < 10000 ; if over 10 seconds assume a hung lock and take it
+      {
+         set !lockcount 0
+         goto putGlobalVar_waitforlock
+      }
+   }
+}
+set * . !lock #nsname
+wait 4
+set !global * . %1
+set !varName %2 , ^ , %3 , ^ , %4 , |
+str pos !global !varName
+if #strres = 0
+{
+   if  * . !lock <> #nsname
+   {
+      set !lockcount 0
+      goto putGlobalVar_waitforlock
+   }
+   if  |CEO*FILESYSTEM| notin !global
+      set !global |CEO*FILESYSTEM|
+   set * . %1 !global , !varName , % . %4 , |
+   set * . !lock N/A
+   set #lpc !lpc
+   nameSpace clear
+   nameSpace pop
+   return #true
+}
+set !varNamePos #strres
+str len !varName
+set !splitString !varNamePos + #strres - 1
+str left !global !splitstring
+set !globalPart1 #strres
+str del !global 1 !splitString
+set !global #strres
+str len !global
+set !globalLen #strres
+str pos !global |
+set !splitString !globalLen - #strres + 1
+str right !global !splitstring
+set !global #strres
+if  * . !lock <> #nsname
+{
+   set !lockcount 0
+   goto putGlobalVar_waitforlock
+}
+set * . %1 !globalPart1 , % . %4 , !global
+set * . !lock N/A
+set #lpc !lpc
+nameSpace clear
+nameSpace pop
+return #true
+;============
+sub SetupMenu
+
+return
+;==================================
+; Script Name: sub waitForSysVars
+; Author: Quintok / Raziel
+; Version: 1.04
+; Client Tested with: 4.0.2b
+; EUO version tested with: 0078
+; Shard OSI / FS: OSI / FS
+; Revision Date: 21st March 2004
+; Public Release: 20th March 2004
+; Global Variables Used: none
+; Purpose: same as waitForSysVar but for multiple inputs.
+;==================================
+sub waitForSysVars
+  set !cnt %0 / 3
+  if ( %0 % 3 = 1 )
+    set !timeOut #scnt + % . %0
+  else
+    set !timeOut #scnt + 5
+  for !i 1 !cnt
+  {
+    set !offset 3 * !i - 2
+    set !evaluation !offset + 1
+    set !value !offset + 2
+    if ! ( # . % . !offset % . !evaluation % . !value )
+      set !i 0
+    if #scnt > !timeout
+      return #false
+  }
+return #true
+;===========
+;**
+;* @name CheckFreeShard
+;* @ver 1.0 2Feb05
+;* @author  Roadkill
+;* @purpose  checks if you're on a known OSI shard or not
+;* @params %1 optional, variablename to return #true/#false in, #true if on a freeshard
+;* @returns #result and @%1 #true if on a freeshard, #false if on a known OSI shard.
+;* @example call rksubs.txt CheckFreeShard <@%1 varname, opt><@#result #true if #shard notin osi list
+;* @status
+sub CheckFreeShard
+	set !OSIshards pacific_sonoma_baja_legends_atlantic_chesapeake_catskills_lake , #spc , austin
+	+_napa , #spc , valley_lake , #spc , superior_great , #spc , lakes_siege , #spc , perilous_europa
+	+_drachenfels_oceania_wakoku_formosa_arirang_balhae_asuka_yamato_mugen_hokuto_misuho_izumo_sakura_
+	set !result #shard notin !OSIshards
+	if %0 >= 1 && %1 <> n/a
+		set % . %1 !result
+return !result
+;======
+;uses animallore %1 times, closes lore gump if it opens
+sub animallore
+	set #ltargetkind 1
+	set %ltargetid %tameid
+	for !c 1 %1
+	{
+		event macro 13 2
+		target 5s
+		event macro 22 0
+		wait 15
+		if #contsize = 400_381
+		{
+			set !x #contposx + 100
+			set !y #contposy + 100
+			click !x !y r f
+			wait 5
+		}
+	}
+return
+;============
+sub GainMusicPeace
+	if %gainpeace && #scnt > %peacetimer && %nowtaming = #false
+		gosub peacemake #charid
+	if %useMusic && #SCNT > %musictimer
+	{
+		finditem QRF_NRF_MQF_PRF_LQF_OQF C
+		IF #findkind = 0
+		{
+			set #Lobjectid #findid
+			event macro 17 0
+			set %musictimer #scnt + 7
+		}
+	}
+return
+;===========
+;**
+;* @name getPropNum
+;* @ver 1.1
+;* @author Kal-In-Ex (parser engine idea, this rewrite by RK to meet needs)
+;* @purpose looks for %1 propstring in #property (already exists)
+;* @params %1= the propstring (substring) to look for in #property
+;* 	%2= the varname to return the propstring intensity in
+;* @returns #result #false if the propstring notin #property (shouldn't happen..)
+;*	#result #true if the propstring is in #property but no intensity ("magearmor")
+;*	#result holds the intensity (same as @%2) if it exists, so you can test #result
+;*	@%2 holds the intensity, or 0 if no intensity
+;* @example gosub getPropNum slayer numprop <=#result would be #true, %numprop = n/a
+sub getPropNum ;%prop1 propnum
+	set % . %2 0
+	str pos #property %1
+	if #strres = 0
+		return #false
+	set !pos #strres    ;holds the pos of the propstring start in #property
+	str len %1          ;strres now holds the length of the propstring
+	set !pos !pos + #strres   ;!pos now holds the pos of the END of the propstring in #property
+	set !propnum        ;!propnum cleared
+	for !_ 1 1
+	{
+		str mid #property !pos 1  ;do until; char after propstring now extracted
+		if #strres notin $/:%+ , #spc   ;if it's not an end delimiter, append to !propnum
+			set !propnum !propnum , #strres
+		if #strres notin $/     ;if it's notin $/, continue the loop on next char
+		{
+			set !_ 0
+			set !pos !pos + 1
+		}
+	}
+	str len !propnum
+	if #strres = 0
+		return #true    ;the prop exists but no intensity
+	set % . %2 !propnum
+return !propnum
+;=====end of RoadkillsUltraTamer.txt============
+

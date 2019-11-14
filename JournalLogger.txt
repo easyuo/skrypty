@@ -1,0 +1,90 @@
+                     ;=======================================
+    ; Script Name:   Journal Logger
+    ; Author: Daruthe
+    ; Version: 1.11
+    ; Client Tested with: 4.0.3c
+    ; EUO version tested with: Build 94
+    ; Shard OSI / FS: OSI (should work with freeshards, but have only tested OSI)
+    ; Revision Date: 1/8/04
+    ; Public Release: 24/7/04
+    ; Purpose: Simple journal logger, to make sure you never miss those important
+    ; messages
+    ;=======================================
+
+    ;=======================================
+    ;  VARIABLES AND SETUP
+    ;=======================================
+    Set %Cmd cmd.exe  ; no need to change this, script auto-detects what is needed
+    Set %JournalFile D:\games\uo\easyuo\journal.log ;change to where you want journal logged to
+    Set %PreviousJournalLine N/A
+    Set %NextScanTime
+
+    GoSub Setup
+
+    ;=======================================
+    ;  END OF VARIABLES AND SETUP
+    ;=======================================
+
+    ;=======================================
+    ;  MAIN LOOP
+    ;=======================================
+    Top:
+
+    Set %NextScanTime #SCNT2 + 200
+    Set %JournalScanStartIndex #JIndex
+
+    WaitToScan:
+      If %NextScanTime >= #SCNT2
+        {
+          GoTo TryScanJournal
+        }
+      Else
+        {
+          GoTo WaitToScan
+        }
+
+    TryScanJournal:
+    For %I %JournalScanStartIndex #JIndex
+      {
+        ScanJournal %I
+        If #Journal <> %PreviousJournalLine
+          {
+            GoSub SaveJournal #Journal
+          }
+        Set %PreviousJournalLine #Journal
+      }
+
+    GoTo Top
+
+    ;=======================================
+    ;  END OF MAIN LOOP
+    ;=======================================
+
+    ;=======================================
+    ;  SUBS
+    ;=======================================
+    Sub Setup
+    ;get comspec for OS
+    ; (this sub is based on another persons code but I
+    ; dont remember where I found it. I'm sorry to who ever
+    ; originally wrote this)
+      Str Left #OSVer 1
+      If #StrRes = 1
+        {
+          Set %Cmd command.com
+        }
+      If #StrRes = 2
+       {
+          Set %Cmd cmd.exe
+       }
+      Set #LPC = 100
+    Return
+
+    Sub SaveJournal
+      Execute %Cmd /c Echo %1 >> %JournalFile
+      Wait 10
+    Return
+
+    ;=======================================
+    ;  END OF SUBS
+    ;=======================================

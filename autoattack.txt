@@ -18,25 +18,31 @@
     ;=========SETUP========
     initevents
     set %maxtries 17
-    set %alwayson #false
+    set %alwayson #true
 
     ; Set to 0 the level of enemy types you DON'T want to attack
     ; Set to a number greater than 0 the level of enemy types you DO want to attack
     ; If the script has to choose between more enemies, it chooses between the ones with the greater level.
 
-      ;blue (innocent)
+    ;blue (innocent)
     set %enemylevel1 0
-      ;green (friend)
+    
+    ;green (friend)
     set %enemylevel2 0
-      ;grey (grey - animal)
+
+    ;grey (grey - animal)
     set %enemylevel3 1
-      ;grey (criminal)
-    set %enemylevel4 1
-      ;orange (enemy)
-    set %enemylevel5 1
-      ;red (murderer)
-    set %enemylevel6 1
-      ;yellow (invulnerable)
+
+    ;grey (criminal)
+    set %enemylevel4 0
+
+    ;orange (enemy)
+    set %enemylevel5 0
+
+    ;red (murderer)
+    set %enemylevel6 0
+
+    ;yellow (invulnerable)
     set %enemylevel7 0
 
     ;=========MAIN LOOP========

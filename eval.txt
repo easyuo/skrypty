@@ -57,22 +57,22 @@ goto start
 }
 }
 wiecej:
-set %licz 0
-event macro 13 16
+       set %licz 0
+       event macro 13 16
+
 czek:
-set #ltargetkind 1
-set #ltargetid #findid
-set %licz %licz + 1
-wait 1
-wait 1
-if #targcurs = 1
-goto dalej
-if %licz > 5
-goto wiecej
+     set #ltargetkind 1
+     set #ltargetid #findid
+     set %licz %licz + 1
+     wait 1
+     wait 1
+     if #targcurs = 1
+     goto dalej
+     if %licz > 5
+     goto wiecej
 goto czek
+
 dalej:
-event macro 22
-event macro 22
-event macro 22
-wait 163
+ event macro 22
+ wait 10s
 goto start

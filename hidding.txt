@@ -8,5 +8,5 @@
 ;Autor: [nGz]
 
 event macro 13 21
-wait 1s
+wait 10s
 

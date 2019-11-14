@@ -1,0 +1,16 @@
+set %glosny 1
+if %glosny = 1
+; set %sound C:\Windows\Media\buzzer.wav
+set %sound D:\games\uo\easyuo\buzzer3.wav
+else
+; set %sound C:\Windows\Media\insert.wav
+set %sound D:\games\uo\easyuo\buzzer3.wav
+
+if #CONTNAME = generic_gump
+{
+wait 1s
+ if #CONTNAME = generic_gump
+ {
+  sound %sound
+ }
+}

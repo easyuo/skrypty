@@ -1,0 +1,209 @@
+                     ;==================================
+    ; Script Name:   Plague_dogs auto heal/cure
+    ; Author: Plague_dog32
+    ; Version: .2
+    ; Client Tested with: Freeshard 4.0.1b
+    ; EUO version tested with: 1.41 (build 0067)
+    ; Shard OSI / FS: FS and OSI but not recommended as the script is very easy to spot, not responsible for lost accounts
+    ; Revision Date: 3/2/2004
+    ; Public Release: 3/1/2004
+    ; Global Variables Used: none
+    ; Purpose: Automated heal/cure script, needs to be run on all who whish to get healed. if you are the healer then set %healer to 1, if you are a player then set %yourname to your characters name, (note %yourname must be the same as the name used on the healers version of the script.
+    ;==================================
+    ; - .1 - The first release
+    ; - .2 - initevent command added, script now works =P thanks CEO!
+    ; ==============================================
+
+    ;=====CurrentTask: =====
+    ; - Testing
+    ; - adding code for auto detection of friends, thnx Orngrimm for the help.
+
+    ;=====ToDo: =====
+    ; - Add paralyze detection
+    ; - add command target system (think about it auto have everyone attack the same target!)
+    ; - add auto battle subs for healer
+    ; - automate healers movements
+    ; - Find out if this script even is helpful to anyone out there.
+    ; - create advanced AI that would take over the world, at least the UO world
+
+    ;=====Bugs: ====
+    ; - no bugs known as of now
+
+    restart:
+
+    ;******************************************
+    ;****** Variable declaration (edit these)**
+    ;******************************************
+    initevents
+    set %healer 1
+    set %yourname Warek Mojcie ;if you are not the healer put your name here (name on the healers script must be identical)
+    set %player1n Warek Mojcie ;define player name here
+    set %player2n playernamehere ;define player name here
+    set %player3n playernamehere ;define player name here
+    set %player4n playernamehere ;define player name here
+    set %player5n playernamehere ;define player name here
+    set %player6n playernamehere ;define player name here
+    set %player7n playernamehere ;define player name here
+    set %player8n playernamehere ;define player name here
+    set %player1ID playeridhere ;define player id here
+    set %player2ID playeridhere ;define player id here
+    set %player3ID playeridhere ;define player id here
+    set %player4ID playeridhere ;define player id here
+    set %player5ID playeridhere ;define player id here
+    set %player6ID playeridhere ;define player id here
+    set %player7ID playeridhere ;define player id here
+    set %player8ID playeridhere ;define player id here
+
+    set %heal heal
+    set %cure cure
+
+    ;******************************************
+    ;****** NO EDITING BELOW THIS LINE ********
+    ;******************************************
+    if %healer = 1
+       {
+       goto startforhealer
+       }
+    if %healer = 0
+       {
+       goto startforplayer
+       }
+    goto restart
+
+    startforplayer:
+       if #hits < 90
+          {
+          msg %heal %yourname $
+          wait 3s
+          }
+       if p in #charstatus
+          {
+          msg %cure %yourname $
+          wait 3s
+          }
+    goto startforplayer
+
+    startforhealer:
+       gosub checkhealth
+       gosub checkothers
+    goto startforhealer
+
+    sub castcure
+       event macro 15 10
+       target 3s
+       event macro 22 0
+       msg you are cured!$
+    return
+
+    sub castheal
+       event macro 15 28
+       target 3s
+       event macro 22 0
+       msg you are healed!$
+    return
+
+    sub checkhealth
+       if #HITS < 80
+          {
+          event macro 15 28
+          target 3s
+          event macro 23 0
+          }
+       if p in #charstatus
+          {
+          event macro 15 10
+          target 3s
+          event macro 23 0
+          }
+    return
+
+    sub checkothers
+       SCANJOURNAL %lalala ;i dont know what to put here but if i get rid of it the script doesnt work so here it stays
+             IF %heal IN #JOURNAL
+          {
+          if %player1n in #journal
+             {
+             set #ltargetid %player1ID
+             gosub castheal
+             }
+          if %player2n in #journal
+             {
+             set #ltargetid %player2ID
+             gosub castheal
+             }
+          if %player3n in #journal
+             {
+             set #ltargetid %player3ID
+             gosub castheal
+             }
+          if %player4n in #journal
+             {
+             set #ltargetid %player4ID
+             gosub castheal
+             }
+          if %player5n in #journal
+             {
+             set #ltargetid %player5ID
+             gosub castheal
+             }
+          if %player6n in #journal
+             {
+             set #ltargetid %player6ID
+             gosub castheal
+             }
+          if %player7n in #journal
+             {
+             set #ltargetid %player7ID
+             gosub castheal
+             }
+          if %player8n in #journal
+             {
+             set #ltargetid %player8ID
+             gosub castheal
+             }
+          }
+       if %cure in #journal
+          {
+          if %player1n in #journal
+             {
+             set #ltargetid %player1ID
+             gosub castcure
+             }
+          if %player2n in #journal
+             {
+             set #ltargetid %player2ID
+             gosub castcure
+             }
+          if %player3n in #journal
+             {
+             set #ltargetid %player3ID
+             gosub castcure
+             }
+          if %player4n in #journal
+             {
+             set #ltargetid %player4ID
+             gosub castcure
+             }
+          if %player5n in #journal
+             {
+             set #ltargetid %player5ID
+             gosub castcure
+             }
+          if %player6n in #journal
+             {
+             set #ltargetid %player6ID
+             gosub castcure
+             }
+          if %player7n in #journal
+             {
+             set #ltargetid %player7ID
+             gosub castcure
+             }
+          if %player8n in #journal
+             {
+             set #ltargetid %player8ID
+             gosub castcure
+             }
+          }
+       DELETEJOURNAL
+    return

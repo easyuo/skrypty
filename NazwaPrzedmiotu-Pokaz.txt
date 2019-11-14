@@ -1,0 +1,77 @@
+    ;==================================
+    ; Script Name: Moz's Get Item name and Durability Subs
+    ; Author: Moz
+    ; Version: 1.00
+    ; Client Tested with: 4.0.0p/q
+    ; EUO version tested with: 1.40 build 0065
+    ; Shard OSI / FS: OSI
+    ; Revision Date: 10th of February 2004
+    ; Public Release: 10th of February 2004
+    ; Purpose: Two subs that gets the items name given t vhe item's ID and the item's durability. (2 Sep Subs that can be reused)
+    ;==================================
+    InitEvents
+
+    ;When invoking the GetItemDurability Subs, these two variables will be filled with the minor/major of the item's dur.
+    Set %ItemDurMinor XXX
+    Set %ItemDurMajor XXX
+
+    Main
+    GoSub GetItemName #LOBJECTID
+    display ok The Item Name is #RESULT
+
+    GoSub GetItemDurability #LOBJECTID
+    display ok The Durability is %ItemDurMinor / %ItemDurMajor
+    halt
+
+    SUB GetItemName
+    ;*************************************************************
+    ;Params: %1 is the ID of the Item to get the name of
+    ;*************************************************************
+            ;Gets the Item ID's Property
+            event Property %1
+
+            ;Gets the location of the first split in the item's property
+            str pos #property $
+
+            ;Gets the items name
+            set %InStr #StrRes - 1
+            str left #property %InStr
+
+    RETURN #StrRes
+
+    SUB GetItemDurability
+    ;*************************************************************
+    ;Params: %1 is the ID of the Item to get the durability
+    ;*************************************************************
+
+            ;Gets the Item ID's Property
+            event Property %1
+
+            ;Error checking if item has no durability
+            str pos #Property DURABILITY
+            if #StrRes < 1 1
+                    return #false
+
+            ;Gets the last 8 characters in the property string XXX/XXX$
+            str right #property 8
+
+            ;Truncate the $ off
+            str mid #strres 1 7
+            set %TempStr #strres
+
+            ;Get the location in the string of the divider
+            set %TempStr #StrRes
+            str pos %TempStr /
+            set %LocDiv #StrRes
+
+            ;Get the item's major
+            set %n %LocDiv + 1
+            str mid %TempStr %n 3
+            set %ItemDurMajor #StrRes
+
+            ;Get the item's minor
+            set %n %LocDiv - 1
+            str mid %TempStr 1 %n
+            set %ItemDurMinor #StrRes
+
+    RETURN #true

@@ -9,10 +9,10 @@ InitEvents
 IgnoreItem Reset
 ; === Edytujemy tutaj ===
 
-set %TnijCiala 0
+set %TnijCiala 1
 set %AutoGrabCiala 0
 set %AutoGrabZiemia 0
-set %UzywajAnatomii 0
+set %UzywajAnatomii 1
 set %PijZolte 1
 set %PijZoltePonizej 50
 

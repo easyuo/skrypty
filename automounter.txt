@@ -1,0 +1,45 @@
+; Mounter
+; Autor: Krowa
+
+; Zejscie z wierzcha przed odpaleniem
+
+gosub mountDismount #CHARID ; Dismount
+
+display OK Pokaz swoje zwierze
+    set #TARGCURS 1
+    while #TARGCURS = 1
+      {
+      wait 0
+      }
+    set %petID #LTARGETID
+    
+loop:
+ gosub mountDismount #CHARID ; Dismount
+ wait 4s
+ gosub mountDismount %PetID ; Mount
+goto loop
+
+sub mountDismount
+    set #LOBJECTID %1
+    wait 1
+    ; Sprawdzanie czy stoimy na bramie. Jezeli tak nie wchodzimy na zwierze.
+    if #CHARID <> %1 ; Jezeli nie schodzimy z mounta
+    {
+     finditem OTF ; Szukanie moongate'a
+      if ( #FINDKIND = -1 )
+      {
+       event macro 17 0
+      }
+      else
+      {
+      event sysmessage Znalazlem moongate. Czekam 1s
+      wait 1s
+      }
+    }
+    else
+    {
+     event macro 17 0
+    }
+return
+
+

@@ -1,0 +1,1228 @@
+;--------------------------------------------------
+; Script Name: Stuby085's Provocation
+; Author: Stuby085
+; Version: 1.0
+; Client Tested with: 5.0.1j Patch 12
+; EUO version tested with: 1.5. Version 69
+; Shard OSI / FS: FS
+; Revision Date: 051506
+; Public Release: 051506
+; Global Variables Used:  None
+; Purpose: Trains Provocation to GM.
+;--------------------------------------------------
+; = [ Instructions ] ==============================
+;--------------------------------------------------
+; Personally, I found no good scripts released for
+; this barding skill.  They all required you to
+; select two animals and then they would repeat the
+; process over and over, even if the creatures had
+; died.  Well, if you've ever tried provocation then
+; you know that it can be hard to stop and start a
+; script while being chased by creatures.  Also, no
+; script said what to use to train or when to train
+; what, neither did any site I've found.  With this
+; script, you go out hunting just like normal and
+; when creatures get within range, you will auto -
+; matically try to provoke them if they are within
+; your gaining range.  This script will target
+; predetermined targets that are in a 30%-75% success
+; range.  You can also set the script to target
+; only user defined creatures.  A table of creatures
+; along with their corresponding barding difficulty
+; is located at the end of the options.
+;--------------------------------------------------
+; = [ What To Train With And When =================
+;--------------------------------------------------
+; YOU SHOULD REALLY BUY YOUR SKILL UP AS HIGH AS YOU CAN
+;
+; This script requires you to have atleast 10.0 skill
+; '''''''''''''
+; Skill >= 10.0
+; '''''''''''''
+; Chicken, Goat, Sewer Rat, Pig, Rabbit, Jack Rabbit, Cow, Sheep, Rat, Cat,
+; Boar, Mongbat, Tropical Bird, Parrot, Bird, Militia Fighter, Frost Ooze,
+; Horde Minion, Strong Mongbat, Llama, Walrus, Hind, Dog, Eagle, Ridable Llama,
+; Headless One, Jwilson, Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad
+; Skill >= 15.0
+; Chicken, Goat, Sewer Rat, Pig, Rabbit, Jack Rabbit, Cow, Sheep, Rat, Cat,
+; Boar, Mongbat, Tropical Bird, Parrot, Bird, Militia Fighter, Frost Ooze,
+; Horde Minion, Strong Mongbat, Llama, Walrus, Hind, Dog, Eagle, Ridable Llama,
+; Headless One, Jwilson, Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad,
+; Ice Snake, Horse, Great Hart, Shadow Fiend, Pack Llama, Seeker Of Adventure, Base Escortable,
+; Brown Bear, Ridgeback, Lava Snake, Savage Ridgeback, Timber Wolf, Alligator, Grey Wolf,
+; White Wolf, Desert Ostard, Silver Steed, Gorilla, Cougar, Sea Horse, Forest Ostardr, Snow Leopard,
+; Black Bear
+;
+; '''''''''''''
+; Skill >= 20.0
+; '''''''''''''
+; Militia Fighter, Frost Ooze, Horde Minion, Strong Mongbat, Llama, Walrus, Hind,
+; Dog, Eagle, Ridable Llama, Headless One, Jwilson, Bull Frog, Giant Rat, Restless Soul,
+; Mountain Goat, Giant Toad, Ice Snake, Horse, Great Hart, Shadow Fiend, Pack Llama,
+; Seeker Of Adventure, Base Escortable, Brown Bear, Ridgeback, Lava Snake, Savage Ridgeback,
+; Timber Wolf, Alligator, Grey Wolf, White Wolf, Desert Ostard, Silver Steed, Gorilla,
+; Cougar, Sea Horse, Forest Ostard, Snow Leopard, Black Bear, Pack Horse, Dolphin, Bull
+; Panther, Snake, Slime
+;
+; '''''''''''''
+; Skill >= 25.0
+; '''''''''''''
+; Strong Mongbat, Llama, Walrus, Hind, Dog, Eagle, Ridable Llama, Headless One,
+; Jwilson, Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad, Ice Snake,
+; Horse, Great Hart, Shadow Fiend, Pack Llama, Seeker Of Adventure, Base Escortable,
+; Brown Bear, Ridgeback, Lava Snake, Savage Ridgeback, Timber Wolf, Alligator, Grey Wolf,
+; White Wolf, Desert Ostard, Silver Steed, Gorilla, Cougar, Sea Horse, Forest Ostard, Snow Leopard,
+; Black Bear, Pack Horse, Dolphin, Bull, Panther, Snake, Slime, Frost Spider, Skittering Hopper,
+; Zombie, Terathan Drone, Mound Of Maggots, Shadow Wisp, Hell Hound
+;
+; '''''''''''''
+; Skill >= 30.0
+; '''''''''''''
+; Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad, Ice Snake, Horse, Great Hart,
+; Shadow Fiend, Pack Llama, Seeker Of Adventure, Base Escortable, Brown Bear, Ridgeback, Lava Snake,
+; Savage Ridgeback, Timber Wolf, Alligator, Grey Wolf, White Wolf, Desert Ostard, Silver Steed,
+; Gorilla, Cougar, Sea Horse, Forest Ostard, Snow Leopard, Black Bear, Pack Horse, Dolphin, Bull,
+; Panther, Snake, Slime, Frost Spider, Skittering Hopper, Zombie, Terathan Drone, Mound Of Maggots,
+; Shadow Wisp, Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf, Ettin,
+; Ogre, Gazer Larva, Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton,
+; Troll, Red Solen Worker
+;
+; '''''''''''''
+; Skill >= 35.0
+; '''''''''''''
+; Timber Wolf, Alligator, Grey Wolf, White Wolf, Desert Ostard, Silver Steed, Gorilla, Cougar,
+; Sea Horse, Forest Ostard, Snow Leopard, Black Bear, Pack Horse, Dolphin, Bull, Panther, Snake,
+; Slime, Frost Spider, Skittering Hopper, Zombie, Terathan Drone, Mound Of Maggots, Shadow Wisp,
+; Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf, Ettin, Ogre, Gazer Larva,
+; Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton, Troll, Red Solen Worker,
+; Orc, Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy
+;
+; '''''''''''''
+; Skill >= 40.0
+; '''''''''''''
+; Snake, Slime, Frost Spider, Skittering Hopper, Zombie, Terathan Drone, Mound Of Maggots, Shadow Wisp,
+; Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf, Ettin, Ogre, Gazer Larva,
+; Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton, Troll, Red Solen Worker,
+; Orc, Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy, Lava Lizard, Hell Cat, Treefellow,
+; Minax War Horse, SLWarHorse, TBWarHorse, Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee,
+; Gibberling, Earth Elemental, Giant Spider, Noble, Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior,
+; Swamp Dragon, Vampire Bat
+;
+; '''''''''''''
+; Skill >= 45.0
+; '''''''''''''
+; Mound Of Maggots, Shadow Wisp, Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf,
+; Ettin, Ogre, Gazer Larva, Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton,
+; Troll, Red Solen Worker, Orc, Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy, Lava Lizard, Hell Cat,
+; Treefellow, Minax War Horse, SLWarHorse, TBWarHorse, Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee,
+; Gibberling, Earth Elemental, Giant Spider, Noble, Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon,
+; Vampire Bat, Doppleganger, Scaled Swamp Dragon, Stone Harpy, Ophidian Warrior, Skeletal Knight, Bone Knight, Frost Troll,
+; Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion
+;
+; '''''''''''''
+; Skill >= 50.0
+; '''''''''''''
+; Gazer Larva, Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton, Troll, Red Solen Worker, Orc,
+; Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy, Lava Lizard, Hell Cat, Treefellow, Minax War Horse, SLWarHorse,
+; TBWarHorse, Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee, Gibberling, Earth Elemental, Giant Spider, Noble,
+; Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon, Vampire Bat, Doppleganger, Scaled Swamp Dragon,
+; Stone Harpy, Ophidian Warrior, Skeletal Knight, Bone Knight, Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion,
+; Red Solen Infiltrator Warrior, Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle, Summoned Earth Elemental, Cyclops,
+; Imp, Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental, Golden Elemental, Orc Bomber,
+; Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle, Quagmire
+;
+; '''''''''''''
+; Skill >= 55.0
+; '''''''''''''
+; Frenzied Ostard, Harpy, Lava Lizard, Hell Cat, Treefellow, Minax War Horse, SLWarHorse, TBWarHorse,
+; Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee, Gibberling, Earth Elemental,
+; Giant Spider, Noble, Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon,
+; Vampire Bat, Doppleganger, Scaled Swamp Dragon, Stone Harpy, Ophidian Warrior, Skeletal Knight,
+; Bone Knight, Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion,
+; Red Solen Infiltrator Warrior, Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle,
+; Summoned Earth Elemental, Cyclops, Imp, Verite Elemental, Spawned Orcish Lord, Agapite Elemental,
+; Copper Elemental, Dull Copper Elemental, Golden Elemental, Orc Bomber, Ravager, Shadow Iron Elemental,
+; Bronze Elemental, Stone Gargoyle, Quagmire, Orcish Lord, Giant Serpent, Lava Serpent, Prerdator Hell Cat,
+; Valorite Elemental, Chaos Daemon, Black Solen Queen, Red Solen Queen, Sand Vortex, Brigand, Meer Warrior,
+; Cursed, Moloch
+;
+; '''''''''''''
+; Skill >= 60.0
+; '''''''''''''
+; Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon, Vampire Bat,
+; Doppleganger, Scaled Swamp Dragon, Stone Harpy, Ophidian Warrior, Skeletal Knight, Bone Knight,
+; Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion, Red Solen Infiltrator Warrior,
+; Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle, Summoned Earth Elemental, Cyclops, Imp,
+; Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental, Golden Elemental,
+; Orc Bomber, Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle, Quagmire, Orcish Lord,
+; Giant Serpent, Lava Serpent, Prerdator Hell Cat, Valorite Elemental, Chaos Daemon, Black Solen Queen,
+; Red Solen Queen, Sand Vortex, Brigand, Meer Warrior, Cursed, Moloch, EscortableMage, Whipping Vine, Spectre,
+; Savage, Bogle, Wraith, Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast,
+; Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel
+;
+; '''''''''''''
+; Skill >= 65.0
+; '''''''''''''
+; Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion, Red Solen Infiltrator Warrior,
+; Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle, Summoned Earth Elemental, Cyclops,
+; Imp, Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental,
+; Golden Elemental, Orc Bomber, Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle,
+; Quagmire, Orcish Lord, Giant Serpent, Lava Serpent, Prerdator Hell Cat, Valorite Elemental,
+; Chaos Daemon, Black Solen Queen, Red Solen Queen, Sand Vortex, Brigand, Meer Warrior, Cursed, Moloch,
+; EscortableMage, Whipping Vine, Spectre, Savage, Bogle, Wraith, Blade Spirts, Morg Bergen, Shade,
+; Red Solen Infiltrator Queen, Plague Beast, Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel,
+; Ratman Archer, Energy Vortex, Giant Black Widow, Gazer, Grimmoch Drummel, Faction Henchman, Deep Sea Serpent,
+; Kraken, Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary, Giant Ice Worm, Centaur
+;
+; '''''''''''''
+; Skill >= 70.0
+; '''''''''''''
+; Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental, Golden Elemental,
+; Orc Bomber, Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle, Quagmire, Orcish Lord, Giant Serpent,
+; Lava Serpent, Prerdator Hell Cat, Valorite Elemental, Chaos Daemon, Black Solen Queen, Red Solen Queen,
+; Sand Vortex, Brigand, Meer Warrior, Cursed, Moloch, EscortableMage, Whipping Vine, Spectre, Savage, Bogle, Wraith,
+; Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast, Black Solen Infiltrator Queen,
+; Snow Elemental, Tavara Sewel, Ratman Archer, Energy Vortex, Giant Black Widow, Gazer, Grimmoch Drummel,
+; Faction Henchman, Deep Sea Serpent, Kraken, Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage,
+; Faction Mercenary, Giant Ice Worm, Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior
+; Air Elemental
+;
+; '''''''''''''
+; Skill >= 75.0
+; '''''''''''''
+; Meer Warrior, Cursed, Moloch, EscortableMage, Whipping Vine, Spectre, Savage, Bogle,
+; Wraith, Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast,
+; Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel, Ratman Archer, Energy Vortex
+; Giant Black Widow, Gazer, Grimmoch Drummel, Faction Henchman, Deep Sea Serpent, Kraken,
+; Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary, Giant Ice Worm,
+; Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior, Air Elemental,
+; Beetle, Golem, Drake, Bone Magi, Skeletal Mage, Ratman Mage, Fire Elemental, Spectral Armour,
+; Summoned Air Elemental, Juggernaut, Exodus Overseer, Ophidian Mage, Bog Thing, Summoned Water Elemental,
+; Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord, Faction Knight, Faction Death Knight,
+; Faction Berserker
+;
+; '''''''''''''
+; Skill >= 80.0
+; '''''''''''''
+; Bogle, Wraith, Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast,
+; Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel, Ratman Archer, Energy Vortex,
+; Giant Black Widow, Gazer, Grimmoch Drummel, Faction Henchman, Deep Sea Serpent, Kraken,
+; Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary, Giant Ice Worm,
+; Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior, Air Elemental,
+; Beetle, Golem, Drake, Bone Magi, Skeletal Mage, Ratman Mage, Fire Elemental, Spectral Armour,
+; Summoned Air Elemental, Juggernaut, Exodus Overseer, Ophidian Mage, Bog Thing, Summoned Water Elemental,
+; Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord, Faction Knight, Faction Death Knight,
+; Faction Berserker, Priced Healer, Golem Controller, Faction Sorceress, Fire Steed, Wisp,
+; Summoned Fire Elemental, Ogre Lord, Reaper, Artic Ogre Lord, Kirin, Exodus Minion, Faction Paladin,
+; Efreet, Pixie, Orc Brute, Ice Fiend, Faction Dragoon, Faction Necromancer, Faction Wizard
+;
+; '''''''''''''
+; Skill >= 85.0
+; '''''''''''''
+; Kraken, Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary,
+; Giant Ice Worm, Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior,
+; Air Elemental, Beetle, Golem, Drake, Bone Magi, Skeletal Mage, Ratman Mage, Fire Elemental,
+; Spectral Armour, Summoned Air Elemental, Juggernaut, Exodus Overseer, Ophidian Mage, Bog Thing,
+; Summoned Water Elemental, Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord, Faction Knight,
+; Faction Death Knight, Faction Berserker, Priced Healer, Golem Controller, Faction Sorceress,
+; Fire Steed, Wisp, Summoned Fire Elemental, Ogre Lord, Reaper, Artic Ogre Lord,
+; Kirin, Exodus Minion, Faction Paladin, Efreet, Pixie, Orc Brute, Ice Fiend, Faction Dragoon,
+; Faction Necromancer, Faction Wizard, Lysander Gathenwale, Fortune Teller, Silver Serpent,
+; Executioner, Crystal Elemental, Savage Shaman, Terathan Matriarch, Ophidian Knight,
+; Healer, Elder Gazer, Blood Elemental, Nightmare, Khaldun Zealot
+;
+; '''''''''''''
+; Skill >= 90.0
+; '''''''''''''
+; Juka Warrior, Air Elemental, Beetle, Golem, Drake, Bone Magi, Skeletal Mage,
+; Ratman Mage, Fire Elemental, Spectral Armour, Summoned Air Elemental, Juggernaut,
+; Exodus Overseer, Ophidian Mage, Bog Thing, Summoned Water Elemental, Ophidian Archmage,
+; Juka Lord, Wyvern, Evil Mage Lord, Faction Knight, Faction Death Knight, Faction Berserker,
+; Priced Healer, Golem Controller, Faction Sorceress, Fire Steed, Wisp, Summoned Fire Elemental,
+; Ogre Lord, Reaper, Artic Ogre Lord, Kirin, Exodus Minion, Faction Paladin, Efreet,
+; Pixie, Orc Brute, Ice Fiend, Faction Dragoon, Faction Necromancer, Faction Wizard,
+; Lysander Gathenwale, Fortune Teller, Silver Serpent, Executioner, Crystal Elemental,
+; Savage Shaman, Terathan Matriarch, Ophidian Knight, Healer, Elder Gazer, Blood Elemental
+; Nightmare, Khaldun Zealot, Unicorn, Lich, Toxic Elemental, Juka Mage, Summoned Daemon,
+; Meer Mage, Daemon
+;
+; '''''''''''''
+; Skill >= 95.0
+; '''''''''''''
+; Summoned Water Elemental, Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord,
+; Faction Knight, Faction Death Knight, Faction Berserker, Priced Healer, Golem Controller,
+; Faction Sorceress, Fire Steed, Wisp, Summoned Fire Elemental, Ogre Lord, Reaper,
+; Artic Ogre Lord, Kirin, Exodus Minion, Faction Paladin, Efreet, Pixie, Orc Brute,
+; Ice Fiend, Faction Dragoon, Faction Necromancer, Faction Wizard, Lysander Gathenwale,
+; Fortune Teller, Silver Serpent, Executioner, Crystal Elemental, Savage Shaman,
+; Terathan Matriarch, Ophidian Knight, Healer, Elder Gazer, Blood Elemental, Nightmare,
+; Khaldun Zealot, Unicorn, Lich, Toxic Elemental, Juka Mage, Summoned Daemon, Meer Mage,
+; Daemon, White Wyrm, Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+; Fire Gargoyle, Wanderer Of The Void, Betrayer, Ophidian Matriarch, Terathan Avenger
+;
+; ''''''''''''''
+; Skill >= 100.0
+; ''''''''''''''
+; Faction Paladin, Efreet, Pixie, Orc Brute, Ice Fiend, Faction Dragoon,
+; Faction Necromancer, Faction Wizard, Lysander Gathenwale, Fortune Teller,
+; Silver Serpent, Executioner, Crystal Elemental, Savage Shaman, Terathan Matriarch,
+; Ophidian Knight, Healer, Elder Gazer, Blood Elemental, Nightmare, Khaldun Zealot,
+; Unicorn, Lich, Toxic Elemental, Juka Mage, Summoned Daemon, Meer Mage, Daemon,
+; White Wyrm, Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+; Fire Gargoyle, Wanderer Of The Void, Betrayer, Ophidian Matriarch, Terathan Avenger,
+; Succubus, Ethereal Warrior, Titan, Dread Spider, Gargoyle Destroyer, Khaldun Summoner,
+; Phoenix, Dragon
+;
+; ''''''''''''''
+; Skill >= 105.0
+; ''''''''''''''
+; Elder Gazer, Blood Elemental, Nightmare, Khaldun Zealot, Unicorn, Lich,
+; Toxic Elemental, Juka Mage, Summoned Daemon, Meer Mage, Daemon, White Wyrm,
+; Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+; Fire Gargoyle, Wanderer Of The Void, Betrayer, Ophidian Matriarch, Terathan Avenger,
+; Succubus, Ethereal Warrior, Titan, Dread Spider, Gargoyle Destroyer, Khaldun Summoner,
+; Phoenix, Dragon, Lich Lord, Devourer, Meer Eternal
+;
+; ''''''''''''''
+; Skill >= 110.0
+; ''''''''''''''
+; Juka Mage, Summoned Daemon, Meer Mage, Daemon, White Wyrm,
+; Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+; Fire Gargoyle, Wanderer of the Void, Betrayer, Ophidian Matriarch,
+; Terathan Avenger, Succubus, Ethereal Warrior, Titan, Dread Spider, Gargoyle Destroyer,
+; Khaldun Summoner, Phoenix, Dragon, Lich Lord, Devourer, Meer Eternal, Balron
+;
+; ''''''''''''''
+; Skill >= 115.0
+; ''''''''''''''
+; Fire Gargoyle, Wanderer of the Void, Betrayer, Ophidian Matriarch,
+; Terathan Avenger, Succubus, Ethereal Warrior, Titan, Dread Spider,
+; Gargoyle Destroyer, Khaldun Summoner, Phoenix, Dragon, Lich Lord,
+; Devourer, Meer Eternal, Balron, Poison Elemental, Rotting Corpse,
+; Vorpal Bunny, Skeletal Dragon, Serpentine Dragon, Ancient Wyrm,
+; Shadow Wyrm, Ancient Lich, Chaos Guard, Order Guard, Shadow Knight,
+; Bone Demon, Flesh Renderer, Darknight Creeper, Impaler, Abysmal Horror,
+; Demon Knight
+;--------------------------------------------------
+; = [ Options ] ===================================
+;--------------------------------------------------
+; = %instruments ==================================
+; This is a listing of all available instrument
+; types for your shard.
+; [ Recommended Value is _PGP_MQF_QRF_PRF_LQF_OQF_NRF_ ]
+; PGP = Bamboo Flute
+; MQF = Drums
+; QRF = Lap Harp
+; PRF = Lute
+; LQF = Tambourine
+; OQF = Tambourine with Tassel
+; NRF = Standing Harp
+; PRF = Iolo's Lute
+; QRF = Gwenno's Harp
+set %instruments _PGP_MQF_QRF_PRF_LQF_OQF_NRF_
+; = Various Messages ==============================
+; Below are the various messages that could be
+; show during the provocation process.  For a more
+; detailed explaination of each message, just look
+; to the far right of each message declaration.
+; [ Recommended Values are below ]
+; %instrumentMessage = What_instrument_shall_you_play?
+; %targetMessage = Whom_do_you_wish_to_incite?
+; %retargetMessage = You_play_your_music_and_your_target_becomes_angered.__Whom_do_you_wish_them_to_attack?
+; %successMessage = Your_music_succeeds,_as_you_start_a_fight.
+; %failureMessage = Your_music_fails_to_incite_enough_anger.
+; %musicFailureMessage = You_play_poorly,_and_there_is_no_effect.
+; %distanceMessage = The_creatures_you_are_trying_to_provoke_are_too_far_away_from_each_other_for_your_music_to_have_an_effect.
+; %tooFarMessage = That_is_too_far_away.
+; %waitMessage = You_must_wait_a_few_moments_to_use_another_skill.
+set %instrumentMessage What_instrument_shall_you_play? ; This is the message shown when you must target an instrument to use.  This occurs when no instrument is set as the "current" to use.
+set %targetMessage Whom_do_you_wish_to_incite? ; This is the initial message shown when you first attempt to provoke.
+set %retargetMessage You_play_your_music_and_your_target_becomes_angered.__Whom_do_you_wish_them_to_attack? ; This is the message shown after successfully targeting the first creature.
+set %successMessage Your_music_succeeds,_as_you_start_a_fight. ; This is the message shown if you are successful at provoking the two creatures.
+set %failureMessage Your_music_fails_to_incite_enough_anger. ; This is the message shown if you are unsuccessful at provoking the two creatures.
+set %musicFailureMessage You_play_poorly,_and_there_is_no_effect. ; This is the message shown if you fail to pass the required internal musicianship check on your instrument.
+set %distanceMessage The_creatures_you_are_trying_to_provoke_are_too_far_away_from_each_other_for_your_music_to_have_an_effect. ; This message is shown when the two creatures you are trying to target too far apart.  Lower your %maxDistanceToTarget value to prevent this message.
+set %tooFarMessage That_is_too_far_away. ; This is the message shown when you try to target a creature too far away from you.  Lower your %maxDistanceToTarget value to prevent this message.
+set %waitMessage You_must_wait_a_few_moments_to_use_another_skill. ; This message is shown when your delay value is set too low.  The script will try to prevent this message itself, however, increasing your %delay value will prevent this message without the script interferring.
+set %noChanceMessage You_have_no_chance_of_provoking_those_creatures. ; This is the message shown when trying to provoke creatures that cannot be provoked.
+; = %delay ========================================
+; This is the time to wait between skill uses.  If
+; this is set too low, the program will auto -
+; calculate the correct figure to use.  It may take
+; a couple skill attempts for this calculation to
+; be set properly.
+; [ Recommended Value is 10 ]
+set %delay 10
+; = %maxDistanceToTarget ==========================
+; This is the furthest distance away from your
+; character that you can target a creature.  It is
+; also used as the furthest distance allowed
+; between your targeted creatures.
+; [ Recommended Value is 8 ]
+set %maxDistanceToTarget 5
+; = %showCountDownTimer ===========================
+; This can either be #true or #false.
+; When #true an estimated timer will be placed above
+; your character's head showing how many seconds you
+; have to wait before attempting your skill again.
+; [ Recommended Value is #true ]
+set %showCountDownTimer #true
+; = %useUserDefinedTargets ========================
+; This can either be #true or #false.
+; When #true an the program WILL NOT define targets
+; based on your skill value but instead will only
+; use targets matching the ID's or Types declared
+; in %useTheseTargets
+; [ Recommended Value is #false ]
+set %useUserDefinedTargets #false
+; = %useTheseTargets ==============================
+; You define what creatures to use as targets here.
+; Seperate each creature Type or ID using an under-
+; score ( _ ).  You can have as many ID's or Types
+; as you like.  Keep in mind that
+; %useUserDefinedTargets must be set as #true for
+; these values to be used.
+; [ There is no recommended value for this variable ]
+; NOTE THAT THERE IS A TABLE LISTING OF CREATURES BELOW
+set %useTheseTargets V
+; = %showOccasionalStats ==========================
+set %showOccasionalStats #true
+; This can be either #true or #false.
+; When #true you will have a system message print-
+; out on your screen of your stats since the start
+; of the script.  The stats consist of your attempts
+; your successes, your failures, and your gains.
+; [ Recommended Value is #true ]
+
+; = CREATURE LISTING ==============================
+; This listing consists of default values for an
+; untouched RunUO shard.  Values are not guaranteed
+; to be accurate for your shard, but they should be
+; fairly close.  All values are taken from an average
+; for each creature.  The table is sorted in no
+; particular order and it is columned off in a manner
+; of [ Creature Name = Creature Type = Averaged Barding Difficulty ]
+;
+; Bird = WC = 6.9
+; Chicken = AG = 3.2
+; Eagle = TC = 14.764
+; Bull = XG_YG = 27.522
+; Cow = NG_IG = 5.004
+; Black Bear = BG = 25.061
+; Brown Bear = ZI = 21.695
+; Grizzly Bear = WF = 35.333
+; Polar Bear = VF = 35.142
+; Dire Wolf = LD = 35.878
+; Dog = HG = 14.277
+; Grey Wolf = VD_XD = 23.784
+; Hell Hound = UB = 34.596
+; Timber Wolf = PG = 23.315
+; White Wolf = GE_ZD = 23.856
+; Great Hart = AH = 20.64
+; Hind = TG = 14.0
+; Cat = RF = 5.551
+; Cougar = ZE = 24.704
+; Hell Cat =  RF = 45.12
+; Panther = YF = 27.852
+; Prerdator Hell Cat = NC = 60.806
+; Snow Leopard = L_M = 24.991
+; Bull Frog = BB = 18.498
+; Giant Toad = CB = 19.966
+; Alligator = UF = 23.559
+; Llama = EG = 13.185
+; Pack Horse = BO = 26.015
+; Pack Llama = WN = 20.907
+; CoMWarHorse = FC = 46.836
+; Minax War Horse = QC = 46.347
+; SLWarHorse = PC = 46.503
+; TBWarHorse = GC = 46.515
+; Beetle = ZGB = 80.376
+; Desert Ostard = CG = 24.429
+; Faction War Horse = SG = 46.738
+; Fire Steed = YJ = 86.575
+; Forest Ostard = JG = 24.751
+; Frenzied Ostard = KG = 44.001
+; Hell Steed = JHB = 77.267
+; Horse = SG_SF_MG_OF = 20.225
+; Kirin = SH = 87.339
+; Nightmare = TJ_UJ_EC = 94.217
+; Ridable Llama = EG = 15.595
+; Ridgeback = BK = 21.803
+; Savage Ridgeback = WJ = 22.606
+; Scaled Swamp Dragon = HHB = 51.234
+; Sea Horse = MI = 24.728
+; Silver Steed = DC = 24.465
+; Skeletal Mount = JHB = 47.023
+; Swamp Dragon = MHB = 49.444
+; Unicorn = SC = 95.757
+; Boar = CO = 5.741
+; Pig = TF = 4.745
+; Giant Rat = XF = 18.578
+; Jack Rabbit = NF = 4.957
+; Rabbit = NF = 4.76
+; Rat = WG = 5.347
+; Sewer Rat = WG = 4.656
+; Goat = ZF = 4.246
+; Mountain Goat = KB = 19.409
+; Sheep = PF = 5.345
+; Gorilla = RD = 24.641
+; Walrus = DG = 13.256
+; Black Solen Infiltrator Queen = PHB = 69.104
+; Black Solen Infiltrator Warrior = QHB = 55.545
+; Black Solen Queen = PHB = 62.354
+; Black Solen Warrior = QHB = 48.102
+; Black Solen Worker = NHB = 38.904
+; Red Solen Infiltrator Queen = RGB = 68.466
+; Red Solen Infiltrator Warrior = SGB = 55.128
+; Red Solen Queen = RGB = 62.459
+; Red Solen Warrior = SGB = 49.125
+; Red Solen Worker = PGB = 39.759
+; Agapite Elemental = BC = 58.794
+; Bronze Elemental = WB = 59.842
+; Copper Elemental = VB = 58.879
+; Dull Copper Elemental = YB = 58.917
+; Golden Elemental = AJ = 59.007
+; Shadow Iron Elemental = XB = 59.63
+; Valorite Elemental = IC = 61.275
+; Verite Elemental = HC = 58.307
+; Air Elemental = BD = 80.120
+; Blood Elemental = RI = 93.665
+; Earth Elemental = ED = 47.189
+; Fire Elemental = DD = 81.78
+; Ice Elemental = BJ = 77.861
+; Poison Elemental = EJ = 122.185
+; Snow Elemental = DJ = 69.679
+; Toxic Elemental = SI = 97.94
+; Water Elemental = OD = 73.69
+; Abysmal Horror = YO = 270.511
+; Bone Demon = MO = 193.336
+; Chaos Daemon = KHB = 61.995
+; Crystal Elemental = EO = 91.626
+; Darknight Creeper = XO = 222.767
+; Demon Knight = WO = 1046.999
+; Devourer = FO = 113.597
+; Flesh Golem = QO = 42.594
+; Flesh Renderer = ZO = 205.495
+; Gibberling = RO = 47.06
+; Gore Fiend = PO = 38.267
+; Horde Minion = UGB = 12.756
+; Impaler = SO = 225.554
+; Mound Of Maggots = VO = 33.82
+; Patchwork Skeleton = LO = 48.442
+; Ravager = AP = 59.545
+; Shadow Knight = NO = 151.091
+; Skittering Hopper = GO = 31.982
+; Treefellow = DO = 45.194
+; Vampire Bat = TO = 49.735
+; Wailing Banshee = OO = 47.033
+; Wanderer Of The Void = UO = 104.236
+; Balron = ME = 116.596
+; Daemon = FD = 100.307
+; Ice Fiend = NE = 89.679
+; Ancient Wyrm = KE = 138.597
+; Dragon = CD_DF = 109.257
+; Drake = XE_YE = 80.996
+; Serpentine Dragon = PB = 132.466
+; Shadow Wyrm = CC = 138.957
+; Skeletal Dragon = AC = 129.797
+; White Wyrm = OJ = 100.759
+; Wyvern = AF = 84.274
+; Fire Gargoyle = YH = 104.202
+; Gargoyle = UC = 73.405
+; Stone Gargoyle = N = 59.918
+; Harpy = UD = 44.297
+; Stone Harpy = T = 51.585
+; Betrayer = DBB = 104.315
+; Brigand = IS_HS = 62.751
+; Evil Mage = MC = 74.008
+; Evil Mage Lord = LC_OC = 84.32
+; Executioner = IS_HS = 91.515
+; Guardian = HS_IS = 73.545
+; Khaldun Summoner = IS = 108.83
+; Khaldun Zealot = IS = 94.264
+; Lava Lizard = QF = 45.035
+; Lizardman = Ae_FE = 38.557
+; Headless One = TD = 17.39
+; Imp = W = 57.936
+; Mongbat = BE = 6.117
+; Strong Mongbat = BE = 13.13
+; Artic Ogre Lord = TH = 87.307
+; Cyclops = V = 57.917
+; Ettin = QD = 35.936
+; Frost Troll = RE = 53.044
+; Ogre = XE = 36.953
+; Ogre Lord = DB = 87.166
+; Titan = Q = 106.666
+; Troll = PE_SE = 39.712
+; Ophidian Archmage = X = 84.094
+; Ophidian Knight = AB = 92.737
+; Ophidian Mage = X = 82.848
+; Ophidian Matriarch = Z = 104.459
+; Ophidian Warrior = AB = 52.125
+; Orc = ND = 40.073
+; Orc Bomber = QJ = 59.417
+; Orc Brute = VJ = 89.674
+; Orc captain = VC = 54.349
+; Orcish Lord = GI = 60.109
+; Orcish Mage = AI = 75.758
+; Spawned Orcish Lord = GI = 58.506
+; Bogling = VGB = 41.951
+; Bog Thing = QGB = 82.917
+; Frost Ooze = IB = 11.84
+; Jwilson = VE = 17.657
+; Plague Beast = JGB = 68.942
+; Plague Spawn = JD_RD_TD_VE_IS_HS_ED = 35.221
+; Slime = VE = 28.675
+; Corpser = GD = 35.724
+; Quagmire = XGB = 59.921
+; Reaper = JE = 87.223
+; Swamp Tentacle = O = 40.545
+; Whipping Vine = GD = 66.517
+; Ratman = OE = 38.329
+; Ratman Archer = CI = 70.315
+; Ratman Mage = BI = 81.704
+; Giant Serpent = JD = 60.141
+; Ice Serpent = JB = 39.394
+; Ice Snake = QE = 20.037
+; Lava Serpent = MB = 60.631
+; Lava Snake = QE = 22.313
+; Silver Serpent = GB = 90.994
+; Snake = QE = 28.496
+; Dread Spider = HD = 107.17
+; Frost Spider = KD = 31.514
+; Giant Spider = SD = 47.32
+; Terathan Avenger = UI = 105.261
+; Terathan Drone = J = 32.349
+; Terathan Matriarch = U = 92.328
+; Terathan Warrior = K = 53.572
+; Ant Lion = DHB = 54.815
+; Cursed = IS = 63.651
+; Doppleganger = TGB = 50.753
+; Efreet = XH = 88.275
+; Elder Gazer = MD = 93.54
+; Enslaved Gargoyle = XAB = 57.511
+; Exodus Minion = TAB = 87.629
+; Exodus Overseer = UAB = 82.644
+; Faction Berserker = IS = 84.899
+; Faction Death Knight = IS = 84.897
+; Faction Dragoon = IS = 89.759
+; Faction Henchman = IS = 72.073
+; Faction Knight = IS = 84.827
+; Faction Mercenary = IS = 74.189
+; Faction Necromancer = IS = 89.966
+; Faction Paladin = IS = 88.071
+; Faction Sorceress = IS = 86.423
+; Faction Wizard = IS = 89.99
+; Gargoyle Destroyer = ZAB = 108.587
+; Gargoyle Enforcer = AAB = 101.127
+; Gazer = MD = 71.89
+; Gazer Larva = WGB = 38.2
+; Giant Black Widow = PI = 71.734
+; Giant Ice Worm = JB = 74.743
+; Golem = YAB = 80.412
+; Golem Controller = IS = 85.673
+; Grimmoch Drummel = IS = 71.939
+; Juggernaut = MGB = 82.428
+; Juka Lord = EBB = 84.233
+; Juka Mage = BBB = 98.671
+; Juka Warrior = CBB = 78.121
+; Kraken = P = 73.234
+; Lysander Gathenwale = IS = 90.231
+; Meer Captain = HGB = 73.417
+; Meer Eternal = IGB = 115.674
+; Meer Mage = OGB = 99.462
+; Meer Warrior = NGB = 63.108
+; Militia Fighter = IS = 9.5
+; Moloch = BHB = 64.745
+; Morg Bergen = IS = 68.113
+; Parrot = NIB = 6.848
+; Phoenix = TC = 108.912
+; Restless Soul = IJB = 18.807
+; Savage = AK_PJ = 67.852
+; Savage Rider = ZJ_CK = 75.487
+; Savage Shaman = AK_PJ = 92.015
+; Scorpion = UE = 54.41
+; Shadow Fiend = KJ = 20.772
+; Shadow Wisp = XI = 34.113
+; Spectral Armour = DW = 81.881
+; Succubus = HI = 105.701
+; Summoned Air Elemental = BD = 81.909
+; Summoned Daemon = FD = 99.287
+; Summoned Earth Elemental = ED = 57.561
+; Summoned Fire Elemental = DD = 87.022
+; Summoned Water Elemental = OD = 83.955
+; Tavara Sewel = HS = 70.145
+; Tropical Bird = WC = 6.377
+; Vorpal Bunny = NF = 124.829
+; Bogle = TI = 68.012
+; Ghoul = TI = 39.359
+; Shade = YD = 68.263
+; Spectre = YD = 67.475
+; Wraith = YD = 68.025
+; Ancient Lich = S = 139.526
+; Lich = WD = 97.33
+; Lich Lord = R = 113.114
+; Bone Knight = BF = 52.867
+; Bone Magi = II = 81.074
+; Skeletal Knight = NI = 52.462
+; Skeletal Mage = II = 81.335
+; Skeleton = CF_WE = 39.489
+; Mummy = WI = 54.083
+; Rotting Corpse = VI = 123.132
+; Zombie = ZC = 32.051
+; Blade Spirts = SY = 68.057
+; Energy Vortex = YI = 71.038
+; Sand Vortex = AHB = 62.496
+; Centaur = NB = 75.112
+; Ethereal Warrior = RC = 106.529
+; Pixie = WH = 88.792
+; Wisp = EF = 86.872
+; Deep Sea Serpent = KI = 72.886
+; Dolphin = JI = 26.18
+; Sea Serpent = KI = 56.344
+; Base Escortable = HS_IS = 21.249
+; EscortableMage = HS_IS = 65.275
+; Noble = HS_IS = 47.783
+; Seeker Of Adventure = HS_IS = 21.117
+; Chaos Guard = HS_IS = 148.545
+; Order Guard = HS_IS = 148.545
+; Evil Healer = HS_IS = 103.656
+; Evil Wandering Healer = HS_IS = 102.422
+; Fortune Teller = HS_IS = 90.623
+; Healer = HS_IS = 92.924
+; Priced Healer = HS_IS = 85.476
+; Wandering Healer = HS_IS = 102.279
+
+; = [Unknow Creature Values ] ================================
+; No town venders were checked, therefore no town venders are
+; used in the automated targeting.
+
+; = [Unprovokable Creatures ] ================================
+; Barracoon , Harrower , HarrowerTentacles , LordOaks ,
+; Mephitis , Neira , Rikktor , Semidar , Silvani , Archer Guard ,
+; Warrior Guard , Town Crier , Wanderer
+
+; = DO NOT EDIT BELOW HERE ========================
+
+; = MAIN ==========================================
+; This is just the main method that runs the entire
+; program.  It merely checks for available targets
+; and provokes them if possible.  Then its a simple
+; rinse and repeat of itself.
+ignoreitem #charid
+chooseskill provocation
+set %origSkill #skill
+set %attempts 0
+set %successes 0
+set %occasionalTimer 0
+macro:
+  gosub setTargetable
+  gosub setTargets
+  if #result
+  {
+    set %attempts %attempts + 1
+    gosub provo
+    if #result
+      set %successes %successes + 1
+    chooseskill provocation
+    set %gains #skill - %origSkill
+    str len %gains
+    set %len #strres - 1
+    str left %gains %len
+    set %whole #strres
+    set %len %len - ( %len - 1 )
+    str right %gains %len
+    set %decimal #strres
+    set %gains %whole , #dot , %decimal
+    set %failures %attempts - %successes
+  }
+  if #scnt > %occasionalTimer
+  {
+    if %showOccasionalStats
+      event sysmessage Attempts: %attempts Successes: %successes Failures: %failures Gains: %gains
+    set %occasionalTimer 20 + #scnt
+  }
+goto macro
+
+;
+sub setTargets
+{
+  finditem %targetable g_ , %maxDistanceToTarget
+  if #findkind
+  {
+    ignoreitem reset
+    ignoreitem #charid
+    set %target_one none
+    return #false
+  }
+  set %target_one #findid
+  ignoreitem %target_one targetid
+  finditem %targetable g_ , %maxDistanceToTarget
+  if #findkind
+  {
+    ignoreitem reset targetid
+    set %target_two none
+    return #false
+  }
+  set %target_two #findid
+  gosub distance %target_one %target_two
+  if #result > %maxDistanceToTarget
+    return #false
+  return #true
+}
+
+; = distance ======================================
+; This takes two ID's or Types as parameters and
+; compares their distances apart from each other.
+; [ Parameters ]
+; %1 = targetid of the first target
+; %2 = targetid of the second target
+; [ Returned Value ]
+; #result will be the distance between the creatures
+;
+sub distance
+{
+  ignoreitem reset targetid
+  set %one %1
+  set %two %2
+  finditem %one G
+  ignoreitem %one creature
+  set %onex #findx
+  set %oney #findy
+  finditem %two G
+  ignoreitem %two creature
+  set %twox #findx
+  set %twoy #findy
+  set %xdist %onex - %twox ABS
+  set %ydist %oney - %twoy ABS
+  if %xdist > %ydist
+    set %dist %xdist
+  else
+    set %dist %ydist
+  return %dist
+}
+
+; = setTargetable =================================
+; This mehtod chooses what creatures to use as
+; possible targets based on your current
+; provocation skill value.  That is however, unless
+; you choose to set the targetable value yourself,
+; in which case the user set values are used.
+sub setTargetable
+{
+  if %useUserDefinedTargets
+    set %targetable %useTheseTargets
+  else
+  {
+    chooseskill provocation
+    ; [Creatures] -> barding difficulty values between 0 and 20
+    ; Chicken, Goat, Sewer Rat, Pig, Rabbit, Jack Rabbit, Cow, Sheep, Rat, Cat,
+    ; Boar, Mongbat, Tropical Bird, Parrot, Bird, Militia Fighter, Frost Ooze,
+    ; Horde Minion, Strong Mongbat, Llama, Walrus, Hind, Dog, Eagle, Ridable Llama,
+    ; Headless One, Jwilson, Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad
+    if #skill >= 100
+      set %targetable _AG_ZF_WG_TF_NF_NF_NG_IG_PF_WG_RF_CO_BE_WC_NIB_WC_IS_IB_UGB_BE_EG_DG_TG_HG_TC_EG_TD_VE_BB_XF_IJB_KB_CB_
+
+    ; [Creatures] -> barding difficulty values between 3 and 25
+    ; Chicken, Goat, Sewer Rat, Pig, Rabbit, Jack Rabbit, Cow, Sheep, Rat, Cat,
+    ; Boar, Mongbat, Tropical Bird, Parrot, Bird, Militia Fighter, Frost Ooze,
+    ; Horde Minion, Strong Mongbat, Llama, Walrus, Hind, Dog, Eagle, Ridable Llama,
+    ; Headless One, Jwilson, Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad,
+    ; Ice Snake, Horse, Great Hart, Shadow Fiend, Pack Llama, Seeker Of Adventure, Base Escortable,
+    ; Brown Bear, Ridgeback, Lava Snake, Savage Ridgeback, Timber Wolf, Alligator, Grey Wolf,
+    ; White Wolf, Desert Ostard, Silver Steed, Gorilla, Cougar, Sea Horse, Forest Ostardr, Snow Leopard,
+    ; Black Bear
+    if #skill >= 150
+      set %targetable _AG_ZF_WG_TF_NF_NF_NG_IG_PF_WG_RF_CO_BE_WC_NIB_WC_IS_IB_UGB_BE_EG_DG_TG_HG_TC_EG_TD_VE_BB_XF_IJB_KB_CB_QE_SG_SF_MG_OF_AH_KJ_WN_HS_IS_HS_IS_ZI_BK_QE_WJ_PG_UF_VD_XD_GE_ZD_CG_DC_RD_ZE_MI_JG_L_M_BG_
+
+    ; [Creatures] -> barding difficulty values between 8 and 30
+    ; Militia Fighter, Frost Ooze, Horde Minion, Strong Mongbat, Llama, Walrus, Hind,
+    ; Dog, Eagle, Ridable Llama, Headless One, Jwilson, Bull Frog, Giant Rat, Restless Soul,
+    ; Mountain Goat, Giant Toad, Ice Snake, Horse, Great Hart, Shadow Fiend, Pack Llama,
+    ; Seeker Of Adventure, Base Escortable, Brown Bear, Ridgeback, Lava Snake, Savage Ridgeback,
+    ; Timber Wolf, Alligator, Grey Wolf, White Wolf, Desert Ostard, Silver Steed, Gorilla,
+    ; Cougar, Sea Horse, Forest Ostard, Snow Leopard, Black Bear, Pack Horse, Dolphin, Bull
+    ; Panther, Snake, Slime
+    if #skill >= 200
+      set %targetable _IS_IB_UGB_BE_EG_DG_TG_HG_TC_EG_TD_VE_BB_XF_IJB_KB_CB_QE_SG_SF_MG_OF_AH_KJ_WN_HS_IS_HS_IS_ZI_BK_QE_WJ_PG_UF_VD_XD_GE_ZD_CG_DC_RD_ZE_MI_JG_L_M_BG_BO_JI_XG_YG_YF_QE_VE_
+
+    ; [Creatures] -> barding difficulty values between 13 and 35
+    ; Strong Mongbat, Llama, Walrus, Hind, Dog, Eagle, Ridable Llama, Headless One,
+    ; Jwilson, Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad, Ice Snake,
+    ; Horse, Great Hart, Shadow Fiend, Pack Llama, Seeker Of Adventure, Base Escortable,
+    ; Brown Bear, Ridgeback, Lava Snake, Savage Ridgeback, Timber Wolf, Alligator, Grey Wolf,
+    ; White Wolf, Desert Ostard, Silver Steed, Gorilla, Cougar, Sea Horse, Forest Ostard, Snow Leopard,
+    ; Black Bear, Pack Horse, Dolphin, Bull, Panther, Snake, Slime, Frost Spider, Skittering Hopper,
+    ; Zombie, Terathan Drone, Mound Of Maggots, Shadow Wisp, Hell Hound
+    if #skill >= 250
+      set %targetable _BE_EG_DG_TG_HG_TC_EG_TD_VE_BB_XF_IJB_KB_CB_QE_SG_SF_MG_OF_AH_KJ_WN_HS_IS_HS_IS_ZI_BK_QE_WJ_PG_UF_VD_XD_GE_ZD_CG_DC_RD_ZE_MI_JG_L_M_BG_BO_JI_XG_YG_YF_QE_VE_KD_GO_ZC_J_VO_XI_UB_
+
+    ; [Creatures] -> barding difficulty values between 18 and 40
+    ; Bull Frog, Giant Rat, Restless Soul, Mountain Goat, Giant Toad, Ice Snake, Horse, Great Hart,
+    ; Shadow Fiend, Pack Llama, Seeker Of Adventure, Base Escortable, Brown Bear, Ridgeback, Lava Snake,
+    ; Savage Ridgeback, Timber Wolf, Alligator, Grey Wolf, White Wolf, Desert Ostard, Silver Steed,
+    ; Gorilla, Cougar, Sea Horse, Forest Ostard, Snow Leopard, Black Bear, Pack Horse, Dolphin, Bull,
+    ; Panther, Snake, Slime, Frost Spider, Skittering Hopper, Zombie, Terathan Drone, Mound Of Maggots,
+    ; Shadow Wisp, Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf, Ettin,
+    ; Ogre, Gazer Larva, Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton,
+    ; Troll, Red Solen Worker
+    if #skill >= 300
+      set %targetable _BB_XF_IJB_KB_CB_QE_SG_SF_MG_OF_AH_KJ_WN_HS_IS_HS_IS_ZI_BK_QE_WJ_PG_UF_VD_XD_GE_ZD_CG_DC_RD_ZE_MI_JG_L_M_BG_BO_JI_XG_YG_YF_QE_VE_KD_GO_ZC_J_VO_XI_UB_VF_JD_RD_TD_VE_IS_HS_ED_WF_GD_LD_QD_XE_WGB_PO_OE_Ae_FE_NHB_TI_JB_CF_WE_PE_SE_PGB_
+
+    ; [Creatures] -> barding difficulty values between 23 and 45
+    ; Timber Wolf, Alligator, Grey Wolf, White Wolf, Desert Ostard, Silver Steed, Gorilla, Cougar,
+    ; Sea Horse, Forest Ostard, Snow Leopard, Black Bear, Pack Horse, Dolphin, Bull, Panther, Snake,
+    ; Slime, Frost Spider, Skittering Hopper, Zombie, Terathan Drone, Mound Of Maggots, Shadow Wisp,
+    ; Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf, Ettin, Ogre, Gazer Larva,
+    ; Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton, Troll, Red Solen Worker,
+    ; Orc, Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy
+    if #skill >= 350
+      set %targetable _PG_UF_VD_XD_GE_ZD_CG_DC_RD_ZE_MI_JG_L_M_BG_BO_JI_XG_YG_YF_QE_VE_KD_GO_ZC_J_VO_XI_UB_VF_JD_RD_TD_VE_IS_HS_ED_WF_GD_LD_QD_XE_WGB_PO_OE_Ae_FE_NHB_TI_JB_CF_WE_PE_SE_PGB_ND_O_VGB_QO_KG_UD_
+
+    ; [Creatures] -> barding difficulty values between 28 and 50
+    ; Snake, Slime, Frost Spider, Skittering Hopper, Zombie, Terathan Drone, Mound Of Maggots, Shadow Wisp,
+    ; Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf, Ettin, Ogre, Gazer Larva,
+    ; Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton, Troll, Red Solen Worker,
+    ; Orc, Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy, Lava Lizard, Hell Cat, Treefellow,
+    ; Minax War Horse, SLWarHorse, TBWarHorse, Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee,
+    ; Gibberling, Earth Elemental, Giant Spider, Noble, Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior,
+    ; Swamp Dragon, Vampire Bat
+    if #skill >= 400
+      set %targetable _QE_VE_KD_GO_ZC_J_VO_XI_UB_VF_JD_RD_TD_VE_IS_HS_ED_WF_GD_LD_QD_XE_WGB_PO_OE_Ae_FE_NHB_TI_JB_CF_WE_PE_SE_PGB_ND_O_VGB_QO_KG_UD_QF_RF_DO_QC_PC_GC_SG_FC_JHB_OO_RO_ED_SD_HS_IS_QHB_LO_SGB_MHB_TO_
+
+    ; [Creatures] -> barding difficulty values between 33 and 55
+    ; Mound Of Maggots, Shadow Wisp, Hell Hound, Polar Bear, Plague Spawn, Grizzly Bear, Corpser, Dire Wolf,
+    ; Ettin, Ogre, Gazer Larva, Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton,
+    ; Troll, Red Solen Worker, Orc, Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy, Lava Lizard, Hell Cat,
+    ; Treefellow, Minax War Horse, SLWarHorse, TBWarHorse, Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee,
+    ; Gibberling, Earth Elemental, Giant Spider, Noble, Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon,
+    ; Vampire Bat, Doppleganger, Scaled Swamp Dragon, Stone Harpy, Ophidian Warrior, Skeletal Knight, Bone Knight, Frost Troll,
+    ; Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion
+    if #skill >= 450
+      set %targetable _VO_XI_UB_VF_JD_RD_TD_VE_IS_HS_ED_WF_GD_LD_QD_XE_WGB_PO_OE_Ae_FE_NHB_TI_JB_CF_WE_PE_SE_PGB_ND_O_VGB_QO_KG_UD_QF_RF_DO_QC_PC_GC_SG_FC_JHB_OO_RO_ED_SD_HS_IS_QHB_LO_SGB_MHB_TO_TGB_HHB_T_AB_NI_BF_RE_K_WI_VC_UE_DHB_
+
+    ; [Creatures] -> barding difficulty values between 38 and 60
+    ; Gazer Larva, Gore Fiend, Ratman, Lizardman, Black Solen Worker, Ghoul, Ice Serpent, Skeleton, Troll, Red Solen Worker, Orc,
+    ; Swamp Tentacle, Bogling, Flesh Golem, Frenzied Ostard, Harpy, Lava Lizard, Hell Cat, Treefellow, Minax War Horse, SLWarHorse,
+    ; TBWarHorse, Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee, Gibberling, Earth Elemental, Giant Spider, Noble,
+    ; Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon, Vampire Bat, Doppleganger, Scaled Swamp Dragon,
+    ; Stone Harpy, Ophidian Warrior, Skeletal Knight, Bone Knight, Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion,
+    ; Red Solen Infiltrator Warrior, Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle, Summoned Earth Elemental, Cyclops,
+    ; Imp, Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental, Golden Elemental, Orc Bomber,
+    ; Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle, Quagmire
+    if #skill >= 500
+      set %targetable _WGB_PO_OE_Ae_FE_NHB_TI_JB_CF_WE_PE_SE_PGB_ND_O_VGB_QO_KG_UD_QF_RF_DO_QC_PC_GC_SG_FC_JHB_OO_RO_ED_SD_HS_IS_QHB_LO_SGB_MHB_TO_TGB_HHB_T_AB_NI_BF_RE_K_WI_VC_UE_DHB_SGB_QHB_KI_XAB_ED_V_W_HC_GI_BC_VB_YB_AJ_QJ_AP_XB_WB_N_XGB_
+
+    ; [Creatures] -> barding difficulty values between 43 and 65
+    ; Frenzied Ostard, Harpy, Lava Lizard, Hell Cat, Treefellow, Minax War Horse, SLWarHorse, TBWarHorse,
+    ; Faction War Horse, CoMWarHorse, Skeletal Mount, Wailing Banshee, Gibberling, Earth Elemental,
+    ; Giant Spider, Noble, Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon,
+    ; Vampire Bat, Doppleganger, Scaled Swamp Dragon, Stone Harpy, Ophidian Warrior, Skeletal Knight,
+    ; Bone Knight, Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion,
+    ; Red Solen Infiltrator Warrior, Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle,
+    ; Summoned Earth Elemental, Cyclops, Imp, Verite Elemental, Spawned Orcish Lord, Agapite Elemental,
+    ; Copper Elemental, Dull Copper Elemental, Golden Elemental, Orc Bomber, Ravager, Shadow Iron Elemental,
+    ; Bronze Elemental, Stone Gargoyle, Quagmire, Orcish Lord, Giant Serpent, Lava Serpent, Prerdator Hell Cat,
+    ; Valorite Elemental, Chaos Daemon, Black Solen Queen, Red Solen Queen, Sand Vortex, Brigand, Meer Warrior,
+    ; Cursed, Moloch
+    if #skill >= 550
+      set %targetable _KG_UD_QF_RF_DO_QC_PC_GC_SG_FC_JHB_OO_RO_ED_SDHS_IS_QHB_LO_SGB_MHB_TO_TGB_HHB_T_AB_NI_BF_RE_K_WI_VC_UE_DHB_SGB_QHB_KI_XAB_ED_V_W_HC_GI_BC_VB_YB_AJ_QJ_AP_XB_WB_N_XGB_GI_JD_MB_NC_IC_KHB_PHB_RGB_AHB_IS_HS_NGB_IS_BHB_
+
+    ; [Creatures] -> barding difficulty values between 48 and 70
+    ; Black Solen Warrior, Patchwork Skeleton, Red Solen Warrior, Swamp Dragon, Vampire Bat,
+    ; Doppleganger, Scaled Swamp Dragon, Stone Harpy, Ophidian Warrior, Skeletal Knight, Bone Knight,
+    ; Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion, Red Solen Infiltrator Warrior,
+    ; Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle, Summoned Earth Elemental, Cyclops, Imp,
+    ; Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental, Golden Elemental,
+    ; Orc Bomber, Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle, Quagmire, Orcish Lord,
+    ; Giant Serpent, Lava Serpent, Prerdator Hell Cat, Valorite Elemental, Chaos Daemon, Black Solen Queen,
+    ; Red Solen Queen, Sand Vortex, Brigand, Meer Warrior, Cursed, Moloch, EscortableMage, Whipping Vine, Spectre,
+    ; Savage, Bogle, Wraith, Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast,
+    ; Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel
+    if #skill >= 600
+      set %targetable _QHB_LO_SGB_MHB_TO_TGB_HHB_T_AB_NI_BF_RE_K_WI_VC_UE_DHB_SGB_QHB_KI_XAB_ED_V_W_HC_GI_BC_VB_YB_AJ_QJ_AP_XB_WB_N_XGB_GI_JD_MB_NC_IC_KHB_PHB_RGB_AHB_IS_HS_NGB_IS_BHB_HS_IS_GD_YD_AK_PJ_TI_YD_SY_IS_YD_RGB_JGB_PHB_DJ_HS_
+
+    ; [Creatures] -> barding difficulty values between 53 and 75
+    ; Frost Troll, Terathan Warrior, Mummy, Orc captain, Scorpion, Ant Lion, Red Solen Infiltrator Warrior,
+    ; Black Solen Infiltrator Warrior, Sea Serpent, Enslaved Gargoyle, Summoned Earth Elemental, Cyclops,
+    ; Imp, Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental,
+    ; Golden Elemental, Orc Bomber, Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle,
+    ; Quagmire, Orcish Lord, Giant Serpent, Lava Serpent, Prerdator Hell Cat, Valorite Elemental,
+    ; Chaos Daemon, Black Solen Queen, Red Solen Queen, Sand Vortex, Brigand, Meer Warrior, Cursed, Moloch,
+    ; EscortableMage, Whipping Vine, Spectre, Savage, Bogle, Wraith, Blade Spirts, Morg Bergen, Shade,
+    ; Red Solen Infiltrator Queen, Plague Beast, Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel,
+    ; Ratman Archer, Energy Vortex, Giant Black Widow, Gazer, Grimmoch Drummel, Faction Henchman, Deep Sea Serpent,
+    ; Kraken, Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary, Giant Ice Worm, Centaur
+    if #skill >= 650
+      set %targetable _RE_K_WI_VC_UE_DHB_SGB_QHB_KI_XAB_ED_V_W_HC_GI_BC_VB_YB_AJ_QJ_AP_XB_WB_N_XGB_GI_JD_MB_NC_IC_KHB_PHB_RGB_AHB_IS_HS_NGB_IS_BHB_HS_IS_GD_YD_AK_PJ_TI_YD_SY_IS_YD_RGB_JGB_PHB_DJ_HS_CI_YI_PI_MD_IS_IS_KI_P_UC_HGB_HS_IS_OD_MC_IS_JB_NB_
+
+    ; [Creatures] -> barding difficulty values between 58 and 80
+    ; Verite Elemental, Spawned Orcish Lord, Agapite Elemental, Copper Elemental, Dull Copper Elemental, Golden Elemental,
+    ; Orc Bomber, Ravager, Shadow Iron Elemental, Bronze Elemental, Stone Gargoyle, Quagmire, Orcish Lord, Giant Serpent,
+    ; Lava Serpent, Prerdator Hell Cat, Valorite Elemental, Chaos Daemon, Black Solen Queen, Red Solen Queen,
+    ; Sand Vortex, Brigand, Meer Warrior, Cursed, Moloch, EscortableMage, Whipping Vine, Spectre, Savage, Bogle, Wraith,
+    ; Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast, Black Solen Infiltrator Queen,
+    ; Snow Elemental, Tavara Sewel, Ratman Archer, Energy Vortex, Giant Black Widow, Gazer, Grimmoch Drummel,
+    ; Faction Henchman, Deep Sea Serpent, Kraken, Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage,
+    ; Faction Mercenary, Giant Ice Worm, Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior
+    ; Air Elemental
+    if #skill >= 700
+      set %targetable _HC_GI_BC_VB_YB_AJ_QJ_AP_XB_WB_N_XGB_GI_JD_MB_NC_IC_KHB_PHB_RGB_AHB_IS_HS_NGB_IS_BHB_HS_IS_GD_YD_AK_PJ_TI_YD_SY_IS_YD_RGB_JGB_PHB_DJ_HS_CI_YI_PI_MD_IS_IS_KI_P_UC_HGB_HS_IS_OD_MC_IS_JB_NB_ZJ_CK_AI_JHB_BJ_CBB_BD_
+
+    ; [Creatures] -> barding difficulty values between 63 and 85
+    ; Meer Warrior, Cursed, Moloch, EscortableMage, Whipping Vine, Spectre, Savage, Bogle,
+    ; Wraith, Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast,
+    ; Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel, Ratman Archer, Energy Vortex
+    ; Giant Black Widow, Gazer, Grimmoch Drummel, Faction Henchman, Deep Sea Serpent, Kraken,
+    ; Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary, Giant Ice Worm,
+    ; Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior, Air Elemental,
+    ; Beetle, Golem, Drake, Bone Magi, Skeletal Mage, Ratman Mage, Fire Elemental, Spectral Armour,
+    ; Summoned Air Elemental, Juggernaut, Exodus Overseer, Ophidian Mage, Bog Thing, Summoned Water Elemental,
+    ; Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord, Faction Knight, Faction Death Knight,
+    ; Faction Berserker
+    if #skill >= 750
+      set %targetable _NGB_IS_BHB_HS_IS_GD_YD_AK_PJ_TI_YD_SY_IS_YD_RGB_JGB_PHB_DJ_HS_CI_YI_PI_MD_IS_IS_KI_P_UC_HGB_HS_IS_OD_MC_IS_JB_NB_ZJ_CK_AI_JHB_BJ_CBB_BD_ZGB_YAB_XE_YE_II_II_BI_DD_DW_BD_MGB_UAB_X_QGB_OD_X_EBB_AF_LC_OC_IS_IS_IS_
+
+    ; [Creatures] -> barding difficulty values between 68 and 90
+    ; Bogle, Wraith, Blade Spirts, Morg Bergen, Shade, Red Solen Infiltrator Queen, Plague Beast,
+    ; Black Solen Infiltrator Queen, Snow Elemental, Tavara Sewel, Ratman Archer, Energy Vortex,
+    ; Giant Black Widow, Gazer, Grimmoch Drummel, Faction Henchman, Deep Sea Serpent, Kraken,
+    ; Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary, Giant Ice Worm,
+    ; Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior, Air Elemental,
+    ; Beetle, Golem, Drake, Bone Magi, Skeletal Mage, Ratman Mage, Fire Elemental, Spectral Armour,
+    ; Summoned Air Elemental, Juggernaut, Exodus Overseer, Ophidian Mage, Bog Thing, Summoned Water Elemental,
+    ; Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord, Faction Knight, Faction Death Knight,
+    ; Faction Berserker, Priced Healer, Golem Controller, Faction Sorceress, Fire Steed, Wisp,
+    ; Summoned Fire Elemental, Ogre Lord, Reaper, Artic Ogre Lord, Kirin, Exodus Minion, Faction Paladin,
+    ; Efreet, Pixie, Orc Brute, Ice Fiend, Faction Dragoon, Faction Necromancer, Faction Wizard
+    if #skill >= 800
+      set %targetable _TI_YD_SY_IS_YD_RGB_JGB_PHB_DJ_HS_CI_YI_PI_MD_IS_IS_KI_P_UC_HGB_HS_IS_OD_MC_IS_JB_NB_ZJ_CK_AI_JHB_BJ_CBB_BD_ZGB_YAB_XE_YE_II_II_BI_DD_DW_BD_MGB_UAB_X_QGB_OD_X_EBB_AF_LC_OC_IS_IS_IS_HS_IS_IS_IS_YJ_EF_DD_DB_JE_TH_SH_TAB_IS_XH_WH_VJ_NE_IS_IS_IS_
+
+    ; [Creatures] -> barding difficulty values between 73 and 95
+    ; Kraken, Gargoyle, Meer Captain, Guardian, Water Elemental, Evil Mage, Faction Mercenary,
+    ; Giant Ice Worm, Centaur, Savage Rider, Orcish Mage, Hell Steed, Ice Elemental, Juka Warrior,
+    ; Air Elemental, Beetle, Golem, Drake, Bone Magi, Skeletal Mage, Ratman Mage, Fire Elemental,
+    ; Spectral Armour, Summoned Air Elemental, Juggernaut, Exodus Overseer, Ophidian Mage, Bog Thing,
+    ; Summoned Water Elemental, Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord, Faction Knight,
+    ; Faction Death Knight, Faction Berserker, Priced Healer, Golem Controller, Faction Sorceress,
+    ; Fire Steed, Wisp, Summoned Fire Elemental, Ogre Lord, Reaper, Artic Ogre Lord,
+    ; Kirin, Exodus Minion, Faction Paladin, Efreet, Pixie, Orc Brute, Ice Fiend, Faction Dragoon,
+    ; Faction Necromancer, Faction Wizard, Lysander Gathenwale, Fortune Teller, Silver Serpent,
+    ; Executioner, Crystal Elemental, Savage Shaman, Terathan Matriarch, Ophidian Knight,
+    ; Healer, Elder Gazer, Blood Elemental, Nightmare, Khaldun Zealot
+    if #skill >= 850
+      set %targetable _P_UC_HGB_HS_IS_OD_MC_IS_JB_NB_ZJ_CK_AI_JHB_BJ_CBB_BD_ZGB_YAB_XE_YE_II_II_BI_DD_DW_BD_MGB_UAB_X_QGB_OD_X_EBB_AF_LC_OC_IS_IS_IS_HS_IS_IS_IS_YJ_EF_DD_DB_JE_TH_SH_TAB_IS_XH_WH_VJ_NE_IS_IS_IS_IS_HS_IS_GB_IS_HS_EO_AK_PJ_U_AB_HS_IS_MD_RI_TJ_UJ_EC_IS_
+
+    ; [Creatures] -> barding difficulty values between 78 and 100
+    ; Juka Warrior, Air Elemental, Beetle, Golem, Drake, Bone Magi, Skeletal Mage,
+    ; Ratman Mage, Fire Elemental, Spectral Armour, Summoned Air Elemental, Juggernaut,
+    ; Exodus Overseer, Ophidian Mage, Bog Thing, Summoned Water Elemental, Ophidian Archmage,
+    ; Juka Lord, Wyvern, Evil Mage Lord, Faction Knight, Faction Death Knight, Faction Berserker,
+    ; Priced Healer, Golem Controller, Faction Sorceress, Fire Steed, Wisp, Summoned Fire Elemental,
+    ; Ogre Lord, Reaper, Artic Ogre Lord, Kirin, Exodus Minion, Faction Paladin, Efreet,
+    ; Pixie, Orc Brute, Ice Fiend, Faction Dragoon, Faction Necromancer, Faction Wizard,
+    ; Lysander Gathenwale, Fortune Teller, Silver Serpent, Executioner, Crystal Elemental,
+    ; Savage Shaman, Terathan Matriarch, Ophidian Knight, Healer, Elder Gazer, Blood Elemental
+    ; Nightmare, Khaldun Zealot, Unicorn, Lich, Toxic Elemental, Juka Mage, Summoned Daemon,
+    ; Meer Mage, Daemon
+    if #skill >= 900
+      set %targetable _CBB_BD_ZGB_YAB_XE_YE_II_II_BI_DD_DW_BD_MGB_UAB_X_QGB_OD_X_EBB_AF_LC_OC_IS_IS_IS_HS_IS_IS_IS_YJ_EF_DD_DB_JE_TH_SH_TAB_IS_XH_WH_VJ_NE_IS_IS_IS_IS_HS_IS_GB_IS_HS_EO_AK_PJ_U_AB_HS_IS_MD_RI_TJ_UJ_EC_IS_SC_WD_SI_BBB_FD_OGB_FD_
+
+    ; [Creatures] -> barding difficulty values between 83 and 105
+    ; Summoned Water Elemental, Ophidian Archmage, Juka Lord, Wyvern, Evil Mage Lord,
+    ; Faction Knight, Faction Death Knight, Faction Berserker, Priced Healer, Golem Controller,
+    ; Faction Sorceress, Fire Steed, Wisp, Summoned Fire Elemental, Ogre Lord, Reaper,
+    ; Artic Ogre Lord, Kirin, Exodus Minion, Faction Paladin, Efreet, Pixie, Orc Brute,
+    ; Ice Fiend, Faction Dragoon, Faction Necromancer, Faction Wizard, Lysander Gathenwale,
+    ; Fortune Teller, Silver Serpent, Executioner, Crystal Elemental, Savage Shaman,
+    ; Terathan Matriarch, Ophidian Knight, Healer, Elder Gazer, Blood Elemental, Nightmare,
+    ; Khaldun Zealot, Unicorn, Lich, Toxic Elemental, Juka Mage, Summoned Daemon, Meer Mage,
+    ; Daemon, White Wyrm, Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+    ; Fire Gargoyle, Wanderer Of The Void, Betrayer, Ophidian Matriarch, Terathan Avenger
+    if #skill >= 950
+      set %targetable _OD_X_EBB_AF_LC_OC_IS_IS_IS_HS_IS_IS_IS_YJ_EF_DD_DB_JE_TH_SH_TAB_IS_XH_WH_VJ_NE_IS_IS_IS_IS_HS_IS_GB_IS_HS_EO_AK_PJ_U_AB_HS_IS_MD_RI_TJ_UJ_EC_IS_SC_WD_SI_BBB_FD_OGB_FD_OJ_AAB_HS_IS_HS_IS_HS_IS_YH_UO_DBB_Z_UI_
+
+    ; [Creatures] -> barding difficulty values between 88 and 110
+    ; Faction Paladin, Efreet, Pixie, Orc Brute, Ice Fiend, Faction Dragoon,
+    ; Faction Necromancer, Faction Wizard, Lysander Gathenwale, Fortune Teller,
+    ; Silver Serpent, Executioner, Crystal Elemental, Savage Shaman, Terathan Matriarch,
+    ; Ophidian Knight, Healer, Elder Gazer, Blood Elemental, Nightmare, Khaldun Zealot,
+    ; Unicorn, Lich, Toxic Elemental, Juka Mage, Summoned Daemon, Meer Mage, Daemon,
+    ; White Wyrm, Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+    ; Fire Gargoyle, Wanderer Of The Void, Betrayer, Ophidian Matriarch, Terathan Avenger,
+    ; Succubus, Ethereal Warrior, Titan, Dread Spider, Gargoyle Destroyer, Khaldun Summoner,
+    ; Phoenix, Dragon
+    if #skill >= 1000
+      set %targetable _IS_XH_WH_VJ_NE_IS_IS_IS_IS_HS_IS_GB_IS_HS_EO_AK_PJ_U_AB_HS_IS_MD_RI_TJ_UJ_EC_IS_SC_WD_SI_BBB_FD_OGB_FD_OJ_AAB_HS_IS_HS_IS_HS_IS_YH_UO_DBB_Z_UI_HI_RC_Q_HD_ZAB_IS_TC_CD_DF_
+
+    ; [Creatures] -> barding difficulty values between 93 and 115
+    ; Elder Gazer, Blood Elemental, Nightmare, Khaldun Zealot, Unicorn, Lich,
+    ; Toxic Elemental, Juka Mage, Summoned Daemon, Meer Mage, Daemon, White Wyrm,
+    ; Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+    ; Fire Gargoyle, Wanderer Of The Void, Betrayer, Ophidian Matriarch, Terathan Avenger,
+    ; Succubus, Ethereal Warrior, Titan, Dread Spider, Gargoyle Destroyer, Khaldun Summoner,
+    ; Phoenix, Dragon, Lich Lord, Devourer, Meer Eternal
+    if #skill >= 1050
+      set %targetable _MD_RI_TJ_UJ_EC_IS_SC_WD_SI_BBB_FD_OGB_FD_OJ_AAB_HS_IS_HS_IS_HS_IS_YH_UO_DBB_Z_UI_HI_RC_Q_HD_ZAB_IS_TC_CD_DF_R_FO_IGB_
+
+    ; [Creatures] -> barding difficulty values between 98 and 120
+    ; Juka Mage, Summoned Daemon, Meer Mage, Daemon, White Wyrm,
+    ; Gargoyle Enforcer, Wandering Healer, Evil Wandering Healer, Evil Healer,
+    ; Fire Gargoyle, Wanderer of the Void, Betrayer, Ophidian Matriarch,
+    ; Terathan Avenger, Succubus, Ethereal Warrior, Titan, Dread Spider, Gargoyle Destroyer,
+    ; Khaldun Summoner, Phoenix, Dragon, Lich Lord, Devourer, Meer Eternal, Balron
+    if #skill >= 1100
+      set %targetable _BBB_FD_OGB_FD_OJ_AAB_HS_IS_HS_IS_HS_IS_YH_UO_DBB_Z_UI_HI_RC_Q_HD_ZAB_IS_TC_CD_DF_R_FO_IGB_ME_
+
+    ; [Creatures] -> barding difficulty values between 103 and above
+    ; Fire Gargoyle, Wanderer of the Void, Betrayer, Ophidian Matriarch,
+    ; Terathan Avenger, Succubus, Ethereal Warrior, Titan, Dread Spider,
+    ; Gargoyle Destroyer, Khaldun Summoner, Phoenix, Dragon, Lich Lord,
+    ; Devourer, Meer Eternal, Balron, Poison Elemental, Rotting Corpse,
+    ; Vorpal Bunny, Skeletal Dragon, Serpentine Dragon, Ancient Wyrm,
+    ; Shadow Wyrm, Ancient Lich, Chaos Guard, Order Guard, Shadow Knight,
+    ; Bone Demon, Flesh Renderer, Darknight Creeper, Impaler, Abysmal Horror,
+    ; Demon Knight
+    if #skill >= 1150
+      set %targetable _YH_UO_DBB_Z_UI_HI_RC_Q_HD_ZAB_IS_TC_CD_DF_R_FO_IGB_ME_EJ_VI_NF_AC_PB_KE_CC_S_HS_IS_HS_IS_NO_MO_ZO_XO_SO_YO_WO_
+  }
+  return
+}
+
+; = provo =========================================
+; This method is the heart of the script.  It uses
+; the two local script variables %target_one and
+; %target_two as targets while provoking.  It attemps
+; the skill process and uses the character's journal
+; as its method of execution procedure.
+; [ Returned Value ]
+; #result = #true if you successfully provoke the
+;           creatures
+; #result = #false if you are unsuccessful at
+;           provoking the creatures due to music
+;           or provocation skill failure or if
+;           you run out of instruments
+; #result = Timeout if the script is unable to find the
+;           various journal messages needed for the
+;           scripting processes.
+; #result = Retarget if you either the two targets
+;           are too far apart or if you are too far
+;           away from your target
+; #result = null if you are unlucky enough to encounter
+;           an error with the sub
+; [ WARNING ]
+; This script WILL PAUSE if you run out of instruments.
+; Place some instruments in your backpack and restart
+; or unpause the script to continue.  You will ( or
+; should ) also recieve this message and action if you
+; do not have the container holding your instruments
+; open.
+sub provo
+{
+  set #ltargetkind 1
+  startProvo:
+  set %provoIndex #jindex
+  event Macro 13 22
+  provoCheckOne:
+  set %scanTimeout 20 + #scnt
+  repeat
+  {
+    if #jindex > %provoIndex
+      set %provoIndex %provoIndex + 1
+    scanjournal %provoIndex
+    wait 5
+  }
+  until %instrumentMessage in #journal || %targetMessage in #journal || %waitMessage in #journal || %scanTimeout < #scnt
+  if %scanTimeout < #scnt
+    return Timeout
+  if %waitMessage in #journal
+  {
+    set %delay %delay + 1
+    wait 20
+    goto startProvo
+  }
+  if %instrumentMessage in #journal
+  {
+    finditem %instruments C
+    if #findkind
+    {
+      event sysmessage Unable to find any instruments!  Restock and unpause the script.
+      pause
+      return #false
+    }
+    set #ltargetid #findid
+    event macro 22 0
+    wait 30
+    goto provoCheckOne
+  }
+  if %targetMessage in #journal
+  {
+    set #ltargetid %target_one
+    event Macro 22 0
+    set %scanTimeout 20 + #scnt
+    repeat
+    {
+      if #jindex > %provoIndex
+        set %provoIndex %provoIndex + 1
+      scanjournal %provoIndex
+      wait 5
+    }
+    until %retargetMessage in #journal || %tooFarMessage in #journal || %scanTimeout < #scnt
+    if %scanTimeout < #scnt
+      return Timeout
+    if %tooFarMessage in #journal
+    {
+      set %maxDistanceToTarget %maxDistanceToTarget - 1
+      return Retarget
+    }
+    if %retargetMessage in #journal
+    {
+      set #ltargetid %target_two
+      event Macro 22 0
+      set %scanTimeout 20 + #scnt
+      repeat
+      {
+        if #jindex > %provoIndex
+          set %provoIndex %provoIndex + 1
+        scanjournal %provoIndex
+        wait 5
+      }
+      until %successMessage in #journal || %failureMessage in #journal || %musicFailureMessage in #journal || %distanceMessage in #journal || %noChanceMessage in #journal || %scanTimeout < #scnt
+      if %scanTimeout < #scnt
+        return Timeout
+      if %distanceMessage in #journal || %noChanceMessage in #journal
+        return Retarget
+      if %musicFailureMessage in #journal || %failureMessage in #journal || %successMessage in #journal
+      {
+        set %return #false
+        if %successMessage in #journal
+          set %return #true
+        set %timeToReProvo #scnt2 + 10 * %delay
+        while #scnt2 < %timeToReProvo
+        {
+          wait 20
+          if %showCountDownTimer
+          {
+            set %showTime ( %timeToReProvo - #scnt2 ) / 10
+            event exmsg #charid 3 0 %showTime
+          }
+        }
+        return %return
+      }
+    }
+  }
+  return null ; This is just a failsafe to make sure you exit the sub incase an error occurs throughout the sub.
+}
+
+
+sub peace
+{
+  set #ltargetkind 1
+  event macro 13 9
+  target 2s
+  set #ltargetid %target_one
+  event macro 22 0
+  set %wait 20 * %delay
+  wait %wait
+  return
+}

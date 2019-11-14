@@ -1,0 +1,145 @@
+;==================================
+; Script Name: Automated Cotton-Picker
+; Author: Aahz
+; Version: 1.0b
+; Client Tested with: 4.0.3.a
+; EUO version tested with: 1.42.0083
+; Shard OSI / FS: OSI
+; Revision Date:
+; Public Release: June 9, 2004
+; Purpose: Continuously harvests any cotton on screen until within 10 stones of maxweight.
+;==================================
+;Note, your paperdoll must be open, with your backpack visible.
+;==================================
+
+initevents
+
+set %ignorelist
+
+event macro 8 1
+wait 10
+event macro 9 7
+wait 10
+openbackpackloop:
+event macro 8 7
+wait 10
+if #contname <> container_gump
+        goto openbackpackloop
+set %backpackid #contid
+
+set %weightlimit #maxweight - 10
+
+loop:
+wait 5
+if #weight > %weightlimit
+        halt
+gosub findcotton
+gosub pickcotton
+gosub grabcotton
+gosub dropcotton
+goto loop
+
+
+sub findcotton
+findcottonloop:
+finditem FPE_HPE_CPE_IPE_NFF G_2
+if #findtype = NFF
+        {
+        set %cotton #findid
+        wait 15
+        gosub grabcotton
+        gosub dropcotton
+        goto findcottonloop
+        }
+if #findkind = -1
+        {
+        finditem FPE_HPE_CPE_IPE_NFF G
+        if #findkind = -1
+                goto findcottonloop
+        gosub findclosest
+        gosub move
+        goto findcottonloop
+        }
+set %cottonplant #findid
+return
+
+sub pickcotton
+pickcottonloop:
+set #lobjectid %cottonplant
+event macro 17
+set %scnt #scnt
+pickcottonwaitloop:
+finditem NFF G_2
+if ( ( #scnt - %scnt ) > 3 )
+        goto pickcottonloop
+if #findkind = -1
+        goto pickcottonwaitloop
+set %cotton #findid
+wait 15
+return
+
+sub grabcotton
+grabcottonloop:
+event drag %cotton
+set %scnt2 #scnt
+grabcottonwaitloop:
+if ( ( #scnt - %scnt2 ) > 3 )
+        goto grabcottonloop
+if #lliftedkind = 0
+        goto grabcottonwaitloop
+wait 15
+return
+
+sub dropcotton
+finditem %backpackid
+set %x #findx + 140
+set %y #findy + 220
+dropcottonloop:
+set %scnt3 #scnt
+click %x %y f dmc
+dropcottonwaitloop:
+if ( ( #scnt - %scnt3 ) > 3 )
+        goto dropcottonloop
+if #lliftedkind = 1
+        goto dropcottonwaitloop
+wait 10
+finditem NFF C
+        {
+        set %ignorelist %ignorelist , _ , #findid
+        ignoreitem #findid
+        }
+return
+
+
+sub findclosest
+set %closest 100
+findclosestloop:
+finditem FPE_HPE_CPE_IPE_NFF G
+if #findkind = -1
+        {
+        ignoreitem reset 1
+        return
+        }
+if #finddist < %closest
+        {
+        set %closest #finddist
+        set %closestid #findid
+        }
+ignoreitem #findid 1
+goto findclosestloop
+return
+
+sub move
+moveloop:
+finditem %closestid G
+wait 2
+if #findkind = -1
+        return
+if #finddist > 2
+        {
+        msg $
+        move #findx #findy 2 0
+        goto moveloop
+        }
+return
+

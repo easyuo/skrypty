@@ -1,0 +1,37 @@
+                          ;==================================
+; Script Name: follow enemy script/sub
+; Author: Nilmer
+; Version: 1.0
+; Client Tested with: 4.0.1b
+; EUO version tested with: V1.42 [Build 0066]
+; Shard OSI / FS: OSI
+; Revision Date:2/1/2004
+; Public Release: 12/16/2003
+; Purpose: follows enemy
+;==================================
+; %followID
+initevents
+set %followID PHIQ ;
+set %followID EHIQ ; SKryba
+set %followID QVYNC ; Angela wondering healer
+; set %followID ROLGC ; of the Dead
+
+; Always Run On / Off
+event macro 32
+wait 2s
+scanjournal %nil
+if off. in #journal
+event macro 32
+
+top:
+finditem %followID
+if #findkind = -1
+goto top
+move #findx #findy 1
+finditem #ltargetid
+if #findkind = -1
+{
+wait 10
+goto top
+}
+;=====end of nilmers followenemy.txt=====

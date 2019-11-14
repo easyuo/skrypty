@@ -1,0 +1,166 @@
+    ; BlaZin' Runebook
+    ; by BlaZe Budd of Excelsior's ßud ßrothers
+    ; v1.0 completed 2/21/09
+    ;
+    ;
+    ; USAGE:
+    ;   gosub runeBook %1 %2 %3
+    ;
+    ;   %1 = recall, gate, sacred
+    ;   %2 = runebook name (or partial name)
+    ;   %3 = which rune to jump to
+    ;
+    ; EXAMPLES:
+    ;   gosub runeBook gate home 3 (gate travel to spot three in book with 'home' in the name)
+    ;   gosub runeBook sacred plat 1 (sacred journey to spot one in book with 'plat' in the name)
+    ;
+    ;
+    ; Note that this script DOES NOT CHECK YOUR MANA!
+    ; That's your job. :P
+    ;
+    ;
+    ; VARIABLES USED:
+    ;   %1 %2 %3
+    ;   %method %name %spot
+    ;   %runeBook %side %page %X %Y
+    ;
+    ;
+    ; Comments/questions/concerns? [pm BlaZe or post in the forums
+    ;
+    ;;;;;;;;;;;;;;;;;
+
+gosub runeBook gate Tam 2
+
+    ;;; Start ;;;
+    sub runeBook
+    ignoreitem reset
+    set %method %1
+    set %name %2
+    set %spot %3
+    gosub spot
+    gosub cast
+    return
+    ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;; Find and open the runebook ;;;
+    sub openBook
+    bookLoop:
+    finditem ZBN C_ , #backPackID
+    event property #findID
+    if %name notin #property
+      {
+      ignoreitem #findID
+      goto bookLoop
+      }
+    set #lObjectID #findID
+    set %runeBook #findID
+    event macro 17 0
+    gosub waitForBook
+    if pass in #result
+      return
+    goto bookLoop
+    ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;; Waits for runebook to open ;;;
+    sub waitForBook
+    loop:
+    gosub journal You_must_wait
+    if #result = fail
+      return
+    if #contSize = 452_236
+      return pass
+    goto loop
+    ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;; Choosing the selected spot ;;;
+    sub pageFlippin
+    savepix ( #contposX + 135 ) ( #contPosY + 25 ) 1
+    set %Y #contPosY + 200
+    if %page = 1
+      set %X #contPosX + 140
+    if %page = 2
+      set %X #contPosX + 175
+    if %page = 3
+      set %X #contPosX + 210
+    if %page = 4
+      set %X #contPosX + 245
+    if %page = 5
+      set %X #contPosX + 310
+    if %page = 6
+      set %X #contPosX + 345
+    if %page = 7
+      set %X #contPosX + 380
+    if %page = 8
+      set %X #contPosX + 415
+    click %X %Y
+    flip:
+    cmpPix 1 t
+      goto flip
+    set %Y #contPosY + 25
+    if %side = left
+      set %X #contPosX + 165
+    if %side = right
+      set %X #contPosX + 305
+    click %X %Y
+    gosub waitForBook
+    click %X %Y r
+    return
+    ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;; Casting ;;;
+    sub cast
+    if recall in %method
+      event macro 1 0 [cs recall
+    if gate in %method
+      event macro 1 0 [cs gatetravel
+    if sacred in %method
+      event macro 1 0 [cs sacredjourney
+    gosub openBook
+    gosub pageFlippin
+    finditem %runeBook C_ , #backPackID
+    set #lTargetID #findID
+    set #lTargetKind 1
+    target
+    event macro 22 0
+    return
+    ;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;;; Setting %side and %page ;;;
+    sub spot
+    if %spot = 1
+      set %page 1
+    if %spot = 3
+      set %page 2
+    if %spot = 5
+      set %page 3
+    if %spot = 7
+      set %page 4
+    if %spot = 9
+      set %page 5
+    if %spot = 11
+      set %page 6
+    if %spot = 13
+      set %page 7
+    if %spot = 15
+      set %page 8
+    set %side left
+    if %spot = 2
+      set %page 1
+    if %spot = 4
+      set %page 2
+    if %spot = 6
+      set %page 3
+    if %spot = 8
+      set %page 4
+    if %spot = 10
+      set %page 5
+    if %spot = 12
+      set %page 6
+    if %spot = 14
+      set %page 7
+    if %spot = 16
+      set %page 8
+    if %spot / 2 = %page
+      set %side right
+    return
+    ;;;;;;;;;;;;;;;;;;;;;;;;;

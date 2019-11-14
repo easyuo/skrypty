@@ -1,0 +1,200 @@
+;==================================
+; Script Name:   Wool Harvester
+; Author: Inveratulo
+; Version: 1.05
+; Client Tested with: 4.0.1b
+; EUO version tested with: 1.41
+; Shard OSI / FS: FS
+; Revision Date: February 4th, 2004
+; Public Release: February 5th, 2004
+; Global Variables Used:
+; Purpose: This script will collect wool from the spawn
+; of four sheep due south of Yew Carpenter.  You must
+; start the script inside the pen.  It tries to avoid being
+; boxed in, gated, and tricked by blue sheep.
+;==================================
+; Wool Harvester v1.05
+; by Inveratulo
+; icq: 20689102
+
+InitEvents
+
+-----------MODIFY---------
+set %bpID #BACKPACKID
+set %bankID VVXXPMD
+set %ppdID AHEG
+set %woolStack 50
+-------------------------------
+
+set %daggerType WSF
+set %weaponType ZPF_RPF
+set %sheepType PF_FG
+set %woolType OFF
+
+set %daggerID%daggerID 0
+set %sheepID 0
+set %ignoreSheepID 0
+set %sheepRep 0
+set %sheepHits 0
+
+set %nextX 0
+set %nextY 0
+
+;-- Avoidance Variables
+set %gateType OTF
+set %containerType HKF_JIF_UMF_WMF_YIE_KKF_TGE_UGE
+set %avoidX 0
+set %avoidY 0
+
+set %selfX 0
+set %selfY 0
+
+if #CLIXRES = 640 && #CLIYRES = 480
+{
+set %selfX 320
+set %selfY 196
+}
+if #CLIXRES = 800 && #CLIYRES = 600
+{
+set %selfX 400
+set %seflY 256
+}
+
+; Execution Begins Here
+;==============================
+gosub preFetch
+set #LOBJECTID %daggerID
+event Macro 17 0
+event Macro 25 0
+wait 10
+findItem %sheepType G_
+if #findKind <> -1
+gosub scanSheep
+
+main:
+findItem %weaponType C_ , %ppdID
+if findKind = -1
+gosub rearm
+findItem %woolType C_ , %bpID
+if #findKind <> -1
+{
+if #findStack > %woolStack
+gosub gotoBank
+}
+IF G IN #CHARSTATUS
+      event macro 6
+set #LOBJECTID %daggerID
+event Macro 17 0
+event Macro 25 0
+wait 10
+findItem %sheepType G_
+if #findKind <> -1
+{
+gosub scanSheep
+goto main
+}
+else
+{
+gosub smartMove 572 1100
+}
+gosub scanSheep
+goto main
+
+sub preFetch
+ findItem %daggerType C_ , %bpID
+ if #findkind <> -1
+ {
+  set %daggerID #findID
+ }
+return
+
+sub scanSheep
+seek:
+ gosub gateAvoid
+ findItem %sheepType G_
+ set %sheepID #findID
+ if #findKind <> -1 && %sheepID <> %ignoreSheepID
+ {
+  goto set
+ }
+ else
+ {
+  goto seek
+ }
+
+goto seek
+
+set:
+ set #LTargetKind 1
+ set #LTargetID %sheepID
+move:
+ findItem %sheepType G_
+ if #findDist > 2
+ {
+  move #findx #findy 1 1s
+  goto move
+ }
+ event Macro 22
+return
+
+sub killSheep
+ findItem %sheepID G_
+ set %sheepRep #findRep
+ if %sheepRep <> 3
+ {
+  set %ignoreSheepID %sheepID
+  ignoreItem %sheepID
+  return
+ }
+
+ attack:
+  findItem %sheepType G_
+  if #findDist > 2
+  move #findx #findy 1 1s
+  IF G NOTIN #CHARSTATUS
+   event macro 6
+  event macro 27
+  wait 20
+  findItem %sheepType G_
+  if #findID = %sheepID
+ goto attack
+return
+
+sub gateAvoid
+avoid:
+findItem %gateType G
+if #findKind <> -1
+{
+set %gatePresent 1
+wait 2s
+goto avoid
+}
+set %gatePresent 0
+detect:
+findItem %containerType G_1
+if #findKind <> -1
+{
+move #findx #findy 1 90s
+event Drag #findID
+wait 5
+click %selfX %selfY
+wait 5
+goto avoid
+}
+return
+
+sub dropBoxes
+
+return
+
+; %1 = X-Position
+; %2 = Y-Position
+sub smartMove
+set %nextX %1
+set %nextY %2
+shuffle:
+gosub gateAvoid
+move %nextX %nextY 0 10s
+if #charposx <> %1 && #charposy <> %2
+goto shuffle
+return

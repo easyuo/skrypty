@@ -1,0 +1,110 @@
+;==================================
+; Script Name: Reloging for Freeshard
+; Author: ReDragoN
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.42.00B4 / 1.5
+; Shard OSI / FS: Mythik / Atlantis
+; Revision Date: 05.10.05
+; Public Release: 05.10.05
+; Purpose: It will relog you when you get a connection lost.
+; Disclaimer: You can modify it, but leave this header.
+;==================================
+
+; If you use it with easyuo 1.42, it will convert all %password to UPPER letter
+; Filename: TheUnseenPowerRelog.txt
+; Scripted by: The Unseen - unseen_mythik@hotmail.com
+; You have to call this file from the main script
+; In the main script use something like:
+; If ( #contSize = 203_121 ) && ( #contName = waiting_gump )
+; Goto Login
+
+; Login:
+; Call TheUnseenPowerRelog.txt
+; If ! #Result
+; Halt
+; Goto whatever
+
+Set %password sebix12345
+Set #Result N/A
+
+ClickAccept:
+If ( #contSizeX <> 203 && #contSizeY <> 121 ) && ( #contName <> waiting_gump )
+Goto ClickAccept
+Wait 10
+Key Enter
+Gosub WaitGump MainMenu_gump
+Goto EnterPass
+
+EnterPass:
+Click 384 399
+Wait 10
+Msg %password
+Wait 100
+Key Enter
+Set %TimeOut #Scnt + 12
+Goto WaitShardScreen
+
+WaitShardScreen:
+If #Scnt > %TimeOut
+Goto ErrorShard
+If ( #contSizeX <> 640 && #contSizeY <> 480 ) && ( #contName <> normal_gump )
+Goto WaitShardScreen
+Goto ChooseShard
+
+ChooseShard:
+Click 190 430
+Set %TimeOut #scnt + 12
+Goto WaitCharScreen
+
+WaitCharScreen:
+If #Scnt > %TimeOut
+Goto ErrorChar
+If ( #contSizeX <> 640 && #contSizeY <> 480 ) && ( #contName <> Login_gump )
+Goto WaitCharScreen
+Goto ChooseChar
+
+ChooseChar:
+Wait 10
+Click 361 205 d f x 4
+Set %TimeOut #Scnt + 12
+Goto WaitToBeInWorld
+
+WaitToBeInWorld:
+If #Scnt > %TimeOut
+Goto ErrorWorld
+If #cliLogged = 1 3
+Wait 100
+Set #Result #True
+Exit
+Goto WaitToBeInWorld
+
+ErrorShard:
+If ( #contSizeX <> 356 && #contSizeY <> 212 ) && ( #contName <> waiting_gump )
+Halt
+Key enter
+Gosub WaitGump MainMenu_gump
+Click 518 404
+Wait 10
+For %pass 0 15
+{
+key back
+wait 5
+}
+Goto EnterPass
+
+ErrorChar:
+Halt
+
+ErrorWorld:
+Halt
+
+Sub WaitGump
+Set %_TimeOut #Scnt + 10
+WaitGump:
+If #Scnt > %_TimeOut
+Return
+If #contName = %1
+Return
+Goto WaitGump
+

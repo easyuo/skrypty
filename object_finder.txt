@@ -1,0 +1,105 @@
+; #################################
+; Script Name:  Guadah's ID Finder
+; Author: Guadah
+; Version: 1.0
+; Client Tested with: EA 6.0.7.0 (Patch 63)
+; EUO version tested with: 1.5 Version 138
+; Shard OSI / FS: OSI Servers
+; Revision Date: N/A
+; Public Release: 5-18-2008
+; Purpose: To display Item ID and Type
+; #################################
+GoSub MainMenu
+GoSub FindID
+
+Sub MainMenu
+;Menu HideEUO
+Menu Window Title Guadah's ID Finder
+Menu Window Color Silver
+Menu Window Size 200 155
+Menu Font BGColor Silver
+Menu Font Color Maroon
+Menu Font Size 12
+; Menus Box around the Title
+Menu Shape TopGrey 5 4 185 2 4 7 1 White 5 White
+Menu Shape WhiteBottom 5 30 185 2 4 7 1 Gray 5 Gray
+Menu Shape LeftSide 5 4 2 28 4 7 1 White 5 White
+Menu Shape RightSide 190 4 2 28 4 7 1 Gray 5 Gray
+Menu Text Title 30 9 Guadah's ID Finder
+; Menu Data
+Menu Font Size 10
+Menu Font Color Black
+Menu Font Align Right
+menu text Info 50 40 Name:
+Menu Text Info 50 60 ID:
+Menu Text Info 50 80 Type:
+Menu Text Info 50 100 Color:
+Menu Font Align Left
+; Menus Buttons
+menu Font BGColor Silver
+menu Font size 10
+menu Font Color Black
+menu Button FindID 60 125 70 25 Find ID
+menu Font Size 8
+menu Font Color Maroon
+menu Button Link 5 125 50 25 Donate
+menu Font Size 10
+menu Font Color Black
+menu Button Quit 135 125 60 25 Quit
+Menu Show
+
+Set #menuButton N/A
+MenuLoop:
+if #menubutton = Link
+   {
+   Set #menuButton N/A
+   execute https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=jim%2efries%40yahoo%2ecom&item_name=Guadahs%20Easy%20UO%20Script&no_shipping=0&no_note=1&currency_code=USD&lc=US&bn=PP%2dBuyNowBF&charset=UTF%2d8
+   }
+if #menuButton = Quit
+   {
+;   Display ok Thank you for using Guadah's ID Finder.$
+;            +$
+;            +Script is Halting$
+   Menu Hide
+   Halt
+   }
+if #menubutton = FindID
+   return
+    else
+     goto MenuLoop
+Return
+
+; #######################
+; # ID Loop and Display #
+; #######################
+sub FindID
+set #targCurs 1
+settarget:
+if #menubutton = Quit
+   {
+   Display ok Thank you for using Guadah's ID Finder.$
+            +$
+            +Script is Halting$
+   Menu Hide
+   Halt
+   }
+if #menubutton = Link
+   {
+   Set #menuButton N/A
+   execute http://www.winuo.org
+   }
+if #targCurs = 1
+   goto settarget
+menu delete data
+finditem #ltargetid
+event property #findid
+  str pos #property $
+	str left #property #strres
+menu text data 60 40 #strres
+menu text data 60 60 #ltargetid
+menu text data 60 80 #findtype
+menu text data 60 100 #findcol
+return
+
+
+

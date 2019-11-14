@@ -1,0 +1,480 @@
+; BOD Inskrypcja - v1.1(09.11.2010 - 17:20) by drm
+; v1.2 - by Krowa (Edytowane 02/02/2013)
+; Poprawiona medytacja
+; ===============================================
+;
+; 1. Wrzuc skrypt do EUO i nacisnij play.
+; 2. Pojawi sie menu, przepisz dane z zamowienia,
+;    wpisz poziom inta postaci (bez blessa).
+; 3. Nacisnij Start.
+; 4. Skrypt zrobi wszystko sam, Ty bedziesz musial(a)
+;    tylko oddac zamowienie do NPCa.
+;
+; #####################################################
+; #  Bugi, pytania, itp. na forum w dziale Offtopic.  #
+; #####################################################
+
+; Modyfikacje Krowy
+; Rozmiar Bulk Container : 568_408
+
+initevents
+set %zmienna_rysuj 0
+set %zmienna_xy 0
+set %krag_x 0
+set %krag_y 0
+set %czar_x 0
+set %czar_y 0
+set %druga 0
+set %ilosc 0
+set %licznik 0
+set %ile_many 0
+set %ile_inta #int
+set %zrobiony 0
+set %strony 0
+
+; 8 luty 2013 - krowa
+set %Bulk_Cont_Size 568_408
+
+Poczatek:
+gosub rysuj_menu
+menu hideEuo
+
+menupokaz:
+set #menubutton n/a
+menu show
+czekaj:
+if #menubutton <> n/a
+  goto #menubutton
+goto czekaj
+
+startuj:
+menu get int_1
+if #contsize = 560_340
+  click 360 200 r
+goto jazda
+
+resetuj:
+set #menubutton n/a
+menu Clear
+gosub rysuj_menu
+goto czekaj
+
+jazda:
+if %zrobiony = 0
+{
+  set %zmienna_xy czar_1
+  gosub xy
+  if %czar_x <> 0
+  {
+    menu get ilosc_1
+    set %ilosc #menures
+    set %strony 1
+    goto zrob_jeden
+  }
+  else
+    set %zrobiony 1
+}
+if %zrobiony = 1
+{
+  set %zmienna_xy czar_2
+  gosub xy
+  if %czar_x <> 0
+  {
+    menu get ilosc_2
+    set %ilosc #menures
+    set %strony 2
+    goto zrob_jeden
+  }
+  else
+    set %zrobiony 2
+}
+if %zrobiony = 2
+{
+  set %zmienna_xy czar_3
+  gosub xy
+  if %czar_x <> 0
+  {
+    menu get ilosc_3
+    set %ilosc #menures
+    set %strony 3
+    goto zrob_jeden
+
+  }
+  else
+    set %zrobiony 3
+}
+if %zrobiony = 3
+{
+  click 427 320 r
+  gosub wsadz
+  set %zrobiony 0
+  Display Zlecenie skonczone.
+  goto menupokaz
+}
+
+zrob_jeden:
+if #contsize <> 640_500
+{
+  event macro 13 23
+  czekaj01:
+  if #contsize <> 640_500
+    goto czekaj01
+}
+click %krag_x %krag_y
+czekaj02:
+if #contsize <> 640_500
+  goto czekaj02
+if %druga = 1
+{
+  click 605 449
+  wait 1
+}
+click %czar_x %czar_y
+czekaj03:
+if #contsize <> 640_500
+  goto czekaj03
+if #sysmsg = Udalo_Ci_sie_przepisac_zwoj_i_wlozyles_go_do_plecaka.
+  set %licznik 1
+goto rob
+
+rob:
+if %licznik = %ilosc || %licznik > %ilosc
+{
+  if %zrobiony = 0
+  {
+    event sysmessage Pierwszy czar zrobiony.
+    set %zrobiony 1
+    gosub kasuj_liczniki
+    goto jazda
+  }
+  if %zrobiony = 1
+  {
+    event sysmessage Drugi czar zrobiony.
+    set %zrobiony 2
+    gosub kasuj_liczniki
+    goto jazda
+  }
+  if %zrobiony = 2
+  {
+    event sysmessage Trzeci czar zrobiony.
+    set %zrobiony 3
+    gosub kasuj_liczniki
+    goto jazda
+  }
+}
+
+if #contsize <> 640_500
+  event macro 13 23
+if #mana => %ile_many
+  gosub klik
+if #mana < %ile_many
+  gosub medyt
+goto rob
+
+sub klik
+click 529 478
+czekaj04:
+if #contsize <> 640_500
+  goto czekaj04
+if #sysmsg = Udalo_Ci_sie_przepisac_zwoj_i_wlozyles_go_do_plecaka.
+  set %licznik %licznik + 1
+goto rob
+
+sub medyt
+click 427 320 r ; Zamykanie okna Inskrypcji
+wait 1
+
+UruchomMedytacje:
+event macro 13 46 ; Medytacja
+wait 5
+if #sysmsg <> Zaczynasz_medytowac...
+{
+ goto UruchomMedytacje
+}
+
+CzekajNaPelnaMane:
+if #mana <> #maxmana
+{
+; wait 5
+; event macro 13 46 ; Medytacja
+ goto CzekajNaPelnaMane
+}
+
+wait 1s
+
+if #int < %ile_inta + 1
+  gosub blessuj
+wait 1s
+return
+
+sub blessuj
+event macro 15 9
+target 2s
+event macro 23 0
+return
+
+sub xy
+set %krag_x 0
+set %krag_y 0
+set %czar_x 0
+set %czar_y 0
+menu get %zmienna_xy
+if #menures > 2 && #menures < 11
+{
+  set %krag_x 137
+  set %krag_y 125
+  set %ile_many 4
+}
+if #menures > 11 && #menures < 20
+{
+  set %krag_x 137
+  set %krag_y 150
+  set %ile_many 6
+}
+if #menures > 20 && #menures < 29
+{
+  set %krag_x 137
+  set %krag_y 175
+  set %ile_many 9
+}
+if #menures > 29 && #menures < 38
+{
+  set %krag_x 137
+  set %krag_y 200
+  set %ile_many 11
+}
+if #menures > 38 && #menures < 47
+{
+  set %krag_x 137
+  set %krag_y 225
+  set %ile_many 14
+}
+if #menures > 47 && #menures < 56
+{
+  set %krag_x 137
+  set %krag_y 250
+  set %ile_many 20
+}
+if #menures > 56 && #menures < 65
+{
+  set %krag_x 137
+  set %krag_y 275
+  set %ile_many 40
+}
+if #menures > 65 && #menures < 74
+{
+  set %krag_x 137
+  set %krag_y 300
+  set %ile_many 50
+}
+
+if #menures = 3 || #menures = 7 || #menures = 12 || #menures = 16 || #menures = 21 || #menures = 25 || #menures = 30 || #menures = 34 || #menures = 39 || #menures = 43 || #menures = 48 || #menures = 52 || #menures = 57 || #menures = 61 || #menures = 66 || #menures = 70
+{
+  set %czar_x 378
+  set %czar_y 125
+}
+if #menures = 4 || #menures = 8 || #menures = 13 || #menures = 17 || #menures = 22 || #menures = 26 || #menures = 31 || #menures = 35 || #menures = 40 || #menures = 44 || #menures = 49 || #menures = 53 || #menures = 58 || #menures = 62 || #menures = 67 || #menures = 71
+{
+  set %czar_x 378
+  set %czar_y 215
+}
+if #menures = 5 || #menures = 9  || #menures = 14 || #menures = 18 || #menures = 23 || #menures = 27 || #menures = 32 || #menures = 36 || #menures = 41 || #menures = 45 || #menures = 50 || #menures = 54 || #menures = 59 || #menures = 63 || #menures = 68 || #menures = 72
+{
+  set %czar_x 378
+  set %czar_y 305
+}
+if #menures = 6 || #menures =  10 || #menures = 15 || #menures = 19 || #menures = 24 || #menures = 28 || #menures = 33 || #menures = 37 || #menures = 42 || #menures = 46 || #menures = 51 || #menures = 55 || #menures = 60 || #menures = 64 || #menures = 69 || #menures = 73
+{
+  set %czar_x 378
+  set %czar_y 395
+}
+
+if #menures = 7 || #menures = 8 || #menures = 9 || #menures = 10 || #menures = 16 || #menures = 17 || #menures = 18 || #menures = 19 || #menures = 25 || #menures = 26 || #menures = 27 || #menures = 28 || #menures = 34 || #menures = 35 || #menures = 36 || #menures = 37 || #menures = 43 || #menures = 44 || #menures = 45 || #menures = 46 || #menures = 52 || #menures = 53 || #menures = 54 || #menures = 55 || #menures = 61 || #menures = 62 || #menures = 63 || #menures = 64 || #menures = 70 || #menures = 71 || #menures = 72 || #menures = 73
+{
+  set %druga 1
+}
+return
+
+sub wsadz
+finditem EYM C
+if #FindKind = -1
+{
+  display Nie ma bulk ordera w plecaku! Dodaj sobie czary sam(a)! Zlecenie skonczone.
+  set %zrobiony 0
+  goto menupokaz
+}
+set #LObjectID #FindID
+event macro 17 0
+czekaj07:
+if #contsize <> %Bulk_Cont_Size
+  goto czekaj07
+  click 360 370  ; Dodaj wiele przedmiotow
+czekaj08:
+; Krowa - Nastepna stron          X Y 500 333
+; Krowa - Poprzednia strona       X Y 470 333
+; Krowa - Dodaj wiele przedmiotow X Y 360 370
+
+if #contsize <> %Bulk_Cont_Size
+  goto czekaj08
+if %strony > 1
+{
+  click 500 333  ; Nastepna strona
+  wait 1
+  click 360 370  ; Dodaj wiele przedmiotow
+  czekaj09:
+  if #contsize <> %Bulk_Cont_Size
+    goto czekaj09
+}
+if %strony = 3
+{
+  click 500 333  ; Nastepna strona
+  wait 1
+  click 500 333  ; Nastepna strona
+  wait 1
+  click 360 370  ; Dodaj wiele przedmiotow
+  czekaj10:
+  if #contsize <> %Bulk_Cont_Size
+    goto czekaj10
+}
+click 340 280 r
+set %strony 0
+return
+
+sub kasuj_liczniki
+set %licznik 0
+set %ilosc 0
+set %druga 0
+set %ile_many 0
+return
+
+sub rysuj_menu
+menu Clear
+menu window title BOD Inskrypcja by drm! (Modyfikacje: Krowa)
+menu window size 330 330
+menu window color btnface
+; Czary
+menu font size 8
+menu text tekst1 20 23 Wybierz z list ponizej czary, ktore masz wykonac
+menu text tekst2 40 37 w zamowieniu. Kolejnosc nie jest wazna.
+menu font name verdana
+menu font size 9
+menu font color black
+menu font bgcolor btnface
+menu font style b
+menu text tekst3 90 5 Wybierz czary
+menu text tekst4 20 72 Pierwszy:
+menu text tekst5 20 100 Ilosc:
+menu text tekst6 20 137 Drugi:
+menu text tekst7 20 165 Ilosc:
+menu text tekst8 20 201 Trzeci:
+menu text tekst9 20 229 Ilosc:
+menu text tekst10 20 265 Int:
+menu font size 8
+menu font bgcolor white
+menu edit ilosc_1 100 96 50     ; Poprawiona szerokosc pola
+menu edit ilosc_2 100 161 50    ; Poprawiona szerokosc pola
+menu edit ilosc_3 100 225 50    ; Poprawiona szerokosc pola
+menu edit int_1 100 261 50      ; Poprawiona szerokosc pola
+menu set int_1 #int             ; Wpisywanie aktualnej wartosci INT w pole od inta
+menu font style
+set %zmienna_rysuj czar_1
+menu combo create czar_1 100 70 160
+gosub rysuj
+menu combo select czar_1 1
+set %zmienna_rysuj czar_2
+menu combo create czar_2 100 135 160
+gosub rysuj
+menu combo select czar_2 1
+set %zmienna_rysuj czar_3
+menu combo create czar_3 100 199 160
+gosub rysuj
+menu combo select czar_3 1
+; Ramka
+menu shape ramka 10 60 262 65 3 5 1 black 2 0
+menu shape ramka 10 124 262 65 3 5 1 black 2 0
+menu shape ramka 10 188 262 65 3 5 1 black 2 0
+menu shape ramka 10 252 262 37 3 5 1 black 2 0
+; Start
+menu font size 10
+menu font color black
+menu font bgcolor btnface
+menu font style b
+menu button startuj 150 297 60 25 Start
+menu button resetuj 70 297 60 25 Reset
+return
+
+sub rysuj
+menu combo add %zmienna_rysuj Wybierz:
+menu combo add %zmienna_rysuj -------- Krag I --------
+menu combo add %zmienna_rysuj Clumsy
+menu combo add %zmienna_rysuj Create Food
+menu combo add %zmienna_rysuj Feeblemind
+menu combo add %zmienna_rysuj Heal
+menu combo add %zmienna_rysuj Magic Arrow
+menu combo add %zmienna_rysuj Night sight
+menu combo add %zmienna_rysuj Reactive Armor
+menu combo add %zmienna_rysuj Weaken
+menu combo add %zmienna_rysuj -------- Krag II --------
+menu combo add %zmienna_rysuj Agility
+menu combo add %zmienna_rysuj Cunning
+menu combo add %zmienna_rysuj Cure
+menu combo add %zmienna_rysuj Harm
+menu combo add %zmienna_rysuj Magic Trap
+menu combo add %zmienna_rysuj Magic Untrap
+menu combo add %zmienna_rysuj Protection
+menu combo add %zmienna_rysuj Strength
+menu combo add %zmienna_rysuj -------- Krag III --------
+menu combo add %zmienna_rysuj Bless
+menu combo add %zmienna_rysuj Fireball
+menu combo add %zmienna_rysuj Magic Lock
+menu combo add %zmienna_rysuj Poison
+menu combo add %zmienna_rysuj Telekinesis
+menu combo add %zmienna_rysuj Teleport
+menu combo add %zmienna_rysuj Magic Unlock
+menu combo add %zmienna_rysuj Wall of Stone
+menu combo add %zmienna_rysuj -------- Krag IV --------
+menu combo add %zmienna_rysuj Arch Cure
+menu combo add %zmienna_rysuj Arch Protection
+menu combo add %zmienna_rysuj Curse
+menu combo add %zmienna_rysuj Fire Field
+menu combo add %zmienna_rysuj Greater Heal
+menu combo add %zmienna_rysuj Lightning
+menu combo add %zmienna_rysuj Mana Drain
+menu combo add %zmienna_rysuj Recall
+menu combo add %zmienna_rysuj -------- Krag V --------
+menu combo add %zmienna_rysuj Blade Spirit
+menu combo add %zmienna_rysuj Dispel Field
+menu combo add %zmienna_rysuj Incognito
+menu combo add %zmienna_rysuj Magic Reflection
+menu combo add %zmienna_rysuj Mind Blast
+menu combo add %zmienna_rysuj Paralyze
+menu combo add %zmienna_rysuj Poison Field
+menu combo add %zmienna_rysuj Summon Creature
+menu combo add %zmienna_rysuj -------- Krag VI --------
+menu combo add %zmienna_rysuj Dispel
+menu combo add %zmienna_rysuj Energy Bolt
+menu combo add %zmienna_rysuj Explosion
+menu combo add %zmienna_rysuj Invisibility
+menu combo add %zmienna_rysuj Mark
+menu combo add %zmienna_rysuj Mass Curse
+menu combo add %zmienna_rysuj Paralyze Field
+menu combo add %zmienna_rysuj Reveal
+menu combo add %zmienna_rysuj -------- Krag VII --------
+menu combo add %zmienna_rysuj Chain Lightning
+menu combo add %zmienna_rysuj Energy Field
+menu combo add %zmienna_rysuj Flamestrike
+menu combo add %zmienna_rysuj Gate Travel
+menu combo add %zmienna_rysuj Mana Vampire
+menu combo add %zmienna_rysuj Mass Dispel
+menu combo add %zmienna_rysuj Meteor Swarm
+menu combo add %zmienna_rysuj Polymorph
+menu combo add %zmienna_rysuj -------- Krag VIII --------
+menu combo add %zmienna_rysuj Earthquake
+menu combo add %zmienna_rysuj Energy Vortex
+menu combo add %zmienna_rysuj Resurrection
+menu combo add %zmienna_rysuj Summon Air Elemental
+menu combo add %zmienna_rysuj Summon Daemon
+menu combo add %zmienna_rysuj Summon Earth Elemental
+menu combo add %zmienna_rysuj Summon Fire Elemental
+menu combo add %zmienna_rysuj Summon Water Elemental
+return

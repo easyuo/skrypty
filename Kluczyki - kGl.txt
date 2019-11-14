@@ -1,0 +1,168 @@
+;; instrukcja by kgl
+;; 2klik na pek kluczy danego rodzaju
+;; po prawej LAST ACTION / #LOBJECTID
+;; np: set %zelazny OHZWUUE<---- zmieniaj te wartosci
+;; zrob tak z kazdym rodzajem kluczy
+;; Kluczyki od najgorszych do najlepszych CTRL 1 - CTRL 5
+;; Jezeli padles i trzeba zmienic id kluczykow a jestes leniwy i niechce ci sie przepisywac nacisnij ctrl + 6
+;;
+
+set %zelazny ASNLYWE
+set %srebrny FSNLYWE
+set %valoryowy GSNLYWE
+set %mithrillowy ESNLYWE
+set %teratythowy DSNLYWE
+
+pocz:
+onHotKey 1 ctrl      ;; kluczyk zelazny
+{
+FindItem %zelazny C_
+set #LOBJECTID #FINDID
+event macro 17 0
+Event SysMessage Kluczy pozostalo #FINDSTACK
+wait 1
+Finditem IIF G_2
+set #LTargetID #FINDID
+set #LTargetKind 1
+event macro 22 0
+wait 1
+FindItem IIF G_2
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 1
+event macro 1 0 .grab ustawione
+wait 1s
+event macro 1 0 .grab zloto kamienie ziola
+goto pocz
+}
+onHotKey 2 ctrl ;; kluczyk srebrny
+{
+FindItem %srebrny C_
+set #LOBJECTID #FINDID
+event macro 17 0
+Event SysMessage Kluczy pozostalo #FINDSTACK
+wait 1
+Finditem IIF G_2
+set #LTargetID #FINDID
+set #LTargetKind 1
+event macro 22 0
+wait 1
+FindItem IIF G_2
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 1
+event macro 1 0 .grab ustawione
+wait 1s
+event macro 1 0 .grab zloto kamienie ziola
+goto pocz
+}
+onHotKey 3 ctrl
+{
+FindItem %valoryowy C_
+set #LOBJECTID #FINDID
+event macro 17 0
+Event SysMessage Kluczy pozostalo #FINDSTACK
+wait 1
+Finditem IIF G_2
+set #LTargetID #FINDID
+set #LTargetKind 1
+event macro 22 0
+wait 1
+FindItem IIF G_2
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 1
+event macro 1 0 .grab ustawione
+wait 1s
+event macro 1 0 .grab zloto kamienie ziola
+goto pocz
+}
+onHotKey 4 ctrl
+{
+FindItem %mithrillowy C_
+set #LOBJECTID #FINDID
+event macro 17 0
+Event SysMessage Kluczy pozostalo #FINDSTACK
+wait 1
+Finditem IIF G_2
+set #LTargetID #FINDID
+set #LTargetKind 1
+event macro 22 0
+wait 1
+FindItem IIF G_2
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 1
+event macro 1 0 .grab ustawione
+wait 1s
+event macro 1 0 .grab zloto kamienie ziola
+goto pocz
+}
+onHotKey 5 ctrl
+{
+FindItem %teratythowy C_
+set #LOBJECTID #FINDID
+event macro 17 0
+Event SysMessage Kluczy pozostalo #FINDSTACK
+wait 1
+Finditem IIF G_2
+set #LTargetID #FINDID
+set #LTargetKind 1
+event macro 22 0
+wait 1
+FindItem IIF G_2
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 1
+event macro 1 0 .grab ustawione
+wait 1s
+event macro 1 0 .grab zloto kamienie ziola
+goto pocz
+}
+onHotKey 6 ctrl
+{
+event SysMessage Wskaz kluczyk zelazny
+set #targCurs 1
+celowniki:
+if #targCurs = 1
+goto celowniki
+set %zelazny #Ltargetid
+event SysMessage kluczyk zelazny ustawiam na #Ltargetid
+
+
+event SysMessage Wskaz kluczyk srerbny
+set #targCurs 1
+celowniki:
+if #targCurs = 1
+goto celowniki
+set %srebrny #Ltargetid
+event SysMessage kluczyk srebrny ustawiam na #Ltargetid
+
+event SysMessage Wskaz kluczyk valorytowy
+set #targCurs 1
+celowniki:
+if #targCurs = 1
+goto celowniki
+set %valoryowy #Ltargetid
+event SysMessage kluczyk valoryowy ustawiam na #Ltargetid
+
+event SysMessage Wskaz kluczyk mithrillowy
+set #targCurs 1
+celowniki:
+if #targCurs = 1
+goto celowniki
+set %mithrillowy #Ltargetid
+event SysMessage kluczyk mithrillowy ustawiam na #Ltargetid
+
+
+event SysMessage Wskaz kluczyk teratythowy
+set #targCurs 1
+celowniki:
+if #targCurs = 1
+goto celowniki
+set %teratythowy #Ltargetid
+event SysMessage kluczyk teratythowy ustawiam na #Ltargetid
+goto pocz
+}
+goto pocz
+

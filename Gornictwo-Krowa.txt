@@ -1,0 +1,336 @@
+    ;==================================
+        ; Script Name: MineGrid
+        ; Author: FuzzyLogic
+        ; Version: 1.0
+        ; Client Tested with: 2.0.0
+        ; EUO version tested with: 1.5
+        ; Shard OSI / FS: Free Shard Neverlands
+        ; Notes: INTENDED USE IN MINOC MINES, ENSURE .AUTO MINING IS TURNED -OFF-.
+        ;==================================
+        set %Banker MDD
+        set %Forges AUJ_AVJ_BUJ_BVJ_CUJ_CVJ_DUJ_DVJ_EUJ_EVJ_FUJ_GUJ_HVJ_IVJ_JBG_JUJ_KUJ_NUJ_NVJ_OUJ_OVJ_PUJ_QUJ_ROJ_SOJ_TUJ_UUJ_VTJ_WTJ_XUJ_YUJ_ZTJ_ZUJ
+        set %Ores DWJ
+        set %Moongate OTF
+        set %Ingots ENK_DWJ_RVH_EVF_FVF_RVF_BVF_HVF_MWF_GVF_VUF_OVF_ZLF
+        set %Weight #WEIGHT
+        set %MaxWeight 370
+        set #SYSMSGCOL 1940
+        set %jrnl #jindex
+
+        event SysMessage Go to Minoc mine, choose an ore pouch and press INSERT
+        Waiting:
+        onhotkey INSERT
+          goto Setbag
+        goto Waiting
+
+        Setbag:
+        event SysMessage Set BAG
+;        if #CONTNAME <> container_gump || #CONTID = #BACKPACKID
+;          goto Waiting
+;        set %Lootbag #CONTID
+        set %Lootbag #BACKPACKID
+        event SysMessage Ore bag is set, script now mining.
+        key BACK
+
+        ;===============================================================================================================================================
+
+        Start:
+        if #WEIGHT > %MaxWeight
+        {
+          event sysmessage Max weight reached!
+          gosub MineToForge
+
+          gosub ForgeToBank
+          gosub BankIngots
+          gosub BankToMine
+          set %Weight #WEIGHT
+        }
+        gosub MoveRandomTile
+        goto MineGrid
+        goto Start
+
+        ;===============================================================================================================================================
+
+        MineGrid:
+        gosub Mine 0 0
+        gosub dh
+        gosub Mine -1 2
+        gosub dh
+        gosub Mine 0 2
+        gosub dh
+        gosub Mine 1 2
+        gosub dh
+        gosub Mine -2 1
+        gosub dh
+        gosub Mine -1 1
+        gosub dh
+        gosub Mine 0 1
+        gosub dh
+        gosub Mine 1 1
+        gosub dh
+        gosub Mine 2 1
+        gosub dh
+        gosub Mine -2 0
+        gosub dh
+        gosub Mine -1 0
+        gosub dh
+        gosub Mine 1 0
+        gosub dh
+        gosub Mine 2 0
+        gosub dh
+        gosub Mine -2 -1
+        gosub dh
+        gosub Mine -1 -1
+        gosub dh
+        gosub Mine 0 -1
+        gosub dh
+        gosub Mine 1 -1
+        gosub dh
+        gosub Mine 2 -1
+        gosub dh
+        gosub Mine -1 -2
+        gosub dh
+        gosub Mine 0 -2
+        gosub dh
+        gosub Mine 1 -2
+        gosub dh
+
+        ;===============================================================================================================================================
+
+        sub Mine
+        finditem WTH_NPF C
+        if #findkind = -1
+        {
+        event sysmessage No Tool
+        halt
+        }
+        set #lobjectid #findid
+        set #ltargetkind 3
+        set #ltargetx #charposx + %1
+        set #ltargety #charposy + %2
+        set #ltargetz #charposz
+        event macro 17 0
+        target
+        event macro 22 0
+        wait 20
+        deletejournal
+        set #sCnt 1
+
+        Looping:
+        if #jindex > %jrnl
+        set %jrnl %jrnl + 1
+        scanjournal %jrnl
+        if You_stop_mining in #JOURNAL || Wybrane_miejsce_jest_za_daleko in #JOURNAL || Nie_ma_tu_wiecej_rudy in #JOURNAL || Nie_udalo_ci_sie_nic_wykopac in #JOURNAL || you_fail_to_find_any_usable_ore in #JOURNAL ||  in #JOURNAL
+        {
+          wait 10
+          return
+        }
+        if Wykopales_ in #JOURNAL
+        gosub MoveMetal
+        if #CONTNAME = waiting_gump && #CONTSIZEX = 356 && #CONTSIZEY = 212
+        {
+          click 400 375
+          msg .age$
+          return
+        }
+        if #sCnt > 30
+        {
+          event sysmessage 30s timer reached, resetting..
+          wait 30
+          goto start
+        }
+        finditem %Moongate G_10
+        if #findkind <> -1
+        goto Moongate
+        goto Looping
+
+        ;===============================================================================================================================================
+
+        sub MoveRandomTile
+        for %i 1 2
+        {
+        set %steps #random % 4 + 1
+        set %direction #random % 2
+        if %direction = 0
+           set %direction -
+        if %direction = 1
+           set %direction +
+        if %i = 1
+        set %move . %i #CHARPOSX %direction %steps
+        if %i = 2
+        set %move . %i #CHARPOSY %direction %steps
+        }
+        Event pathFind %Move1 %Move2 #CHARPOSZ
+        for %i 5 1
+        {
+        scanjournal %i
+        if Can't_get_there in #JOURNAL
+       {
+           deletejournal %i
+           gosub MoveRandomTile
+       }
+       }
+       set #scnt 0
+       repeat
+       until #CHARPOSX = %Move1 && #CHARPOSY = %Move2 || #scnt > 5
+       if This_gate_leads in #journal
+       gosub MoveRandomTile
+       return
+
+       ;===============================================================================================================================================
+
+       sub MineToForge
+       wait 1s
+       gosub pathFind 2564 484 0
+       wait 1s
+       gosub pathFind 2559 493 0
+       wait 1s
+       gosub pathFind 2558 502 0
+       wait 1s
+       gosub pathFind 2563 509 5
+       wait 1s
+       gosub pathFind 2567 516 15
+       wait 1s
+       gosub pathFind 2571 522 15
+       return
+
+       ;===============================================================================================================================================
+
+       sub MakeIngots
+       repeat
+         finditem %Ores C
+         if #FINDKIND <> -1
+         {
+           set #LOBJECTID #FINDID
+           event Macro 17 0
+           wait 12
+         }
+       until #FINDKIND = -1
+       set %Weight #WEIGHT
+       return
+
+       ;===============================================================================================================================================
+
+       sub ForgeToBank
+       finditem %Banker G_10
+       if #FINDID <> -1
+       {
+         gosub pathFind #findx #findy #FINDZ
+         set #LOBJECTID %Banker
+         event Macro 17 0
+         repeat
+         until #CONTNAME = generic_gump && #CONTSIZE = 230_298
+         set %Cont #CONTID
+         click 100 140 mc
+         repeat
+         until #CONTSIZE = 180_240
+         set %Bankbox #CONTID
+       }
+       return
+
+       ;===============================================================================================================================================
+
+       sub BankIngots
+       finditem %Ingots , _ , %Ores C_ , %Lootbag
+       if #FINDKIND <> -1
+       {
+         for %n 1 #FINDCNT
+         {
+           set #FINDINDEX %n
+           if #LLIFTEDKIND = 0
+           {
+             exevent Drag #FINDID #FINDSTACK
+             wait 10
+             exevent Dropc #BACKPACKID
+             wait 10
+           }
+         }
+       }
+       finditem %Ingots C_ , #BACKPACKID
+       if #FINDKIND <> -1
+       {
+         for %n 1 #FINDCNT
+         {
+           set #FINDINDEX %n
+           exevent Drag #FINDID #FINDSTACK
+           wait 10
+           exevent Dropc %Bankbox
+           wait 10
+         }
+       }
+       set %Weight #WEIGHT
+       return
+
+       ;===============================================================================================================================================
+
+       sub BankToMine
+       gosub pathFind 2567 524 15
+       wait 1s
+       gosub pathFind 2572 522 15
+       wait 1s
+       gosub pathFind 2567 516 15
+       wait 1s
+       gosub pathFind 2563 509 5
+       wait 1s
+       gosub pathFind 2558 502 0
+       wait 1s
+       gosub pathFind 2558 502 0
+       wait 1s
+       gosub pathFind 2559 493 0
+       wait 1s
+       gosub pathFind 2564 484 0
+       wait 1s
+       gosub pathFind 2578 479 0
+       return
+
+       ;===============================================================================================================================================
+
+       sub MoveMetal
+       finditem %Ingots , _ , %Ores C_ , #BACKPACKID
+       if #FINDKIND <> -1
+       {
+         for %n 1 #FINDCNT
+         {
+           set #FINDINDEX %n
+           if #LLIFTEDKIND = 0
+           {
+             exevent Drag #FINDID #FINDSTACK
+             wait 5
+             exevent Dropc %Lootbag 50 50
+             wait 5
+           }
+         }
+       }
+       set %Weight #WEIGHT
+       return
+
+       ;===============================================================================================================================================
+
+       sub pathFind
+       event sysmessage Ide do: %1 %2 %3
+       Event pathFind %1 %2 %3
+       repeat
+       until #CHARPOSX = %1 && #CHARPOSY = %2
+       return
+
+       ;===============================================================================================================================================
+
+       Moongate:
+       event sysmessage Some asshat is gating, chillin' for a bit.
+        repeat
+        finditem %Moongate G_10
+        until #findkind = -1
+        event sysmessage Resetting..
+        goto Start
+        ;=======================================================================================
+        sub dh
+
+        event macro 13 14
+        wait 1s
+           event macro 23
+        gosub stay
+       ;=================
+       sub stay  ; This part makes sure you will stay in the mine when mining
+
+       gosub pathFind 2573 482 0
+       goto start

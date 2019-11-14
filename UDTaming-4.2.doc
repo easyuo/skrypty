@@ -1,0 +1,147 @@
+[size=18][b]Uncle Dave’s Tamer Plus 4.2[/b][/size]
+
+This script finds animals that will give you the best gains and tames the closest animal to your current location.
+
+[b]Highlights[/b]
+
+• Automatically detect the best animals to tame based upon your current skill level.
+• Run the script while surrounded by other tamers without them even knowing that you’re running it.
+• Tame hostile creatures such as dragons and nightmares.
+• Pickup nearby mage reagents and place them into a container that you specify.
+
+[b]What’s New[/b]
+
+[u]Version 4.2[/u]
+
+• Fixed a problem with the context release menu option.
+• Updated the taming chart to include Tokuno animals and spotted bull.
+
+[u]Version 4.1c[/u]
+
+• Changed check from #contkind to #contname to prevent requirement of an update for each client.
+
+[u]Version 4.1b[/u]
+
+• The Flamestrike kill option now requires 80 Evaluating Intelligence.
+• Fixed a problem causing the context menu release option to not work properly after the 4.0.3d client update.
+
+[u]Version 4.1a[/u]
+
+• Fixed a problem causing the context menu release option to not work properly after the 4.0.3b client update.
+
+[u]Version 4.1[/u]
+
+• Implemented the new #jindex variable for more accurate journal scanning and removal of the high LPC setting.
+• Added a new release option by using Context Menus.
+• Added auto detection of Magery and Necromancy skills and will cast either Flamestrike or Pain Strike to kill the creature.
+• Prevented the killing of creatures until after the animal has been released.
+• Provided the manual targeting of the container to drop reagents picked up off the ground.
+• Provided auto detection of the location of the reagent container in case it is moved during the execution of the script.
+• Added the decimal point to the displayed value of the Animal Taming and Animal Lore skill.
+• Complete documentation.
+
+[b]Features[/b]
+
+[u]Auto Tame Creatures[/u]
+
+When this box is checked, the script will find the animals that will give you the best gains and target the closest animal to your current location. If “Don’t Move Character” is unchecked the script will PathFind to the creature and attempt to tame while following it. The script will move as close to the creature as possible when your distance to the animal reaches a certain threshold, so taming hostile creatures may cause a problem using this option. Hostile creatures should be tamed using the “Manual Tame” button with “Auto Tame Creatures” unchecked, and “Don’t Move Character” checked.
+
+The script will tame any animal that will give you between a 10% and 90% success rate for the best gains. Skill data was retrieved from uo.stratics.com with the animal types added manually then compiled using Microsoft Excel. The portion of the script that determines which animals to tame was automatically generated using a VBScript on the Excel spreadsheet. 
+
+If you are unsuccessful at taming the animal, the script will repeatedly attempt to tame the animal until it’s successful or until you manually ignore the creature using the “Ignore Current” button. Certain scenarios prevent an animal from being tamed at a particular time and the script will ignore these creatures temporarily and will reattempt to tame them after 1 minute. This allows the script to move on to another nearby creature and come back to the problem creature later. The journal entries that cause the creature to get added to the "Retry Later" list are listed below: 
+
+• You can't see that. 
+• Someone else is already taming that creature. 
+• The animal is too angry to continue taming. 
+• The animal has been distracted, and you cannot continue taming.
+
+Once the creature is successfully tamed, it will either release the animal and optionally kill it, or have it follow you. The animal will then be completely ignored and will not tame it again unless you reset the ignore list with the “Reset Ignore” button.
+
+It is a good idea to turn off “Auto Tame Creatures” when taming in a hostile area or around other tamers.
+
+[u]Pickup Reagents[/u]
+
+This feature will pickup nearby mage reagents and place them into a container that you specify with the “Set Reagent Container” button. If this box is checked and the “Don’t Move Character” box is unchecked, the script will move your character to the closet reagent on the ground that it finds and move it to your container. If the “Don’t Move Character” box is checked, or you are currently taming an animal, it will pickup any reagents off the ground within reach (2 tiles).
+
+If the outer container is repositioned while the script is being run or the reagent container is moved within the outer container, the new location of your reagent container will be automatically detected so that the reagents can be dropped in the right location. The only requirement is that the reagent container remains in clear view at all times. If the reagent container has not been set or cannot be found in an open container, this option will be automatically disabled.
+
+[b]Release Option[/b]
+
+[u]Context Menu[/u]
+
+When this box is checked, the script will attempt to release the animal after it has been tamed by using the context menu options. This is, by far, the fastest method to release the animal, but it does have a nasty side effect if you happen to be standing in the wrong place at the wrong time. Since the script has to click on the animal to bring up the context menu, a retry may get interpreted as a double click by the client and if your character gets accidentally targeted, you can become dismounted. A third click would then cause the context menu of your mount to appear and then your bonded nightmare will become hostile. I have reduced the chances of this happening by comparing the location of the character in relation to the animal being released and making adjustments to compensate, although this is not 100% foolproof. It is best to use this feature with a mount that you are willing to do without.
+
+You should turn “Circle of Transparency” on to its highest setting when using this feature around buildings and obstacles. This option overrides the “Rename” feature if both boxes are checked. If neither the “Context Menu” nor the “Rename” option is checked, the script will issue an “All Follow Me” command once the animal has been tamed.
+
+[u]Rename[/u]
+
+When this box is checked, the script will attempt to rename the animal after it has been tamed, and then release it. This method is much slower than using the context menu, but the worst side effect is having your character status bar dragged to the center of the screen, or the script may get caught in a loop because something is blocking the cursor from dragging the status bar of your tamed animal. If the script gets caught in a loop trying to rename your creature, manually drag the creature to retrieve its status bar. The script will detect the presence of the status bar and continue to rename and release. This method can be used to fix a loop while using the “Context Menu” release option as well.
+
+You should turn “Circle of Transparency” on to its highest setting when using this feature around buildings and obstacles. The “Context Menu” option overrides this feature if both boxes are checked. If neither the “Context Menu” nor the “Rename” option is checked, the script will issue an “All Follow Me” command once the animal has been tamed.
+
+[u]Mage/Necro Kill[/u]
+
+When this box is checked, the script will attempt to kill the tamed animal using either the mage spell Flamestrike or the necromancy spell Pain Strike. The script will not attempt to kill the creature until it has been released using either the “Context Menu” or the “Rename” option. If you have at least 80 points in Evaluating Intelligence, the Flamestrike will be used to kill the creature. If you don’t have 80 points in Eval, but have 80 points in Necromancy, the Pain Strike will be used instead. The script will continue to cast the spell until the creature can no longer be found (usually because it’s dead), or you uncheck the “Mage/Necro Kill” option. If you do not have at least 80 points in either Eval or Necromancy, this option will automatically be disabled.
+
+If your mana drops below 50 you must have at least 50 points in Meditation for this option to continue. It will cast meditation every 11 seconds until your mana reaches 50.
+
+[b]Character Movement[/b]
+
+[u]Don’t Move Character[/u]
+
+When this box is checked, the script will not move your character except when attempting to target a creature to be released. This allows you to perform character movement manually while the script focuses on the taming and releasing of the animal. This can be useful for taming hostile creatures or temporarily overriding character movement to reset your starting location with the “Reset Start” button.
+
+[u]Return To Start[/u]
+
+When this box is checked, your character will return to the location where it was when you started the script. If the script is unable to PathFind to your starting location, this option will be automatically disabled. The starting location can be reset by using the “Reset Start” button.
+
+[b]Buttons[/b]
+
+[u]Manual Tame[/u]
+
+This button allows you to manually target any animal for the script to tame unless the creature has already been tamed and ignored. If you wish to manually target a creature that has already been tamed and ignored, you can use the “Reset Ignore” button to reset the ignore list.
+
+The “Manual Tame” feature can be used to be courteous around other tamers by not trying to tame their animal. This should be done with the “Auto Tame Creatures” option unchecked; however, the “Don’t Move Character” option may be left unchecked as well allowing the script to follow the creature that you target. These are the default settings which allow you to start the script while surrounded by other tamers without them even knowing that you’re running it.
+
+Hostile creatures such as dragons and nightmares can be tamed by using this feature in combination with “Don’t Move Character.” When taming hostile creatures, you will want to uncheck “Auto Tame Creatures,” “Context Menu,” and “Rename.” This will give you freedom to move your character about while the script handles the taming. You will need to move your character within 3 tiles of the hostile creature for the script to start to tame, but you can then move to a safe distance in taming range until the creature is tamed or another attempt needs to be made.
+
+[u]Reset Start[/u]
+
+If you have the “Return To Start” option checked, this button will allow you to reset the starting location to where you are currently standing. To move your starting point to a different location, check the “Don’t Move Character” box, move to the location where you want your character to return to, and then click the “Reset Start” button. The “Don’t Move Character” box can then be unchecked to allow the script to follow the animal being tamed, move to pickup nearby reagents, and return to your new starting location.
+
+[u]Ignore Current[/u]
+
+This button can be used to cancel the taming of the current animal and completely prevent it from being tamed by the script until the “Reset Ignore” button is pressed. This feature button does not work after the creature has already been tamed.
+
+[u]Reset Ignore[/u]
+
+This button resets the ignore list and allows any animal previously tamed and ignored by the script to be tamed again. This also allows animals to be tamed that have been ignored by the “Ignore Current” button.
+
+[u]Set Reagent Container[/u]
+
+This button allows you to target the container used to drop reagents found using the “Pickup Reagents” feature. This container should be located in the top level of your backpack and should remain in clear view at all times.
+
+[b]Known Issues[/b]
+
+• If you have your right mouse button down to move your character when the script begins to PathFind, your character may get stuck in follow cursor mode. To fix this, simply right click on the screen for the script to resume movement.
+• Not all animals have not been identified and some small animals will not target properly to be released. See the “Rename” option for a fix.
+
+[b]Credits[/b]
+
+The rename and release feature was inspired by RoadKill's subroutine. I have included a modified version clickScreenXYZ by ScriptFellow and GetYDisplacementForAnimType by RoadKill.
+
+
+[code];=========================================
+; Script Name: Uncle Dave's Tamer Plus
+; Author: Uncle Dave
+; Version: 4.2
+; Client Tested with: 4.0.9b
+; EUO version tested with: 1.42.00A3
+; Shard OSI / FS: OSI Tested Only
+; Revision Date: 3/24/2005
+; Public Release: 6/10/2004
+; Global Variables Used: None
+; Purpose: Finds animals that will give
+; you the best gains and tames the closest
+; animal to your current location.
+;=========================================[/code]

@@ -1,0 +1,355 @@
+;================================== 
+; Script Name: Peragrins UOAM Orespot Marker
+; Author: Peragrin
+; Version: 3.3
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 3/6/05
+; Public Release: 31/10/04
+; Purpose: To make a .MAP file for UOAM to mark the types of ore in a 8x8 spot
+; Revisions 
+;	3.3 Marks spot as soon as coloured ore is found, crafts pick when needed, better journal scans
+;	3.2 incorperates Roadkills getOSfilecmd sub
+;	3.1 Works on all facets now.
+;	3.0 Now targets spot to mine rather than just the square you are standing on
+;	2.0 Now fully automatic oretype discovery
+;	Utilises UOAM Ore Icons
+;============================================ 
+
+set %uoam_path D:\Games\Ultima~2\AutoMap\ores.map ; THIS IS AN EXAMPLE, SET TO YOUR OWN PATH\FILENAME
+if \ notin %uoam_path
+	{
+	display OK Path and filename not set.
+	halt
+	}
+set %mark_spot = NO
+set %coloureds DULL_COPPER_SHADOW_BRONZE_GOLDEN_AGAPITE_VERITE_VALORITE
+
+gosub setup
+gosub getOSfilecmd filecmd
+gosub showeuomenu1
+set #menubutton NULL
+	MAIN_LOOP:
+if #menubutton <> MARK
+	{
+	if #menubutton = CLOSED
+		halt
+	goto main_loop
+	}
+set #menubutton NULL
+gosub find_tile
+set %journal_start #jindex
+gosub mine
+if #result
+	{
+	gosub sort_ore
+	gosub write_to_file
+	}
+goto main_loop
+
+halt
+;==================
+;**
+;* @name GetOSFileCmd
+;* @ver 1.0 9May04
+;* @author  Roadkill
+;* @purpose check the OS and set @%1 to cmd.exe or command.exe if win98/2000xp
+;* @params %1 the varname to hold the return command
+;* @returns @%1   and #result hold cmd.exe for win2k and xp, or command.exe for 98/me
+;* @example call rksubs.txt GetOSFileCmd filecmd
+;* @status done
+sub GetOSFileCmd
+str Left #osver 1
+set % . %1 cmd.exe
+if #strRes = 1
+	set % . %1 command.com
+return % . %1
+;===============================================================================
+sub write_to_file
+set %x #ltargetx
+set %x %x / 8
+set %x %x * 8
+set %x %x + 4
+set %y #ltargety
+set %y %y / 8
+set %y %y * 8
+set %y %y + 4
+set %facet #curskind + 1
+execute %filecmd /c echo + , %ore , : , #spc , %x , #spc , %y , #spc , %facet , #spc , %ore >> %uoam_path
+return
+;===============================================================================
+sub sort_ore
+
+set %ore IRON
+if DULL in %journal
+	set %ore Dull , #spc , Copper
+if COPPER in %journal && DULL notin %journal
+	set %ore COPPER
+if SHADOW in %journal
+	set %ore SHADOW , #spc , IRON
+if GOLDEN in %journal
+	set %ore GOLDEN
+if BRONZE in %journal
+	set %ore BRONZE
+if AGAPITE in %journal
+	set %ore AGAPITE
+if VERITE in %journal
+	set %ore VERITE
+if VALORITE in %journal
+	set %ore VALORITE
+return
+;===============================================================================
+sub mine
+_MINE:
+finditem %mining_tool C_ , %pack
+if #findkind = -1
+	{
+	gosub craft_mining_tool
+	}
+set #lobjectid #findid
+event macro 17 0
+target
+set %jindex #jindex
+event macro 22 0
+for %t 1 5
+	{
+	for %line %jindex #jindex
+		{
+		scanjournal %line
+		wait 5
+		if COPPER in #journal || SHADOW in #journal || VALORITE in #journal || VERITE in #journal || GOLDEN in #journal || BRONZE in #journal || AGAPITE in #journal
+			{
+			set %journal #journal
+			return #true
+			}
+		if YOU_DIG_SOME in #journal || YOU_LOOSEN_SOME in #journal
+			goto _mine
+		if BACKPACK_IS_FULL in #journal
+			{
+			display OK Empty pack and unpause
+			pause
+			goto _mine
+			}
+		if CANNOT in #journal || TOO_FAR in #journal || THERE_IS_NO_METAL in #journal
+			return #false
+		}
+	wait 1s
+	}
+goto _mine
+;===============================================================================
+sub setup
+
+_REOPEN_PACK:
+Event macro 8 7
+_WAIT_FOR_PACK_TO_OPEN:
+if #contid <> #backpackid
+	{
+	if YOU_MUST_WAIT in #sysmsg
+		goto _reopen_pack
+	goto _wait_for_pack_to_open
+	}
+contpos 617 226
+set %pack #contid
+set %mining_tool QPF_WWF
+return
+;===============================================================================
+sub craft_mining_tool
+_make_pick:
+finditem %mining_tool C_ , #backpackid
+if #findkind = -1
+{
+	gosub craft KTL 2 2 6
+	goto _make_pick 
+}
+return
+;================================================================================
+sub find_tile
+finditem %mining_tool C_ , %pack
+if #findkind = -1
+	{
+	gosub craft_mining_tool
+	}
+set #lobjectid #findid
+event macro 17 0
+event sysmessage Target the orespot.
+_TARGET_AREA:
+if #targcurs = 1
+	goto _target_area
+return
+;==================================================================================
+;--------- EasyUO Menu Designer Code Begin ---------
+sub showEUOMenu1
+	menu Clear
+	menu Window Title Orespot Marker
+	menu Window Color BtnFace
+	menu Window Size 146 45
+	menu Font Transparent #true
+	menu Font Align Right
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Style
+	menu Font Color WindowText
+	menu Button Mark 10 10 125 25 Mark spot
+	menu Show 421 270
+return
+;--------- EasyUO Menu Designer Code End ---------
+sub craft
+;%0 - 1
+;%1 - tool type to use / Make_last
+;%2 - catagory of item to make
+;%3 - page of item to make
+;%4 - item number in list to make
+;%5 - material to use (optional, if blank then last material is used.)
+;Purpose to make items from the crafting menu
+namespace local craft_sub
+set !tool %1
+set !catagory %2
+set !page %3
+set !item %4
+set !material %5
+set !gump_size 530_437
+set !make_last #false
+if %0 = 2 && %2 = MAKE_LAST
+{
+	set !make_last #true
+}
+if %0 = 1 && %1 <> MAKE_LAST
+{
+	display OK Error in craft sub, incorrect arguments passed.
+	halt
+}
+finditem !tool C_ , #backpackid
+if #findkind = -1
+{
+	display OK Error in Crafting sub, tool not found
+	halt
+}
+set #lobjectid #findid
+_OPEN_CRAFTING_GUMP:
+event macro 17 0
+gosub wait_for_variable CONTSIZE !gump_size 5 continue
+if ! #result
+	goto open_crafting_gump
+if !make_last
+{
+	set %x #contposx + 283
+	set %y #contposy + 412
+	click %x %y f
+	wait 10
+	gosub wait_for_variable CONTSIZE !gump_size 5 continue
+	if ! #result
+		return #false
+	set %x #contposx + 29
+	set %y #contposy + 414
+	click %x %y f
+	return #true
+}
+if !material <> N/A
+{
+	gosub change_material
+}
+_CHANGE_CATAGORY:
+set %x #contposx + 28
+set %y #contposy + 70
+set %tmp 20 * !catagory
+set %y %y + %tmp
+click %x %y f
+wait 10
+gosub wait_for_variable CONTSIZE !gump_size 5 continue
+if ! #result
+	goto _change_catagory
+_CHANGE_PAGE:
+if !page = 1
+	goto _select_item
+set %x #contposx + 383
+set %y #contposy + 272
+for !1 2 !page
+{
+	click %x %y f
+	wait 5
+}
+_SELECT_ITEM:
+set %x #contposx + 233
+set %y #contposy + 50
+set %tmp 20 * !item
+set %y %y + %tmp
+click %x %y f
+wait 10
+gosub wait_for_variable CONTSIZE !gump_size 5 continue
+if ! #result
+	return #false
+set %x #contposx + 29
+set %y #contposy + 414
+click %x %y f
+return #true
+;=================================
+sub change_material
+set %x #contposx + 28
+set %y #contposy + 374
+_CHANGE_MATERIAL:
+click %x %y f
+wait 5
+gosub wait_for_variable CONTSIZE !gump_size 5 continue
+if ! #result
+	goto _change_material
+set %x #contposx + 232
+set %y #contposy + 48
+set %tmp 20 * !material
+set %y %y + %tmp
+_CLICK_MATERIAL:
+click %x %y f
+wait 5
+gosub wait_for_variable CONTSIZE !gump_size 5 continue
+if ! #result
+	goto _click_material
+return
+;==================================
+
+
+
+
+
+
+
+
+
+
+;==================================
+sub wait_for_variable
+;%0 - 4
+;%1 - variable name
+;%2 - value to wait for
+;%3 - timeout in seconds
+;%4 - response on failure
+if %0 <> 4
+{
+	display OK Error in WAIT_FOR_VARIABLE subroutine, incorrect number of arguments passed.
+	halt
+}
+set %timeout #scnt + %3
+_WAIT_FOR_VARIABLE:
+if #scnt => %timeout
+{
+	goto _wait_for_variable_timedout
+}
+if # . %1 <> %2
+{
+	goto _wait_for_variable
+}
+return #true
+_WAIT_FOR_VARIABLE_TIMEDOUT:
+if %4 = HALT || %4 = STOP
+{
+	halt
+}
+if %4 = CONTINUE
+{
+	return #false
+}
+else
+{
+	display OK WAIT_FOR_VARIABLE subroutine paused, # , %1 did not equal %2 within %3 seconds.
+	pause
+	return #false
+}

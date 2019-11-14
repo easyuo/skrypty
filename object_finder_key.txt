@@ -1,0 +1,22 @@
+    loop:
+    onhotkey F11
+    gosub findid
+    goto loop
+    sub findid
+    set #targcurs 1
+    while #targcurs = 1
+          {
+          wait 5
+          }
+    set  %finditem #ltargetid
+    finditem %finditem
+    set %findtype #findtype
+    event Property #findID
+    event sysmessage #property
+    event exmsg #charid 3 30 Type: #findtype
+    event exmsg #charid 3 30 ID: #findid
+    event exmsg #charid 3 30 REP: #findrep
+    event exmsg #charid 3 30 COL: #findcol
+    event exmsg #charid 3 30 Czas: #scnt
+
+    return

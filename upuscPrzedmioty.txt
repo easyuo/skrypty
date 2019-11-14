@@ -1,0 +1,69 @@
+set %mapy 0
+set %ruda 1
+set %inne 1
+set %zostawiac_wyjatki 1
+
+set %upuscID 0
+
+set %mapy 1
+set %mapaID RVH_KEG
+set %mapaKoloryDoUpuszczenia 995_444 ; Kolory map do upuszczenia
+
+set %rudaID DWJ_CNF_NYD_IEG_XCG_XRD_RQF_WSF_KAG_ENK
+set %inneID KAG_ENK
+; TVH - Kalendarze
+;set %rudaID TLH
+ignoreItem reset *
+
+loop:
+
+if %ruda = 1
+{
+FindItem %rudaID C_ , #BackPackID
+      if #FindKind <> -1
+      {
+            set %upuscID #FindID
+            if %zostawiac_wyjatki = 1
+            {
+             event Property %upuscID
+             str Pos #property wyjatkowej
+             
+             ; Jezeli nie jest wyjatekiem upuszczam
+             if #strRes = 0
+              gosub upusc
+              event sysmessage Upuszczam: #property
+             else
+              {
+               event sysmessage Nie upuszczam wyjatku: #property
+               ignoreItem %upuscID
+              }
+            }
+            else
+             gosub upusc
+
+      }
+}
+
+FindItem %mapaID C_ , #BackPackID
+for #FindIndex 1 #FindCNT
+{
+         if #FindCol in %mapaKoloryDoUpuszczenia
+         {
+          event sysmessage Upuszczam niepotrzebna mape.
+          set %upuscID #FindID
+          gosub upusc
+         }
+}
+goto loop
+
+sub upusc
+ event macro 1 0 .upusc
+ target
+ set #LTargetID %upuscID
+ set #LTargetKind 1
+ event macro 22 0
+return
+
+
+
+return

@@ -1,0 +1,99 @@
+set %jrnl #jindex
+
+while #true
+   {
+   if #jindex > %jrnl
+      {
+      set %jrnl %jrnl + 1
+      scanjournal %jrnl
+      
+      ; Animals that you have been tasked to find by the Zoo Keeper
+      if Albino_Wyrm in #journal
+         gosub found
+
+      if Arctic_Wolf in #journal
+         gosub found
+
+      if Black_Sheep in #journal
+         gosub found
+
+      if Bloodthirsty_Bull in #journal
+         gosub found
+
+      if Crimson_Drake in #journal
+         gosub found
+
+      if Crocodile in #journal
+         gosub found
+
+      if Dark_Wolf in #journal
+         gosub found
+
+      if Flying_Monkey in #journal
+         gosub found
+
+      if Frost_Bear in #journal
+         gosub found
+
+      if Gilded_Dragon in #journal
+         gosub found
+
+      if Hypno_Toad in #journal
+         gosub found
+
+      if jwilson in #journal
+         gosub found
+
+      if King_Scorpion in #journal
+         gosub found
+
+      if Mad_Cow in #journal
+         gosub found
+
+      if Majestic_Hart in #journal
+         gosub found
+
+      if Raging_Grizzly_Bear in #journal
+         gosub found
+
+      if Ram in #journal
+         gosub found
+
+      if RattleSnake in #journal
+         gosub found
+
+      if Savage_Ostard in #journal
+         gosub found
+
+      if Sewer_Rat in #journal
+         gosub found
+
+      if Silverback_Gorilla in #journal
+         gosub found
+
+      if Snow_Jaguar in #journal
+         gosub found
+
+      if Wild_Boar in #journal
+         gosub found
+         
+      if Golden_Dragon in #journal
+         gosub found
+
+      }
+   }
+
+
+sub found
+;    display ok ZWIERZAK!
+;    event macro 1 0 Finally I have found You!
+    event exmsg #CHARID 3 30 ZOO QUEST!
+    wait 1s
+    event exmsg #CHARID 3 30 ZOO QUEST!
+    wait 1s
+
+;    wait 1s
+;    event macro 1 0 Finally I have found You!
+;    wait 1s
+
+return

@@ -45,6 +45,6 @@
          set #ltargetid %pet
          wait 10
          event macro 22 0
-         wait 3s
+         wait 10s
          set %creature false
     goto fighting
