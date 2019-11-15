@@ -372,12 +372,12 @@ sub TamingCheckSkill
     if %tameskill >= 796 && %tameskill < 831
        set %tameable XF_BE_AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
     if %tameskill >= 831
+    set %tameable YE_YF_YG_XG_AF_AH_HG_RD_NF_BE_GO_WC_RF_AG_KB_WG_IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_VF_DG_LD_BK_CB_FN_GE_HD_IH_JD_KD_KG_L_M_MHB_OH_QE_QF_SD_UE_UF_VD_W_WF_XE_ZD_ZE_ZI_XD_UB
 ; set %tameable LD_XF_BE_AF_AH_BG_BK_CB_DG_EG_FN_GE_HD_IH_JD_JG_KD_KG_L_M_MG_MHB_OF_OH_PG_QE_QF_RF_SD_TC_TG_UE_UF_VD_VF_W_WF_XE_XG_YE_YF_YG_ZD_ZE_ZI_
 ; TG - hind usuniete
-;    set %tameable YE_YF_YG_XG_AF_AH_HG_RD_NF_BE_GO_WC_RF_AG_KB_WG_IG_NG_ZF_JF_TF_PF_TC_BB_TG_VE_PG_CO_CG_JG_ZGB_XF_SF_MG_SG_OF_BO_WN_EG_QC_BG_VF_DG_LD_BK_CB_FN_GE_HD_IH_JD_KD_KG_L_M_MHB_OH_QE_QF_SD_UE_UF_VD_W_WF_XE_ZD_ZE_ZI_XD_UB
 
 ;    set %tameable AH_YG_XG_UF_RD_TF_PF_WF_FG_
-    set %tameable YG_XG
+;    set %tameable YG_XG
 
 ; ZOO Quest animals
 ; Great Hart          59.1     64    1	04   N   AH
