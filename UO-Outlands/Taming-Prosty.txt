@@ -152,5 +152,5 @@ sub Kill
   finditem %target_id
  }
  msg all guard me$
- key F9
+; key F9
 return
