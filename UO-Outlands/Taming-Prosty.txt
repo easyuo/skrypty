@@ -1,0 +1,156 @@
+                                                                                               set %jrnl #jindex
+set %tame #false
+set %taming #false
+set %followers #FOLLOWERS
+set %target_id X
+set %target_type EF ; EF - Wispy , ustaw X zeby wskazac na poczatku
+
+;User #true #false
+set %typeTame #true
+set %petName k
+set %release #true
+set %kill #true
+set %follow #true
+;------------------------
+
+
+begin:
+ ;getting target
+ if %target_id = X
+ {
+  set #targCurs 1
+  targLoop:
+  if #targCurs = 1
+   goto targLoop
+  finditem #LTARGETID
+ }
+ else
+ {
+  finditem %target_type
+ }
+
+ ;target handler
+ if #FINDID = X
+  goto targLoop
+ set %target_id #FINDID
+ set %target_type #FINDTYPE
+ set #LTARGETID #FINDID
+ set %tame #true
+
+
+ ;taming loop
+ while %tame
+ {
+  gosub EventHandler
+  if %follow
+   gosub Moving 2
+  gosub Taming
+ }
+
+;loop
+goto begin
+
+
+sub EventHandler
+ if #FOLLOWERS > %followers
+ {
+  if %release
+   gosub petRelease
+  if %kill
+   gosub Kill
+  set %tame #false
+  set %taming #false
+ }
+
+ while #jindex > %jrnl
+ {
+  set %jrnl %jrnl + 1
+  scanjournal %jrnl
+
+  if Can't_get_there in #journal
+  {
+   set %tame #false
+   ignoreitem %target_id
+  }
+
+  if You_fail_to_tame in #journal
+   set %taming #false
+
+  if That_is_too_far_away = #journal
+   set %taming #false
+
+  if is_too_angry in #journal
+   set %taming #false
+
+  if You_start_to_tame in #journal
+   set %taming #true
+
+  if looks_tame_already in #journal
+   ignoreitem %target_id
+
+  if do_not_have_a_clear_path in #journal
+   set %taming #false
+ }
+return
+
+
+sub Moving
+ if %tame = #false
+  return
+ finditem %target_id
+ if #FINDX - #CHARPOSX > %1 || #FINDX - #CHARPOSX < %1 * -1
+  event PathFind #FINDX #FINDY
+ else
+  if #FINDY - #CHARPOSY > %1 || #FINDY - #CHARPOSY < %1 * -1
+   event PathFind #FINDX #FINDY
+return
+
+
+sub Taming
+ if %tame = #false
+  return
+ if %taming
+  return
+ event macro 13 35
+ target 3s
+ event macro 22 0
+return
+                      130 230
+
+sub petRelease
+ Exevent RenamePet #LTARGETID %petName
+; ignoreitem #LTARGETID
+ msg %petName release$
+ wait 1s
+ set %x 80 + #CONTPOSX
+ set %y 180 + #CONTPOSY
+ click %x %y
+ wait 2s
+ msg all guard me$
+return
+
+
+sub Kill
+ finditem %target_id
+ set #LTARGETID #FINDID
+ ;~virtue + all kill
+ if #FINDID <> X
+ {
+  event macro 49 1
+  target 3s
+  event macro 22 0
+  msg all kill$
+  target 3s
+  event macro 22 0
+ }
+ ;~
+ while #FINDID <> X
+ {
+  gosub moving 1
+  event macro 27 0
+  wait 1s
+  finditem %target_id
+ }
+ msg all guard me$
+ key F9
+return
