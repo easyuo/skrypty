@@ -1,11 +1,11 @@
 	;=========================================
-; Script Name: Uncle Dave's Tamer Plus
-; Author: Uncle Dave
-; Version: 4.2
+; Script Name: Krowa's Tamer Plus
+; Author: Uncle Dave && Krowa
+; Version: 4.3
 ; Client Tested with: 4.0.9b
 ; EUO version tested with: 1.42.00A3
-; Shard OSI / FS: OSI Tested Only
-; Revision Date: 3/24/2005
+; Shard OSI / FS: UO Outlands
+; Revision Date: 12/17/2019
 ; Public Release: 6/10/2004
 ; Global Variables Used: None
 ; Purpose: Finds animals that will give
